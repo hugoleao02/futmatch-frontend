@@ -6,7 +6,6 @@ import {
   Button,
   Grid,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Paper,
@@ -43,7 +42,6 @@ const CriarSala: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({

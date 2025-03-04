@@ -10,6 +10,7 @@ export default {
     learnMore: "Saiba mais",
     viewAll: "Ver todos",
     join: "Participar",
+    searchPlaceholder: "Buscar partidas, jogadores...",
   },
   navigation: {
     home: "Início",

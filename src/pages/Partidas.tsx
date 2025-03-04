@@ -32,6 +32,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import { useTranslation } from "react-i18next";
 
 // Dados mockados para o MVP
 const mockPartidas = [
@@ -88,6 +89,7 @@ const Partidas: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+  const { t } = useTranslation();
 
   const handleNivelChange = (event: any) => {
     setNivel(event.target.value);
@@ -215,7 +217,7 @@ const Partidas: React.FC = () => {
             <Grid item xs={12} sm={7} md={8}>
               <TextField
                 fullWidth
-                placeholder="Buscar partidas por nome ou local"
+                placeholder={t("matches.search")}
                 variant="outlined"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
