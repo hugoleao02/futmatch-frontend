@@ -69,13 +69,21 @@ const Login: React.FC = () => {
   ) => {
     try {
       setError("");
+      console.log("Iniciando login com valores:", values);
+      console.log("Token antes do login:", localStorage.getItem("token"));
+
       await login(values);
+
+      console.log("Login realizado com sucesso");
+      console.log("Token após login:", localStorage.getItem("token"));
 
       // Redireciona para a página anterior ou para a home
       const state = location.state as LocationState;
       const from = state?.from?.pathname || "/";
+      console.log("Redirecionando para:", from);
       navigate(from, { replace: true });
-    } catch {
+    } catch (error) {
+      console.error("Erro durante o login:", error);
       setError(t("auth.errors.invalidCredentials"));
     } finally {
       setSubmitting(false);

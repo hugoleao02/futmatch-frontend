@@ -36,11 +36,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (credentials: LoginDTO) => {
     try {
       console.log("Fazendo login com:", credentials);
+      console.log("Token antes do login:", localStorage.getItem("token"));
+
       const token = await authService.login(credentials);
       console.log("Token recebido:", token);
+
       if (token) {
+        // Garantir que o token seja salvo no localStorage
         localStorage.setItem("token", token);
+        console.log(
+          "Token salvo no localStorage:",
+          localStorage.getItem("token")
+        );
+
+        // Verificar se o token foi realmente salvo
+        const savedToken = localStorage.getItem("token");
+        if (!savedToken) {
+          console.error("Falha ao salvar token no localStorage!");
+          // Tentar novamente
+          localStorage.setItem("token", token);
+          console.log(
+            "Segunda tentativa de salvar token:",
+            localStorage.getItem("token")
+          );
+        }
+
         await loadUser();
+      } else {
+        console.error("Token não recebido do servidor");
       }
     } catch (error) {
       console.error("Erro no login:", error);
@@ -64,7 +87,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    console.log("Realizando logout...");
+    console.log("Token antes do logout:", localStorage.getItem("token"));
+
+    try {
+      // Chamar o método de logout do serviço de autenticação
+      authService.logout();
+
+      // Garantir que o token seja removido do localStorage
+      localStorage.removeItem("token");
+      console.log("Token após logout:", localStorage.getItem("token"));
+
+      // Verificar se o token foi realmente removido
+      const token = localStorage.getItem("token");
+      if (token) {
+        console.error("Falha ao remover token do localStorage!");
+        // Tentar novamente
+        localStorage.removeItem("token");
+        console.log(
+          "Segunda tentativa de remover token:",
+          localStorage.getItem("token")
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao realizar logout:", error);
+    }
+
+    // Limpar o estado do usuário
     setUser(null);
   };
 

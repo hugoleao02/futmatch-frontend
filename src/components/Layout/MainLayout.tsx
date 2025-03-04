@@ -66,7 +66,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const handleLogout = () => {
+    console.log("Token antes do logout:", localStorage.getItem("token"));
+    console.log("Usuário antes do logout:", user);
+
     logout();
+
+    console.log("Token após logout:", localStorage.getItem("token"));
+    console.log("Usuário após logout:", user);
+
     navigate("/login");
     setLogoutDialogOpen(false);
     if (isMobile) {
@@ -415,38 +422,72 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               >
                 {t("navigation.matches")}
               </Button>
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/perfil"
-                sx={{
-                  mx: 1,
-                  opacity: isActive("/perfil") ? 1 : 0.8,
-                  fontWeight: isActive("/perfil") ? "bold" : "medium",
-                  "&:hover": { opacity: 1 },
-                }}
-              >
-                {t("navigation.profile")}
-              </Button>
-
-              <Tooltip title={t("navigation.notifications")}>
-                <IconButton color="inherit" sx={{ ml: 1 }}>
-                  <Badge badgeContent={3} color="secondary">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
 
               {user && (
-                <Tooltip title={t("navigation.logout")}>
-                  <IconButton
+                <>
+                  <Button
                     color="inherit"
-                    onClick={handleLogoutClick}
-                    sx={{ ml: 1 }}
+                    component={RouterLink}
+                    to="/perfil"
+                    sx={{
+                      mx: 1,
+                      opacity: isActive("/perfil") ? 1 : 0.8,
+                      fontWeight: isActive("/perfil") ? "bold" : "medium",
+                      "&:hover": { opacity: 1 },
+                    }}
                   >
-                    <LogoutIcon />
-                  </IconButton>
-                </Tooltip>
+                    {t("navigation.profile")}
+                  </Button>
+
+                  <Tooltip title={t("navigation.notifications")}>
+                    <IconButton color="inherit" sx={{ ml: 1 }}>
+                      <Badge badgeContent={3} color="secondary">
+                        <NotificationsIcon />
+                      </Badge>
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title={t("navigation.logout")}>
+                    <IconButton
+                      color="inherit"
+                      onClick={handleLogoutClick}
+                      sx={{ ml: 1 }}
+                    >
+                      <LogoutIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+
+              {!user && (
+                <>
+                  <Button
+                    color="inherit"
+                    component={RouterLink}
+                    to="/login"
+                    sx={{
+                      mx: 1,
+                      opacity: isActive("/login") ? 1 : 0.8,
+                      fontWeight: isActive("/login") ? "bold" : "medium",
+                      "&:hover": { opacity: 1 },
+                    }}
+                  >
+                    {t("auth.login.title")}
+                  </Button>
+                  <Button
+                    color="inherit"
+                    component={RouterLink}
+                    to="/register"
+                    sx={{
+                      mx: 1,
+                      opacity: isActive("/register") ? 1 : 0.8,
+                      fontWeight: isActive("/register") ? "bold" : "medium",
+                      "&:hover": { opacity: 1 },
+                    }}
+                  >
+                    {t("auth.register.title")}
+                  </Button>
+                </>
               )}
 
               <FormControl sx={{ ml: 2, minWidth: 120 }}>
@@ -541,14 +582,18 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   </Button>
 
                   <Button
+                    variant="outlined"
                     color="inherit"
                     component={RouterLink}
                     to="/register"
                     sx={{
                       mx: 1,
-                      opacity: isActive("/register") ? 1 : 0.8,
-                      fontWeight: isActive("/register") ? "bold" : "medium",
-                      "&:hover": { opacity: 1 },
+                      borderRadius: 2,
+                      borderColor: alpha("#fff", 0.5),
+                      "&:hover": {
+                        borderColor: "white",
+                        bgcolor: alpha("#fff", 0.1),
+                      },
                     }}
                   >
                     {t("auth.register.title")}
