@@ -26,6 +26,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import Logo from "../components/common/Logo";
+import { getToken } from "../services/tokenService";
 
 interface LocationState {
   message?: string;
@@ -70,12 +71,30 @@ const Login: React.FC = () => {
     try {
       setError("");
       console.log("Iniciando login com valores:", values);
-      console.log("Token antes do login:", localStorage.getItem("token"));
+      console.log("Token antes do login:", getToken());
 
       await login(values);
 
       console.log("Login realizado com sucesso");
-      console.log("Token após login:", localStorage.getItem("token"));
+      console.log("Token após login (imediato):", getToken());
+
+      // Verificar o token após um pequeno atraso
+      setTimeout(() => {
+        console.log("Token após login (com delay):", getToken());
+
+        // Tentar salvar novamente o token diretamente
+        const tokenAtual = getToken();
+        if (!tokenAtual) {
+          console.log("Tentando salvar token diretamente da página de login");
+          // Tentar obter o token de alguma forma e salvá-lo
+          // Esta é uma solução temporária para diagnóstico
+          window.sessionStorage.setItem("tokenBackup", "token_teste_login");
+          console.log(
+            "Token de backup salvo em sessionStorage:",
+            window.sessionStorage.getItem("tokenBackup")
+          );
+        }
+      }, 500);
 
       // Redireciona para a página anterior ou para a home
       const state = location.state as LocationState;
