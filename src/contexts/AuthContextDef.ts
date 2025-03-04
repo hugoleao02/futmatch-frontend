@@ -7,6 +7,7 @@ interface AuthContextType {
   login: (credentials: LoginDTO) => Promise<void>;
   register: (userData: CriarJogadorDTO) => Promise<Jogador>;
   logout: () => void;
+  loadUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

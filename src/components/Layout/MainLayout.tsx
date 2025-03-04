@@ -43,6 +43,7 @@ import { useAuth } from "../../hooks/useAuth";
 import Logo from "../common/Logo";
 import LogoutDialog from "../common/LogoutDialog";
 import { useSnackbar } from "notistack";
+
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();

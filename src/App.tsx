@@ -17,6 +17,16 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { useAuth } from "./hooks/useAuth";
+
+// Componente para verificar autenticação no layout principal
+const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { user } = useAuth();
+
+  return <MainLayout>{children}</MainLayout>;
+};
 
 const App: React.FC = () => {
   return (
@@ -25,10 +35,9 @@ const App: React.FC = () => {
       <AuthProvider>
         <Router>
           <Routes>
+            {/* Rotas públicas */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-
-            {/* Rota pública para a Home */}
             <Route
               path="/"
               element={
