@@ -71,6 +71,7 @@ export default {
     statistics: "Estatísticas",
     performance: "Desempenho",
     lastMatches: "Últimas Partidas",
+    notLoggedIn: "Você precisa estar logado para ver seu perfil.",
     stats: {
       matchesPlayed: "Partidas Jogadas",
       matchesOrganized: "Partidas Organizadas",

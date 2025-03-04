@@ -10,21 +10,23 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Skeleton,
+  Alert,
 } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import StarIcon from "@mui/icons-material/Star";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PersonIcon from "@mui/icons-material/Person";
+import { useAuth } from "../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 
-// Dados mockados para o MVP
-const mockPerfil = {
-  nome: "João Silva",
-  nivel: "Intermediário",
+// Dados mockados para complementar os dados do usuário
+const mockDadosComplementares = {
+  cidade: "São Paulo",
   partidasJogadas: 25,
   partidasOrganizadas: 5,
   avaliacao: 4.5,
-  cidade: "São Paulo",
-  posicaoPreferida: "Meia",
   estatisticas: {
     gols: 12,
     assistencias: 8,
@@ -47,9 +49,48 @@ const mockPerfil = {
 };
 
 const Perfil: React.FC = () => {
+  const { user } = useAuth();
+  const { t } = useTranslation();
+
+  if (!user) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="info">
+          {t(
+            "profile.notLoggedIn",
+            "Você precisa estar logado para ver seu perfil."
+          )}
+        </Alert>
+      </Box>
+    );
+  }
+
+  // Mapeamento de posições para exibição
+  const getPosicaoLabel = (posicao?: string) => {
+    if (!posicao) return "Não definida";
+
+    const posicoes: Record<string, string> = {
+      GOLEIRO: "Goleiro",
+      ZAGUEIRO: "Zagueiro",
+      LATERAL: "Lateral",
+      VOLANTE: "Volante",
+      MEIA: "Meia",
+      ATACANTE: "Atacante",
+    };
+
+    return posicoes[posicao] || posicao;
+  };
+
+  // Nível baseado na pontuação
+  const getNivel = (nivelHabilidade: number) => {
+    if (nivelHabilidade < 3) return "Iniciante";
+    if (nivelHabilidade < 7) return "Intermediário";
+    return "Avançado";
+  };
+
   return (
     <Box>
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: 3 }}>
         <Grid container spacing={3} alignItems="center">
           <Grid item xs={12} md={3} sx={{ textAlign: "center" }}>
             <Avatar
@@ -58,25 +99,47 @@ const Perfil: React.FC = () => {
                 height: 120,
                 margin: "0 auto",
                 bgcolor: "primary.main",
+                boxShadow: 2,
               }}
             >
-              <Typography variant="h4">{mockPerfil.nome.charAt(0)}</Typography>
+              <Typography variant="h4">
+                {user.apelido.charAt(0).toUpperCase()}
+              </Typography>
             </Avatar>
           </Grid>
           <Grid item xs={12} md={9}>
-            <Typography variant="h4" gutterBottom>
-              {mockPerfil.nome}
+            <Typography variant="h4" gutterBottom fontWeight="bold">
+              {user.apelido}
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-              <Chip label={mockPerfil.nivel} color="primary" size="small" />
+            <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+              <Chip
+                label={getNivel(user.nivelHabilidade)}
+                color="primary"
+                size="small"
+                sx={{ borderRadius: 2 }}
+              />
               <Chip
                 icon={<LocationOnIcon />}
-                label={mockPerfil.cidade}
+                label={mockDadosComplementares.cidade}
                 size="small"
+                sx={{ borderRadius: 2 }}
               />
+              {user.isPremium && (
+                <Chip
+                  icon={<StarIcon />}
+                  label="Premium"
+                  color="secondary"
+                  size="small"
+                  sx={{ borderRadius: 2 }}
+                />
+              )}
             </Box>
             <Typography variant="body1" color="text.secondary">
-              Posição preferida: {mockPerfil.posicaoPreferida}
+              <strong>Posição preferida:</strong>{" "}
+              {getPosicaoLabel(user.posicao)}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              <strong>Email:</strong> {user.email}
             </Typography>
           </Grid>
         </Grid>
@@ -84,31 +147,37 @@ const Perfil: React.FC = () => {
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, height: "100%" }}>
-            <Typography variant="h6" gutterBottom>
-              Estatísticas
+          <Paper sx={{ p: 3, height: "100%", borderRadius: 3, boxShadow: 2 }}>
+            <Typography variant="h6" gutterBottom fontWeight="bold">
+              {t("profile.statistics")}
             </Typography>
             <List>
               <ListItem>
                 <ListItemText
-                  primary="Partidas Jogadas"
-                  secondary={mockPerfil.partidasJogadas}
-                  secondaryTypographyProps={{ color: "primary" }}
+                  primary={t("profile.stats.matchesPlayed")}
+                  secondary={mockDadosComplementares.partidasJogadas}
+                  secondaryTypographyProps={{
+                    color: "primary",
+                    fontWeight: "bold",
+                  }}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary="Partidas Organizadas"
-                  secondary={mockPerfil.partidasOrganizadas}
-                  secondaryTypographyProps={{ color: "primary" }}
+                  primary={t("profile.stats.matchesOrganized")}
+                  secondary={mockDadosComplementares.partidasOrganizadas}
+                  secondaryTypographyProps={{
+                    color: "primary",
+                    fontWeight: "bold",
+                  }}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary="Avaliação Média"
+                  primary={t("profile.stats.averageRating")}
                   secondary={
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      {mockPerfil.avaliacao}
+                      {mockDadosComplementares.avaliacao}
                       <StarIcon sx={{ color: "warning.main", ml: 0.5 }} />
                     </Box>
                   }
@@ -119,31 +188,37 @@ const Perfil: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, height: "100%" }}>
-            <Typography variant="h6" gutterBottom>
-              Desempenho
+          <Paper sx={{ p: 3, height: "100%", borderRadius: 3, boxShadow: 2 }}>
+            <Typography variant="h6" gutterBottom fontWeight="bold">
+              {t("profile.performance")}
             </Typography>
             <List>
               <ListItem>
                 <ListItemText
-                  primary="Gols"
-                  secondary={mockPerfil.estatisticas.gols}
-                  secondaryTypographyProps={{ color: "primary" }}
+                  primary={t("profile.stats.goals")}
+                  secondary={mockDadosComplementares.estatisticas.gols}
+                  secondaryTypographyProps={{
+                    color: "primary",
+                    fontWeight: "bold",
+                  }}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary="Assistências"
-                  secondary={mockPerfil.estatisticas.assistencias}
-                  secondaryTypographyProps={{ color: "primary" }}
+                  primary={t("profile.stats.assists")}
+                  secondary={mockDadosComplementares.estatisticas.assistencias}
+                  secondaryTypographyProps={{
+                    color: "primary",
+                    fontWeight: "bold",
+                  }}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary="Fair Play"
+                  primary={t("profile.stats.fairPlay")}
                   secondary={
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      {mockPerfil.estatisticas.fairPlay}
+                      {user.pontuacaoFairPlay}
                       <StarIcon sx={{ color: "warning.main", ml: 0.5 }} />
                     </Box>
                   }
@@ -154,12 +229,12 @@ const Perfil: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, height: "100%" }}>
-            <Typography variant="h6" gutterBottom>
-              Últimas Partidas
+          <Paper sx={{ p: 3, height: "100%", borderRadius: 3, boxShadow: 2 }}>
+            <Typography variant="h6" gutterBottom fontWeight="bold">
+              {t("profile.lastMatches")}
             </Typography>
             <List>
-              {mockPerfil.ultimasPartidas.map((partida, index) => (
+              {mockDadosComplementares.ultimasPartidas.map((partida, index) => (
                 <React.Fragment key={index}>
                   <ListItem>
                     <ListItemText
@@ -181,10 +256,12 @@ const Perfil: React.FC = () => {
                               color={
                                 partida.resultado === "Vitória"
                                   ? "success"
+                                  : partida.resultado === "Derrota"
+                                  ? "error"
                                   : "default"
                               }
                               size="small"
-                              sx={{ mr: 1 }}
+                              sx={{ mr: 1, borderRadius: 2 }}
                             />
                             <StarIcon
                               sx={{ color: "warning.main", fontSize: 16 }}
@@ -197,7 +274,10 @@ const Perfil: React.FC = () => {
                       }
                     />
                   </ListItem>
-                  {index < mockPerfil.ultimasPartidas.length - 1 && <Divider />}
+                  {index <
+                    mockDadosComplementares.ultimasPartidas.length - 1 && (
+                    <Divider />
+                  )}
                 </React.Fragment>
               ))}
             </List>
