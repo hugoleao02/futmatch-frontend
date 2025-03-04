@@ -18,6 +18,7 @@ export default {
     profile: "Perfil",
     createMatch: "Criar Partida",
     logout: "Sair",
+    createRoom: "Criar Sala",
   },
   home: {
     title: "FutMatch",

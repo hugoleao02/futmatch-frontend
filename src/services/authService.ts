@@ -37,18 +37,15 @@ export const authService = {
       if (response.data && response.data.token) {
         token = response.data.token;
       } else if (typeof response.data === "string") {
-        // Se a resposta for uma string, assume que é o token
         const tokenString = response.data as string;
         token = tokenString;
       } else {
         throw new Error("Token não encontrado na resposta");
       }
 
-      // Não salvamos o token aqui, deixamos essa responsabilidade para o contexto de autenticação
       return token;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Repassar o erro para ser tratado pelo chamador
       }
       throw error;
     }
@@ -61,11 +58,9 @@ export const authService = {
         userData
       );
 
-      // Não salvamos o token aqui, deixamos essa responsabilidade para o contexto de autenticação
       return response.data.jogador || (response.data as unknown as Jogador);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Repassar o erro para ser tratado pelo chamador
       }
       throw error;
     }
@@ -79,22 +74,18 @@ export const authService = {
         throw new Error("Token não encontrado");
       }
 
-      // Garantir que o token esteja no cabeçalho
       const headers = {
         Authorization: `Bearer ${token}`,
       };
 
       try {
-        // Tentar com a URL correta para o backend
         const response = await api.get<Jogador>("/jogadores/me", { headers });
         return response.data;
       } catch (apiError) {
-        // Tentar com URL alternativa
         try {
           const response = await api.get<Jogador>("/auth/me", { headers });
           return response.data;
         } catch (altError) {
-          // Se todas as tentativas falharem, extrair informações do token
           const userData = this.getUserFromToken();
           if (userData) {
             return userData;
@@ -105,23 +96,18 @@ export const authService = {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Repassar o erro para ser tratado pelo chamador
       }
       throw error;
     }
   },
 
-  logout(): void {
-    // Não removemos o token aqui, deixamos essa responsabilidade para o contexto de autenticação
-  },
+  logout(): void {},
 
-  // Método para extrair informações do usuário a partir do token JWT
   getUserFromToken(): Jogador | null {
     try {
       const payload = getTokenPayload();
       if (!payload) return null;
 
-      // Criar um objeto Jogador com as informações disponíveis no token
       const jogador: Jogador = {
         id: payload.id || 0,
         apelido: payload.sub || "Usuário",
