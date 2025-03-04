@@ -35,6 +35,8 @@ import LanguageIcon from "@mui/icons-material/Language";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import LoginIcon from "@mui/icons-material/Login";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useTranslation } from "react-i18next";
 import { SelectChangeEvent } from "@mui/material/Select";
 import { useAuth } from "../../hooks/useAuth";
@@ -150,60 +152,130 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </ListItemIcon>
           <ListItemText primary={t("navigation.matches")} />
         </ListItem>
-        <ListItem
-          button
-          onClick={() => navigateTo("/perfil")}
-          sx={{
-            borderRadius: 2,
-            mb: 1,
-            bgcolor: isActive("/perfil")
-              ? alpha(theme.palette.primary.main, 0.1)
-              : "transparent",
-            color: isActive("/perfil") ? theme.palette.primary.main : "inherit",
-            "&:hover": {
-              bgcolor: alpha(theme.palette.primary.main, 0.05),
-            },
-          }}
-        >
-          <ListItemIcon
-            sx={{
-              color: isActive("/perfil")
-                ? theme.palette.primary.main
-                : "inherit",
-            }}
-          >
-            <PersonIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("navigation.profile")} />
-        </ListItem>
-        <ListItem
-          button
-          onClick={() => navigateTo("/criar-sala")}
-          sx={{
-            borderRadius: 2,
-            mb: 1,
-            bgcolor: isActive("/criar-sala")
-              ? alpha(theme.palette.primary.main, 0.1)
-              : "transparent",
-            color: isActive("/criar-sala")
-              ? theme.palette.primary.main
-              : "inherit",
-            "&:hover": {
-              bgcolor: alpha(theme.palette.primary.main, 0.05),
-            },
-          }}
-        >
-          <ListItemIcon
-            sx={{
-              color: isActive("/criar-sala")
-                ? theme.palette.primary.main
-                : "inherit",
-            }}
-          >
-            <AddCircleIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("navigation.createRoom")} />
-        </ListItem>
+
+        {user && (
+          <>
+            <ListItem
+              button
+              onClick={() => navigateTo("/perfil")}
+              sx={{
+                borderRadius: 2,
+                mb: 1,
+                bgcolor: isActive("/perfil")
+                  ? alpha(theme.palette.primary.main, 0.1)
+                  : "transparent",
+                color: isActive("/perfil")
+                  ? theme.palette.primary.main
+                  : "inherit",
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  color: isActive("/perfil")
+                    ? theme.palette.primary.main
+                    : "inherit",
+                }}
+              >
+                <PersonIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("navigation.profile")} />
+            </ListItem>
+
+            <ListItem
+              button
+              onClick={() => navigateTo("/criar-sala")}
+              sx={{
+                borderRadius: 2,
+                mb: 1,
+                bgcolor: isActive("/criar-sala")
+                  ? alpha(theme.palette.primary.main, 0.1)
+                  : "transparent",
+                color: isActive("/criar-sala")
+                  ? theme.palette.primary.main
+                  : "inherit",
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  color: isActive("/criar-sala")
+                    ? theme.palette.primary.main
+                    : "inherit",
+                }}
+              >
+                <AddCircleIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("navigation.createRoom")} />
+            </ListItem>
+          </>
+        )}
+
+        {!user && (
+          <>
+            <ListItem
+              button
+              onClick={() => navigateTo("/login")}
+              sx={{
+                borderRadius: 2,
+                mb: 1,
+                bgcolor: isActive("/login")
+                  ? alpha(theme.palette.primary.main, 0.1)
+                  : "transparent",
+                color: isActive("/login")
+                  ? theme.palette.primary.main
+                  : "inherit",
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  color: isActive("/login")
+                    ? theme.palette.primary.main
+                    : "inherit",
+                }}
+              >
+                <LoginIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("auth.login.title")} />
+            </ListItem>
+
+            <ListItem
+              button
+              onClick={() => navigateTo("/register")}
+              sx={{
+                borderRadius: 2,
+                mb: 1,
+                bgcolor: isActive("/register")
+                  ? alpha(theme.palette.primary.main, 0.1)
+                  : "transparent",
+                color: isActive("/register")
+                  ? theme.palette.primary.main
+                  : "inherit",
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  color: isActive("/register")
+                    ? theme.palette.primary.main
+                    : "inherit",
+                }}
+              >
+                <PersonAddIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("auth.register.title")} />
+            </ListItem>
+          </>
+        )}
       </List>
       <Divider />
       <List sx={{ px: 2, py: 1 }}>
@@ -415,38 +487,73 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               >
                 {t("navigation.matches")}
               </Button>
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/perfil"
-                sx={{
-                  mx: 1,
-                  opacity: isActive("/perfil") ? 1 : 0.8,
-                  fontWeight: isActive("/perfil") ? "bold" : "medium",
-                  "&:hover": { opacity: 1 },
-                }}
-              >
-                {t("navigation.profile")}
-              </Button>
 
-              <Tooltip title={t("navigation.notifications")}>
-                <IconButton color="inherit" sx={{ ml: 1 }}>
-                  <Badge badgeContent={3} color="secondary">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-
-              {user && (
-                <Tooltip title={t("navigation.logout")}>
-                  <IconButton
+              {user ? (
+                // Botões para usuários autenticados
+                <>
+                  <Button
                     color="inherit"
-                    onClick={handleLogoutClick}
-                    sx={{ ml: 1 }}
+                    component={RouterLink}
+                    to="/perfil"
+                    sx={{
+                      mx: 1,
+                      opacity: isActive("/perfil") ? 1 : 0.8,
+                      fontWeight: isActive("/perfil") ? "bold" : "medium",
+                      "&:hover": { opacity: 1 },
+                    }}
                   >
-                    <LogoutIcon />
-                  </IconButton>
-                </Tooltip>
+                    {t("navigation.profile")}
+                  </Button>
+
+                  <Tooltip title={t("navigation.notifications")}>
+                    <IconButton color="inherit" sx={{ ml: 1 }}>
+                      <Badge badgeContent={3} color="secondary">
+                        <NotificationsIcon />
+                      </Badge>
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title={t("navigation.logout")}>
+                    <IconButton
+                      color="inherit"
+                      onClick={handleLogoutClick}
+                      sx={{ ml: 1 }}
+                    >
+                      <LogoutIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              ) : (
+                // Botões para usuários não autenticados
+                <>
+                  <Button
+                    color="inherit"
+                    component={RouterLink}
+                    to="/login"
+                    sx={{
+                      mx: 1,
+                      opacity: isActive("/login") ? 1 : 0.8,
+                      fontWeight: isActive("/login") ? "bold" : "medium",
+                      "&:hover": { opacity: 1 },
+                    }}
+                  >
+                    {t("auth.login.title")}
+                  </Button>
+
+                  <Button
+                    color="inherit"
+                    component={RouterLink}
+                    to="/register"
+                    sx={{
+                      mx: 1,
+                      opacity: isActive("/register") ? 1 : 0.8,
+                      fontWeight: isActive("/register") ? "bold" : "medium",
+                      "&:hover": { opacity: 1 },
+                    }}
+                  >
+                    {t("auth.register.title")}
+                  </Button>
+                </>
               )}
 
               <FormControl sx={{ ml: 2, minWidth: 120 }}>
