@@ -73,15 +73,9 @@ export const authService = {
 
   async getProfile(): Promise<Jogador> {
     try {
-      console.log("authService - Obtendo perfil do usuário");
       const token = getToken();
-      console.log(
-        "authService - Token para obter perfil:",
-        token ? "Presente" : "Ausente"
-      );
 
       if (!token) {
-        console.error("authService - Token não encontrado para obter perfil");
         throw new Error("Token não encontrado");
       }
 
@@ -93,28 +87,16 @@ export const authService = {
       try {
         // Tentar com a URL correta para o backend
         const response = await api.get<Jogador>("/jogadores/me", { headers });
-        console.log("authService - Resposta do perfil:", response.data);
         return response.data;
       } catch (apiError) {
-        console.error("authService - Erro na primeira tentativa:", apiError);
-
         // Tentar com URL alternativa
         try {
-          console.log("authService - Tentando URL alternativa");
           const response = await api.get<Jogador>("/auth/me", { headers });
-          console.log(
-            "authService - Resposta da URL alternativa:",
-            response.data
-          );
           return response.data;
         } catch (altError) {
-          console.error("authService - Erro na URL alternativa:", altError);
-
           // Se todas as tentativas falharem, extrair informações do token
-          console.log("authService - Extraindo informações do token");
           const userData = this.getUserFromToken();
           if (userData) {
-            console.log("authService - Dados extraídos do token:", userData);
             return userData;
           }
 
@@ -122,10 +104,8 @@ export const authService = {
         }
       }
     } catch (error) {
-      console.error("authService - Erro ao obter perfil:", error);
       if (axios.isAxiosError(error)) {
-        console.error("authService - Status:", error.response?.status);
-        console.error("authService - Dados:", error.response?.data);
+        // Repassar o erro para ser tratado pelo chamador
       }
       throw error;
     }
@@ -141,8 +121,6 @@ export const authService = {
       const payload = getTokenPayload();
       if (!payload) return null;
 
-      console.log("authService - Payload do token:", payload);
-
       // Criar um objeto Jogador com as informações disponíveis no token
       const jogador: Jogador = {
         id: payload.id || 0,
@@ -156,7 +134,6 @@ export const authService = {
 
       return jogador;
     } catch (error) {
-      console.error("authService - Erro ao extrair dados do token:", error);
       return null;
     }
   },

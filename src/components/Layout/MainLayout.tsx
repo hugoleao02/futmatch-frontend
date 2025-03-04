@@ -59,14 +59,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Verificar estado de autenticação
   useEffect(() => {
     const token = getToken();
-    console.log("MainLayout - Token:", token ? "Presente" : "Ausente");
-    console.log("MainLayout - User:", user);
-    console.log("MainLayout - hasToken():", hasToken());
 
     if (token && !user) {
-      console.log(
-        "MainLayout - Token presente mas usuário ausente, tentando carregar usuário"
-      );
       loadUser();
     }
   }, [user, loadUser]);
