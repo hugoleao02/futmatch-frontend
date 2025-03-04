@@ -23,6 +23,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import StarIcon from "@mui/icons-material/Star";
 import { useTranslation } from "react-i18next";
+import Logo from "../components/common/Logo";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -104,18 +105,18 @@ const Home: React.FC = () => {
           }}
         >
           <Container maxWidth="md">
-            <Typography
+            <Logo
               variant={isMobile ? "h3" : "h2"}
-              component="h1"
-              gutterBottom
+              darkMode={true}
+              iconSize={isMobile ? 40 : 56}
               sx={{
-                fontWeight: "bold",
-                textShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                justifyContent: "center",
                 mb: 3,
               }}
-            >
-              {t("home.title")}
-            </Typography>
+              textSx={{
+                textShadow: "0 2px 10px rgba(0,0,0,0.1)",
+              }}
+            />
 
             <Typography
               variant={isMobile ? "body1" : "h6"}

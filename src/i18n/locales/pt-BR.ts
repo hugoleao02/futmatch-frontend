@@ -7,6 +7,9 @@ export default {
     delete: "Excluir",
     select: "Selecione",
     loading: "Carregando...",
+    learnMore: "Saiba mais",
+    viewAll: "Ver todos",
+    join: "Participar",
   },
   navigation: {
     home: "Início",
@@ -16,8 +19,15 @@ export default {
     logout: "Sair",
   },
   home: {
-    title: "Bem-vindo ao FutMatch",
-    subtitle: "Encontre sua próxima pelada com facilidade",
+    title: "FutMatch",
+    subtitle: "A melhor forma de organizar seu futebol",
+    createMatch: "Criar Partida",
+    featuresTitle: "Como funciona",
+    featuredMatches: "Partidas em Destaque",
+    joinCommunity: "Junte-se à Comunidade",
+    joinCommunityText:
+      "Milhares de jogadores já estão usando o FutMatch para encontrar e organizar partidas de futebol. Crie sua conta e comece a jogar!",
+    getStarted: "Começar Agora",
     features: {
       findMatches: {
         title: "Encontre Partidas",
@@ -36,16 +46,23 @@ export default {
   },
   matches: {
     title: "Partidas Disponíveis",
-    search: "Buscar partidas",
+    subtitle: "Encontre jogos próximos a você ou crie sua própria partida",
+    search: "Buscar partidas por nome ou local",
+    nearbyMatches: "Partidas Próximas",
+    noMatchesFound: "Nenhuma partida encontrada",
+    noMatchesFoundText:
+      "Não encontramos partidas com os filtros selecionados. Tente outros filtros ou crie sua própria partida.",
     level: "Nível",
     levels: {
-      all: "Todos",
+      all: "Todos os níveis",
       beginner: "Iniciante",
       intermediate: "Intermediário",
       advanced: "Avançado",
     },
     matchInfo: {
-      players: "jogadores",
+      location: "Local",
+      dateTime: "Data e Hora",
+      players: "Jogadores",
       join: "Participar",
     },
   },
@@ -68,13 +85,40 @@ export default {
     },
   },
   createMatch: {
-    title: "Criar Nova Sala",
+    title: "Criar Nova Partida",
+    subtitle: "Preencha os dados para criar uma nova partida de futebol",
+    steps: {
+      basicInfo: "Informações Básicas",
+      details: "Detalhes da Partida",
+      review: "Revisão",
+    },
     form: {
       title: "Título da Partida",
+      titlePlaceholder: "Ex: Pelada no Parque",
+      location: "Local da Partida",
+      locationPlaceholder: "Ex: Quadra do Parque Central",
+      date: "Data da Partida",
+      time: "Horário",
+      maxPlayers: "Máximo de Jogadores",
+      selectQuantity: "Selecione a quantidade",
+      level: "Nível da Partida",
+      selectLevel: "Selecione o nível",
+      description: "Descrição (opcional)",
+      descriptionPlaceholder: "Descreva detalhes adicionais sobre a partida...",
+      descriptionTooltip:
+        "Adicione informações adicionais como regras específicas, equipamentos necessários, etc.",
+      next: "Próximo",
+      back: "Voltar",
+      cancel: "Cancelar",
+      create: "Criar Sala",
+      reviewAlert: "Verifique os detalhes da sua partida antes de criar a sala",
+    },
+    review: {
+      title: "Título",
       location: "Local",
       date: "Data",
-      time: "Hora",
-      maxPlayers: "Número Máximo de Jogadores",
+      time: "Horário",
+      maxPlayers: "Máximo de Jogadores",
       level: "Nível",
       description: "Descrição",
     },
@@ -122,5 +166,8 @@ export default {
       passwordTooShort: "A senha deve ter pelo menos 6 caracteres",
       passwordsDontMatch: "As senhas não coincidem",
     },
+  },
+  footer: {
+    copyright: "© 2025 FutMatch - A melhor forma de organizar seu futebol",
   },
 };
