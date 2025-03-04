@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -37,6 +37,8 @@ import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import DescriptionIcon from "@mui/icons-material/Description";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import apiService from "../services/apiService";
+import { CriarSalaDTO } from "../types/api";
 
 const CriarSala: React.FC = () => {
   const navigate = useNavigate();
@@ -44,11 +46,14 @@ const CriarSala: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     titulo: "",
     local: "",
-    data: null,
-    hora: null,
+    data: null as Date | null,
+    hora: null as Date | null,
     maxJogadores: "",
     nivel: "",
     descricao: "",
@@ -69,10 +74,66 @@ const CriarSala: React.FC = () => {
     setActiveStep((prevStep) => prevStep - 1);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Dados do formulário:", formData);
-    navigate("/partidas");
+
+    if (!formData.data || !formData.hora) {
+      setError("Data e hora são obrigatórios");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Combinar data e hora em um único objeto Date
+      const dataHora = new Date(formData.data);
+      const hora = new Date(formData.hora);
+
+      dataHora.setHours(hora.getHours());
+      dataHora.setMinutes(hora.getMinutes());
+
+      // Mapear nível para valores numéricos
+      let nivelMinimo = 1;
+      let nivelMaximo = 10;
+
+      switch (formData.nivel) {
+        case "iniciante":
+          nivelMinimo = 1;
+          nivelMaximo = 3;
+          break;
+        case "intermediario":
+          nivelMinimo = 4;
+          nivelMaximo = 7;
+          break;
+        case "avancado":
+          nivelMinimo = 8;
+          nivelMaximo = 10;
+          break;
+      }
+
+      // Criar objeto para enviar à API
+      const salaData: CriarSalaDTO = {
+        nome: formData.titulo,
+        numeroJogadores: Number(formData.maxJogadores),
+        nivelMinimo,
+        nivelMaximo,
+        dataHora: dataHora.toISOString(),
+        localizacao: formData.local,
+      };
+
+      // Enviar para a API
+      const novaSala = await apiService.salas.criarSala(salaData);
+
+      // Redirecionar para a página de partidas após sucesso
+      navigate("/partidas");
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message || "Erro ao criar sala. Tente novamente."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const steps = ["Informações Básicas", "Detalhes da Partida", "Revisão"];
@@ -662,6 +723,12 @@ const CriarSala: React.FC = () => {
             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
           }}
         >
+          {error && (
+            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+              {error}
+            </Alert>
+          )}
+
           <Stepper
             activeStep={activeStep}
             alternativeLabel={!isMobile}
@@ -690,6 +757,7 @@ const CriarSala: React.FC = () => {
                   borderRadius: 2,
                   px: 3,
                 }}
+                disabled={loading}
               >
                 {activeStep === 0 ? "Cancelar" : "Voltar"}
               </Button>
@@ -706,8 +774,9 @@ const CriarSala: React.FC = () => {
                       py: 1,
                       fontWeight: "bold",
                     }}
+                    disabled={loading}
                   >
-                    Criar Sala
+                    {loading ? "Criando..." : "Criar Sala"}
                   </Button>
                 ) : (
                   <Button
@@ -715,6 +784,7 @@ const CriarSala: React.FC = () => {
                     color="primary"
                     onClick={handleNext}
                     disabled={
+                      loading ||
                       (activeStep === 0 && !isStepOneValid()) ||
                       (activeStep === 1 && !isStepTwoValid())
                     }
