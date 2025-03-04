@@ -112,6 +112,13 @@ export default {
         nicknameTooShort: "Nickname must be at least 3 characters",
       },
     },
+    logout: {
+      title: "Sign Out",
+      confirm: "Are you sure you want to sign out?",
+      confirmWithName: "{{name}}, are you sure you want to sign out?",
+      confirmButton: "Sign Out",
+      success: "You have successfully signed out",
+    },
     errors: {
       invalidCredentials: "Invalid email or password",
       serverError: "Server error. Please try again later.",

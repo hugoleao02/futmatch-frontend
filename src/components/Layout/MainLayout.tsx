@@ -39,6 +39,7 @@ import { useTranslation } from "react-i18next";
 import { SelectChangeEvent } from "@mui/material/Select";
 import { useAuth } from "../../hooks/useAuth";
 import Logo from "../common/Logo";
+import LogoutDialog from "../common/LogoutDialog";
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { t, i18n } = useTranslation();
@@ -48,14 +49,24 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const handleLanguageChange = (event: SelectChangeEvent) => {
     i18n.changeLanguage(event.target.value);
   };
 
+  const handleLogoutClick = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const handleLogoutCancel = () => {
+    setLogoutDialogOpen(false);
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/login");
+    setLogoutDialogOpen(false);
     if (isMobile) {
       setDrawerOpen(false);
     }
@@ -199,7 +210,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {user && (
           <ListItem
             button
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
             sx={{
               borderRadius: 2,
               mb: 1,
@@ -358,7 +369,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <Tooltip title={t("navigation.logout")}>
                   <IconButton
                     color="inherit"
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     sx={{ ml: 1 }}
                   >
                     <LogoutIcon />
@@ -430,7 +441,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <Tooltip title={t("navigation.logout")}>
                   <IconButton
                     color="inherit"
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     sx={{ ml: 1 }}
                   >
                     <LogoutIcon />
@@ -525,6 +536,13 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </Box>
         </Container>
       </Box>
+
+      <LogoutDialog
+        open={logoutDialogOpen}
+        onClose={handleLogoutCancel}
+        onConfirm={handleLogout}
+        username={user?.nickname}
+      />
     </Box>
   );
 };

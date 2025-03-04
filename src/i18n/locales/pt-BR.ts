@@ -158,6 +158,13 @@ export default {
         nicknameTooShort: "O apelido deve ter pelo menos 3 caracteres",
       },
     },
+    logout: {
+      title: "Sair da conta",
+      confirm: "Tem certeza que deseja sair da sua conta?",
+      confirmWithName: "{{name}}, tem certeza que deseja sair da sua conta?",
+      confirmButton: "Sair",
+      success: "Você saiu da sua conta com sucesso",
+    },
     errors: {
       invalidCredentials: "E-mail ou senha inválidos",
       serverError: "Erro no servidor. Tente novamente mais tarde.",
