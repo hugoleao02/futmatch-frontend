@@ -10,6 +10,8 @@ import {
   Select,
   MenuItem,
   Paper,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -20,6 +22,9 @@ import ptBR from "date-fns/locale/pt-BR";
 
 const CriarSala: React.FC = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [formData, setFormData] = useState({
     titulo: "",
     local: "",
@@ -39,20 +44,24 @@ const CriarSala: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Aqui você implementará a lógica para criar a sala
     console.log("Dados do formulário:", formData);
     navigate("/partidas");
   };
 
   return (
-    <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
+    <Box sx={{ width: "100%" }}>
+      <Typography
+        variant={isMobile ? "h5" : "h4"}
+        component="h1"
+        gutterBottom
+        sx={{ textAlign: { xs: "center", sm: "left" } }}
+      >
         Criar Nova Sala
       </Typography>
 
-      <Paper sx={{ p: 3, mt: 3 }}>
+      <Paper sx={{ p: { xs: 2, sm: 3 }, mt: 3 }}>
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -73,7 +82,7 @@ const CriarSala: React.FC = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} sm={6}>
               <LocalizationProvider
                 dateAdapter={AdapterDateFns}
                 adapterLocale={ptBR}
@@ -84,14 +93,12 @@ const CriarSala: React.FC = () => {
                   onChange={(newValue) => {
                     setFormData({ ...formData, data: newValue });
                   }}
-                  renderInput={(params) => (
-                    <TextField {...params} fullWidth required />
-                  )}
+                  slotProps={{ textField: { fullWidth: true, required: true } }}
                 />
               </LocalizationProvider>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} sm={6}>
               <LocalizationProvider
                 dateAdapter={AdapterDateFns}
                 adapterLocale={ptBR}
@@ -102,35 +109,41 @@ const CriarSala: React.FC = () => {
                   onChange={(newValue) => {
                     setFormData({ ...formData, hora: newValue });
                   }}
-                  renderInput={(params) => (
-                    <TextField {...params} fullWidth required />
-                  )}
+                  slotProps={{ textField: { fullWidth: true, required: true } }}
                 />
               </LocalizationProvider>
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Número Máximo de Jogadores"
-                type="number"
-                value={formData.maxJogadores}
-                onChange={handleChange("maxJogadores")}
-                required
-              />
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth required>
+                <InputLabel id="max-jogadores-label">
+                  Máximo de Jogadores
+                </InputLabel>
+                <Select
+                  labelId="max-jogadores-label"
+                  value={formData.maxJogadores}
+                  onChange={handleChange("maxJogadores")}
+                  label="Máximo de Jogadores"
+                >
+                  <MenuItem value={10}>10 jogadores</MenuItem>
+                  <MenuItem value={14}>14 jogadores</MenuItem>
+                  <MenuItem value={22}>22 jogadores</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} sm={6}>
               <FormControl fullWidth required>
-                <InputLabel>Nível</InputLabel>
+                <InputLabel id="nivel-label">Nível</InputLabel>
                 <Select
+                  labelId="nivel-label"
                   value={formData.nivel}
-                  label="Nível"
                   onChange={handleChange("nivel")}
+                  label="Nível"
                 >
-                  <MenuItem value="Iniciante">Iniciante</MenuItem>
-                  <MenuItem value="Intermediário">Intermediário</MenuItem>
-                  <MenuItem value="Avançado">Avançado</MenuItem>
+                  <MenuItem value="iniciante">Iniciante</MenuItem>
+                  <MenuItem value="intermediario">Intermediário</MenuItem>
+                  <MenuItem value="avancado">Avançado</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -139,25 +152,33 @@ const CriarSala: React.FC = () => {
               <TextField
                 fullWidth
                 label="Descrição"
-                multiline
-                rows={4}
                 value={formData.descricao}
                 onChange={handleChange("descricao")}
+                multiline
+                rows={4}
               />
             </Grid>
 
-            <Grid item xs={12}>
-              <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate("/partidas")}
-                >
-                  Cancelar
-                </Button>
-                <Button type="submit" variant="contained" color="primary">
-                  Criar Sala
-                </Button>
-              </Box>
+            <Grid
+              item
+              xs={12}
+              sx={{
+                mt: 2,
+                display: "flex",
+                justifyContent: { xs: "center", sm: "flex-end" },
+              }}
+            >
+              <Button
+                type="button"
+                variant="outlined"
+                sx={{ mr: 2 }}
+                onClick={() => navigate("/partidas")}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" variant="contained" color="primary">
+                Criar Sala
+              </Button>
             </Grid>
           </Grid>
         </form>
