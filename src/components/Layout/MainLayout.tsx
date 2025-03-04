@@ -42,7 +42,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import { useAuth } from "../../hooks/useAuth";
 import Logo from "../common/Logo";
 import LogoutDialog from "../common/LogoutDialog";
-
+import { useSnackbar } from "notistack";
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
@@ -52,6 +52,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleLanguageChange = (event: SelectChangeEvent) => {
     i18n.changeLanguage(event.target.value);
@@ -66,19 +67,19 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const handleLogout = () => {
-    console.log("Token antes do logout:", localStorage.getItem("token"));
-    console.log("Usuário antes do logout:", user);
-
     logout();
-
-    console.log("Token após logout:", localStorage.getItem("token"));
-    console.log("Usuário após logout:", user);
-
     navigate("/login");
     setLogoutDialogOpen(false);
     if (isMobile) {
       setDrawerOpen(false);
     }
+    enqueueSnackbar(t("auth.logout.success"), {
+      variant: "success",
+      anchorOrigin: {
+        vertical: "top",
+        horizontal: "center",
+      },
+    });
   };
 
   const handleDrawerToggle = () => {
