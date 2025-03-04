@@ -30,6 +30,9 @@ import Logo from "../components/common/Logo";
 interface LocationState {
   message?: string;
   email?: string;
+  from?: {
+    pathname: string;
+  };
 }
 
 const Login: React.FC = () => {
@@ -67,7 +70,11 @@ const Login: React.FC = () => {
     try {
       setError("");
       await login(values);
-      navigate("/");
+
+      // Redireciona para a página anterior ou para a home
+      const state = location.state as LocationState;
+      const from = state?.from?.pathname || "/";
+      navigate(from, { replace: true });
     } catch {
       setError(t("auth.errors.invalidCredentials"));
     } finally {

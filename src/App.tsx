@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { theme } from "./theme/theme";
@@ -11,6 +16,7 @@ import Perfil from "./pages/Perfil";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const App: React.FC = () => {
   return (
@@ -24,14 +30,17 @@ const App: React.FC = () => {
             <Route
               path="/*"
               element={
-                <MainLayout>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/partidas" element={<Partidas />} />
-                    <Route path="/criar-sala" element={<CriarSala />} />
-                    <Route path="/perfil" element={<Perfil />} />
-                  </Routes>
-                </MainLayout>
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/partidas" element={<Partidas />} />
+                      <Route path="/criar-sala" element={<CriarSala />} />
+                      <Route path="/perfil" element={<Perfil />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </MainLayout>
+                </ProtectedRoute>
               }
             />
           </Routes>
