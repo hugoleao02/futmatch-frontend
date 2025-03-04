@@ -23,7 +23,7 @@ export default {
   home: {
     title: "FutMatch",
     subtitle: "A melhor forma de organizar seu futebol",
-    createMatch: "Criar Partida",
+    createMatch: "Criar Sala",
     featuresTitle: "Como funciona",
     featuredMatches: "Partidas em Destaque",
     joinCommunity: "Junte-se à Comunidade",

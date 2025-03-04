@@ -679,14 +679,15 @@ const CriarSala: React.FC = () => {
                 textShadow: "0 2px 10px rgba(0,0,0,0.2)",
               }}
             >
-              Criar Nova Partida
+              Criar Nova Sala
             </Typography>
           </Box>
           <Typography
             variant="body1"
             sx={{ opacity: 0.9, ml: { xs: 0, sm: 7 }, mt: 1 }}
           >
-            Preencha os dados para criar uma nova partida de futebol
+            Preencha os dados para criar uma nova sala para organizar partidas
+            de futebol
           </Typography>
         </Container>
 
