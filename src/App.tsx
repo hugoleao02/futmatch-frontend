@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import Partidas from "./pages/Partidas";
 import CriarSala from "./pages/CriarSala";
 import Perfil from "./pages/Perfil";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const App: React.FC = () => {
@@ -16,14 +18,23 @@ const App: React.FC = () => {
       <CssBaseline />
       <AuthProvider>
         <Router>
-          <MainLayout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/partidas" element={<Partidas />} />
-              <Route path="/criar-sala" element={<CriarSala />} />
-              <Route path="/perfil" element={<Perfil />} />
-            </Routes>
-          </MainLayout>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/*"
+              element={
+                <MainLayout>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/partidas" element={<Partidas />} />
+                    <Route path="/criar-sala" element={<CriarSala />} />
+                    <Route path="/perfil" element={<Perfil />} />
+                  </Routes>
+                </MainLayout>
+              }
+            />
+          </Routes>
         </Router>
       </AuthProvider>
     </ThemeProvider>

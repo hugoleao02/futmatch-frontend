@@ -9,17 +9,28 @@ import {
   Select,
   MenuItem,
   FormControl,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useTranslation } from "react-i18next";
 import { SelectChangeEvent } from "@mui/material/Select";
+import { useAuth } from "../../hooks/useAuth";
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { t, i18n } = useTranslation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLanguageChange = (event: SelectChangeEvent) => {
     i18n.changeLanguage(event.target.value);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -39,6 +50,15 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Button color="inherit" component={RouterLink} to="/perfil">
             {t("navigation.profile")}
           </Button>
+
+          {user && (
+            <Tooltip title={t("navigation.logout")}>
+              <IconButton color="inherit" onClick={handleLogout} sx={{ ml: 1 }}>
+                <LogoutIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+
           <FormControl sx={{ ml: 2, minWidth: 120 }}>
             <Select
               value={i18n.language}

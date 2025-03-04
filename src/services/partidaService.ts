@@ -3,9 +3,17 @@ import { Partida, CriarPartidaDTO, AtualizarPlacarDTO } from "../types/api";
 
 const API_URL = "http://localhost:8080";
 
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
+
 export const partidaService = {
   async criarPartida(partidaData: CriarPartidaDTO): Promise<Partida> {
-    const response = await axios.post(`${API_URL}/api/partidas`, partidaData, {
+    const response = await api.post("/api/partidas", partidaData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -14,7 +22,7 @@ export const partidaService = {
   },
 
   async buscarPartida(id: number): Promise<Partida> {
-    const response = await axios.get(`${API_URL}/api/partidas/${id}`, {
+    const response = await api.get(`/api/partidas/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -23,7 +31,7 @@ export const partidaService = {
   },
 
   async listarPartidasDaSala(salaId: number): Promise<Partida[]> {
-    const response = await axios.get(`${API_URL}/api/partidas/sala/${salaId}`, {
+    const response = await api.get(`/api/partidas/sala/${salaId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -32,7 +40,7 @@ export const partidaService = {
   },
 
   async listarMinhasPartidas(): Promise<Partida[]> {
-    const response = await axios.get(`${API_URL}/api/partidas/minhas`, {
+    const response = await api.get("/api/partidas/minhas", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -41,7 +49,7 @@ export const partidaService = {
   },
 
   async listarPartidasEmAndamento(): Promise<Partida[]> {
-    const response = await axios.get(`${API_URL}/api/partidas/em-andamento`, {
+    const response = await api.get("/api/partidas/em-andamento", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -50,8 +58,8 @@ export const partidaService = {
   },
 
   async iniciarPartida(partidaId: number): Promise<Partida> {
-    const response = await axios.post(
-      `${API_URL}/api/partidas/${partidaId}/iniciar`,
+    const response = await api.post(
+      `/api/partidas/${partidaId}/iniciar`,
       {},
       {
         headers: {
@@ -63,8 +71,8 @@ export const partidaService = {
   },
 
   async finalizarPartida(partidaId: number): Promise<Partida> {
-    const response = await axios.post(
-      `${API_URL}/api/partidas/${partidaId}/finalizar`,
+    const response = await api.post(
+      `/api/partidas/${partidaId}/finalizar`,
       {},
       {
         headers: {
@@ -79,8 +87,8 @@ export const partidaService = {
     partidaId: number,
     placar: AtualizarPlacarDTO
   ): Promise<Partida> {
-    const response = await axios.put(
-      `${API_URL}/api/partidas/${partidaId}/placar`,
+    const response = await api.put(
+      `/api/partidas/${partidaId}/placar`,
       placar,
       {
         headers: {

@@ -1,16 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Jogador, LoginDTO, CriarJogadorDTO } from "../types/api";
 import { authService } from "../services/authService";
-
-interface AuthContextType {
-  user: Jogador | null;
-  loading: boolean;
-  login: (credentials: LoginDTO) => Promise<void>;
-  register: (userData: CriarJogadorDTO) => Promise<void>;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from "./AuthContextDef";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -20,6 +11,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    console.log("Token no localStorage:", token);
     if (token) {
       loadUser();
     } else {
@@ -29,9 +21,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const loadUser = async () => {
     try {
+      console.log("Carregando usuário...");
       const userData = await authService.getProfile();
+      console.log("Usuário carregado:", userData);
       setUser(userData);
     } catch (error) {
+      console.error("Erro ao carregar usuário:", error);
       localStorage.removeItem("token");
     } finally {
       setLoading(false);
@@ -39,14 +34,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const login = async (credentials: LoginDTO) => {
-    const token = await authService.login(credentials);
-    localStorage.setItem("token", token);
-    await loadUser();
+    try {
+      console.log("Fazendo login com:", credentials);
+      const token = await authService.login(credentials);
+      console.log("Token recebido:", token);
+      if (token) {
+        localStorage.setItem("token", token);
+        await loadUser();
+      }
+    } catch (error) {
+      console.error("Erro no login:", error);
+      throw error;
+    }
   };
 
   const register = async (userData: CriarJogadorDTO) => {
-    const user = await authService.register(userData);
-    setUser(user);
+    try {
+      console.log("Registrando usuário:", userData);
+      const response = await authService.register(userData);
+      console.log("Resposta do registro:", response);
+
+      // Não faz login automático após o registro
+      // O usuário será redirecionado para a página de login
+      return response;
+    } catch (error) {
+      console.error("Erro no registro:", error);
+      throw error;
+    }
   };
 
   const logout = () => {
@@ -59,12 +73,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 };
