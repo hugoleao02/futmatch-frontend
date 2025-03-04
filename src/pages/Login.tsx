@@ -8,12 +8,24 @@ import {
   Box,
   Link,
   Alert,
+  useTheme,
+  Avatar,
+  InputAdornment,
+  IconButton,
+  Divider,
+  useMediaQuery,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import { loginSchema, LoginFormValues } from "../schemas";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import Logo from "../components/common/Logo";
 
 interface LocationState {
   message?: string;
@@ -25,8 +37,11 @@ const Login: React.FC = () => {
   const location = useLocation();
   const { login } = useAuth();
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [initialValues, setInitialValues] = useState<LoginFormValues>({
     email: "",
     senha: "",
@@ -60,97 +75,235 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Paper
-          elevation={3}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
+      }}
+    >
+      <Container maxWidth="sm">
+        <Box
           sx={{
-            padding: 4,
+            marginTop: isMobile ? 4 : 8,
+            marginBottom: 4,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: "100%",
           }}
         >
-          <Typography component="h1" variant="h5" gutterBottom>
-            {t("auth.login.title")}
-          </Typography>
-          {error && (
-            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" sx={{ width: "100%", mb: 2 }}>
-              {success}
-            </Alert>
-          )}
-          <Formik
-            initialValues={initialValues}
-            validationSchema={loginSchema(t)}
-            onSubmit={handleSubmit}
-            enableReinitialize
+          <Paper
+            elevation={24}
+            sx={{
+              padding: { xs: 3, sm: 5 },
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+              borderRadius: 4,
+              position: "relative",
+              overflow: "hidden",
+            }}
           >
-            {({ isSubmitting, touched, errors }) => (
-              <Form style={{ width: "100%" }}>
-                <Field
-                  as={TextField}
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label={t("auth.login.email")}
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  error={touched.email && Boolean(errors.email)}
-                  helperText={touched.email && errors.email}
-                />
-                <Field
-                  as={TextField}
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="senha"
-                  label={t("auth.login.password")}
-                  type="password"
-                  id="senha"
-                  autoComplete="current-password"
-                  error={touched.senha && Boolean(errors.senha)}
-                  helperText={touched.senha && errors.senha}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? t("common.loading") : t("auth.login.submit")}
-                </Button>
-                <Box sx={{ textAlign: "center" }}>
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => navigate("/register")}
-                  >
-                    {t("auth.login.registerLink")}
-                  </Link>
-                </Box>
-              </Form>
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "8px",
+                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              }}
+            />
+
+            <Box sx={{ mb: 4, mt: 2, textAlign: "center" }}>
+              <Logo variant="h4" iconSize={40} />
+            </Box>
+
+            <Avatar
+              sx={{
+                mb: 2,
+                bgcolor: theme.palette.primary.main,
+                width: 56,
+                height: 56,
+              }}
+            >
+              <LockOutlinedIcon fontSize="large" />
+            </Avatar>
+
+            <Typography
+              component="h1"
+              variant="h4"
+              gutterBottom
+              sx={{ fontWeight: 700, mb: 3 }}
+            >
+              {t("auth.login.title")}
+            </Typography>
+
+            {error && (
+              <Alert
+                severity="error"
+                sx={{
+                  width: "100%",
+                  mb: 3,
+                  borderRadius: 2,
+                }}
+              >
+                {error}
+              </Alert>
             )}
-          </Formik>
-        </Paper>
-      </Box>
-    </Container>
+
+            {success && (
+              <Alert
+                severity="success"
+                sx={{
+                  width: "100%",
+                  mb: 3,
+                  borderRadius: 2,
+                }}
+              >
+                {success}
+              </Alert>
+            )}
+
+            <Formik
+              initialValues={initialValues}
+              validationSchema={loginSchema(t)}
+              onSubmit={handleSubmit}
+              enableReinitialize
+            >
+              {({ isSubmitting, touched, errors }) => (
+                <Form style={{ width: "100%" }}>
+                  <Field
+                    as={TextField}
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label={t("auth.login.email")}
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    error={touched.email && Boolean(errors.email)}
+                    helperText={touched.email && errors.email}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <EmailOutlinedIcon color="primary" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                      },
+                    }}
+                  />
+
+                  <Field
+                    as={TextField}
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="senha"
+                    label={t("auth.login.password")}
+                    type={showPassword ? "text" : "password"}
+                    id="senha"
+                    autoComplete="current-password"
+                    error={touched.senha && Boolean(errors.senha)}
+                    helperText={touched.senha && errors.senha}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LockOutlinedIcon color="primary" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleTogglePasswordVisibility}
+                            edge="end"
+                          >
+                            {showPassword ? (
+                              <VisibilityOffOutlinedIcon />
+                            ) : (
+                              <VisibilityOutlinedIcon />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                      },
+                    }}
+                  />
+
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    sx={{
+                      mt: 4,
+                      mb: 3,
+                      py: 1.5,
+                      borderRadius: 2,
+                      fontWeight: "bold",
+                      boxShadow: 4,
+                      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                      "&:hover": {
+                        background: `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
+                      },
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting
+                      ? t("common.loading")
+                      : t("auth.login.submit")}
+                  </Button>
+
+                  <Divider sx={{ my: 2 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ px: 1 }}
+                    >
+                      ou
+                    </Typography>
+                  </Divider>
+
+                  <Box sx={{ textAlign: "center", mt: 2 }}>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      {t("auth.login.registerLink").split("?")[0]}?
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      onClick={() => navigate("/register")}
+                      sx={{
+                        borderRadius: 2,
+                        px: 3,
+                        fontWeight: "medium",
+                      }}
+                    >
+                      {t("auth.login.registerLink").split("?")[1]}
+                    </Button>
+                  </Box>
+                </Form>
+              )}
+            </Formik>
+          </Paper>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
