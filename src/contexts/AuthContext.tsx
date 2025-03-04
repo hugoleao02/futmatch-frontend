@@ -21,14 +21,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const loadUser = async () => {
     try {
+      console.log("AuthContext - Tentando carregar usuário");
+      console.log("AuthContext - Token atual:", getToken());
+
       const userData = await authService.getProfile();
-      setUser(userData);
+      console.log("AuthContext - Dados do usuário recebidos:", userData);
+
+      if (userData) {
+        setUser(userData);
+        console.log("AuthContext - Usuário definido com sucesso");
+        return userData;
+      } else {
+        console.log("AuthContext - Dados do usuário vazios");
+        setUser(null);
+      }
     } catch (error) {
+      console.error("AuthContext - Erro ao carregar usuário:", error);
       // Não remover o token aqui, apenas limpar o estado do usuário
       setUser(null);
     } finally {
       setLoading(false);
     }
+    return null;
   };
 
   const login = async (credentials: LoginDTO) => {

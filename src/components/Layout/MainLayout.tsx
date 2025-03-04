@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -43,10 +43,11 @@ import { useAuth } from "../../hooks/useAuth";
 import Logo from "../common/Logo";
 import LogoutDialog from "../common/LogoutDialog";
 import { useSnackbar } from "notistack";
+import { hasToken, getToken } from "../../services/tokenService";
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { t, i18n } = useTranslation();
-  const { user, logout } = useAuth();
+  const { user, logout, loadUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -54,6 +55,21 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+
+  // Verificar estado de autenticação
+  useEffect(() => {
+    const token = getToken();
+    console.log("MainLayout - Token:", token ? "Presente" : "Ausente");
+    console.log("MainLayout - User:", user);
+    console.log("MainLayout - hasToken():", hasToken());
+
+    if (token && !user) {
+      console.log(
+        "MainLayout - Token presente mas usuário ausente, tentando carregar usuário"
+      );
+      loadUser();
+    }
+  }, [user, loadUser]);
 
   const handleLanguageChange = (event: SelectChangeEvent) => {
     i18n.changeLanguage(event.target.value);
