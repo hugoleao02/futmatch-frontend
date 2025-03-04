@@ -22,14 +22,18 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import StarIcon from "@mui/icons-material/Star";
+import LoginIcon from "@mui/icons-material/Login";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useTranslation } from "react-i18next";
 import Logo from "../components/common/Logo";
+import { useAuth } from "../hooks/useAuth";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { user } = useAuth();
 
   const features = [
     {
@@ -136,41 +140,86 @@ const Home: React.FC = () => {
               justifyContent="center"
               sx={{ mt: 4 }}
             >
-              <Button
-                variant="contained"
-                color="secondary"
-                size={isMobile ? "medium" : "large"}
-                startIcon={<SportsSoccerIcon />}
-                onClick={() => navigate("/partidas")}
-                sx={{
-                  px: { xs: 3, sm: 4 },
-                  py: { xs: 1, sm: 1.5 },
-                  borderRadius: 3,
-                  fontWeight: "bold",
-                }}
-              >
-                {t("common.startPlaying")}
-              </Button>
+              {user ? (
+                // Botões para usuários autenticados
+                <>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size={isMobile ? "medium" : "large"}
+                    startIcon={<SportsSoccerIcon />}
+                    onClick={() => navigate("/partidas")}
+                    sx={{
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      borderRadius: 3,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {t("common.startPlaying")}
+                  </Button>
 
-              <Button
-                variant="outlined"
-                size={isMobile ? "medium" : "large"}
-                onClick={() => navigate("/criar-sala")}
-                sx={{
-                  px: { xs: 3, sm: 4 },
-                  py: { xs: 1, sm: 1.5 },
-                  borderRadius: 3,
-                  fontWeight: "bold",
-                  color: "white",
-                  borderColor: "rgba(255,255,255,0.5)",
-                  "&:hover": {
-                    borderColor: "white",
-                    bgcolor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-              >
-                {t("home.createMatch")}
-              </Button>
+                  <Button
+                    variant="outlined"
+                    size={isMobile ? "medium" : "large"}
+                    onClick={() => navigate("/criar-sala")}
+                    sx={{
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      borderRadius: 3,
+                      fontWeight: "bold",
+                      color: "white",
+                      borderColor: "rgba(255,255,255,0.5)",
+                      "&:hover": {
+                        borderColor: "white",
+                        bgcolor: "rgba(255,255,255,0.1)",
+                      },
+                    }}
+                  >
+                    {t("home.createMatch")}
+                  </Button>
+                </>
+              ) : (
+                // Botões para usuários não autenticados
+                <>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size={isMobile ? "medium" : "large"}
+                    startIcon={<LoginIcon />}
+                    onClick={() => navigate("/login")}
+                    sx={{
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      borderRadius: 3,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {t("auth.login.title")}
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    size={isMobile ? "medium" : "large"}
+                    startIcon={<PersonAddIcon />}
+                    onClick={() => navigate("/register")}
+                    sx={{
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      borderRadius: 3,
+                      fontWeight: "bold",
+                      color: "white",
+                      borderColor: "rgba(255,255,255,0.5)",
+                      "&:hover": {
+                        borderColor: "white",
+                        bgcolor: "rgba(255,255,255,0.1)",
+                      },
+                    }}
+                  >
+                    {t("auth.register.title")}
+                  </Button>
+                </>
+              )}
             </Stack>
           </Container>
         </Box>
@@ -249,9 +298,9 @@ const Home: React.FC = () => {
                 >
                   <Box
                     sx={{
-                      p: 3,
                       background: feature.bgColor,
                       color: "white",
+                      p: 2,
                       display: "flex",
                       alignItems: "center",
                     }}
@@ -259,33 +308,37 @@ const Home: React.FC = () => {
                     <Avatar
                       sx={{
                         bgcolor: "rgba(255,255,255,0.2)",
-                        width: 56,
-                        height: 56,
-                        mr: 2,
+                        color: "white",
+                        width: 50,
+                        height: 50,
                       }}
                     >
                       {feature.icon}
                     </Avatar>
-                    <Typography variant="h6" fontWeight="bold">
+                    <Typography
+                      variant="h6"
+                      component="h3"
+                      sx={{ ml: 2, fontWeight: "bold" }}
+                    >
                       {feature.title}
                     </Typography>
                   </Box>
-
                   <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                    <Typography color="text.secondary" sx={{ mb: 2 }}>
+                    <Typography variant="body1" color="text.secondary">
                       {feature.description}
                     </Typography>
-
+                  </CardContent>
+                  <Box sx={{ p: 2, pt: 0 }}>
                     <Button
                       variant="text"
                       color="primary"
-                      onClick={feature.action}
                       endIcon={<ArrowForwardIcon />}
-                      sx={{ mt: 1, fontWeight: "medium" }}
+                      onClick={user ? feature.action : () => navigate("/login")}
+                      sx={{ fontWeight: "medium" }}
                     >
-                      {t("common.learnMore")}
+                      {user ? t("common.learnMore") : t("auth.login.title")}
                     </Button>
-                  </CardContent>
+                  </Box>
                 </Card>
               </Grid>
             ))}
@@ -293,7 +346,7 @@ const Home: React.FC = () => {
         </Box>
 
         {/* Featured Matches Section */}
-        <Box sx={{ mb: { xs: 4, sm: 6 } }}>
+        <Box sx={{ mb: { xs: 6, sm: 8 } }}>
           <Box
             sx={{
               display: "flex",
@@ -305,12 +358,11 @@ const Home: React.FC = () => {
             <Typography variant="h5" component="h2" sx={{ fontWeight: "bold" }}>
               {t("home.featuredMatches")}
             </Typography>
-
             <Button
               variant="text"
-              color="primary"
               endIcon={<ArrowForwardIcon />}
               onClick={() => navigate("/partidas")}
+              sx={{ fontWeight: "medium" }}
             >
               {t("common.viewAll")}
             </Button>
@@ -320,87 +372,97 @@ const Home: React.FC = () => {
             {featuredMatches.map((match) => (
               <Grid item xs={12} sm={6} key={match.id}>
                 <Paper
+                  elevation={2}
                   sx={{
                     p: 3,
-                    borderRadius: 3,
-                    display: "flex",
-                    flexDirection: { xs: "column", sm: "row" },
-                    alignItems: { xs: "flex-start", sm: "center" },
+                    borderRadius: 4,
                     transition: "transform 0.2s, box-shadow 0.2s",
                     "&:hover": {
                       transform: "translateY(-4px)",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                      boxShadow: theme.shadows[6],
                     },
                   }}
                 >
-                  <Avatar
+                  <Box
                     sx={{
-                      bgcolor: theme.palette.primary.main,
-                      width: 60,
-                      height: 60,
-                      mr: { xs: 0, sm: 3 },
-                      mb: { xs: 2, sm: 0 },
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      mb: 2,
                     }}
                   >
-                    <SportsSoccerIcon sx={{ fontSize: 30 }} />
-                  </Avatar>
-
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      {match.title}
-                    </Typography>
-
-                    <Stack
-                      direction={{ xs: "column", sm: "row" }}
-                      spacing={{ xs: 1, sm: 2 }}
-                      divider={<Divider orientation="vertical" flexItem />}
-                      sx={{ mb: 2 }}
-                    >
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box>
+                      <Typography
+                        variant="h6"
+                        component="h3"
+                        sx={{ fontWeight: "bold", mb: 0.5 }}
+                      >
+                        {match.title}
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "text.secondary",
+                        }}
+                      >
                         <LocationOnIcon
-                          sx={{
-                            fontSize: 18,
-                            mr: 0.5,
-                            color: "text.secondary",
-                          }}
+                          fontSize="small"
+                          sx={{ mr: 0.5, color: "primary.main" }}
                         />
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2">
                           {match.location}
                         </Typography>
                       </Box>
+                    </Box>
+                    <Chip
+                      label={match.level}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
+                  </Box>
 
-                      <Typography variant="body2" color="text.secondary">
+                  <Divider sx={{ my: 2 }} />
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 0.5 }}
+                      >
                         {match.time}
                       </Typography>
-
-                      <Typography variant="body2" color="text.secondary">
-                        {match.players} jogadores
-                      </Typography>
-                    </Stack>
-
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Chip
-                        label={match.level}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                      />
-
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        onClick={() => navigate(`/partida/${match.id}`)}
-                      >
-                        {t("common.join")}
-                      </Button>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <GroupIcon
+                          fontSize="small"
+                          sx={{ mr: 0.5, color: "primary.main" }}
+                        />
+                        <Typography variant="body2" color="text.secondary">
+                          {match.players}
+                        </Typography>
+                      </Box>
                     </Box>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={
+                        user
+                          ? () => navigate(`/partidas/${match.id}`)
+                          : () => navigate("/login")
+                      }
+                      sx={{ borderRadius: 2 }}
+                    >
+                      {user ? t("common.join") : t("auth.login.title")}
+                    </Button>
                   </Box>
                 </Paper>
               </Grid>
@@ -408,80 +470,63 @@ const Home: React.FC = () => {
           </Grid>
         </Box>
 
-        {/* Call to Action */}
-        <Paper
-          sx={{
-            p: { xs: 3, sm: 5 },
-            borderRadius: 4,
-            backgroundImage:
-              "linear-gradient(135deg, #FF9800 0%, #FF5722 100%)",
-            color: "white",
-            textAlign: "center",
-            position: "relative",
-            overflow: "hidden",
-            mb: 4,
-          }}
-        >
-          <Box sx={{ position: "relative", zIndex: 1 }}>
+        {/* Join Community Section */}
+        <Box sx={{ mb: { xs: 6, sm: 8 } }}>
+          <Paper
+            sx={{
+              p: { xs: 3, sm: 5 },
+              borderRadius: 4,
+              background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
+              color: "white",
+              textAlign: "center",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: -30,
+                right: -30,
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                bgcolor: "rgba(255,255,255,0.1)",
+                display: { xs: "none", md: "block" },
+              }}
+            />
+
             <Typography
-              variant={isMobile ? "h5" : "h4"}
+              variant="h4"
               component="h2"
-              fontWeight="bold"
               gutterBottom
+              sx={{ fontWeight: "bold", position: "relative", zIndex: 1 }}
             >
               {t("home.joinCommunity")}
             </Typography>
-
-            <Typography sx={{ mb: 4, maxWidth: 700, mx: "auto", opacity: 0.9 }}>
+            <Typography
+              variant="body1"
+              sx={{ mb: 4, maxWidth: 700, mx: "auto", opacity: 0.9 }}
+            >
               {t("home.joinCommunityText")}
             </Typography>
-
             <Button
               variant="contained"
               color="secondary"
               size="large"
-              startIcon={<StarIcon />}
+              onClick={() => navigate(user ? "/partidas" : "/register")}
               sx={{
-                bgcolor: "white",
-                color: theme.palette.secondary.main,
-                "&:hover": {
-                  bgcolor: "rgba(255,255,255,0.9)",
-                },
                 px: 4,
                 py: 1.5,
                 borderRadius: 3,
                 fontWeight: "bold",
+                boxShadow: theme.shadows[5],
               }}
-              onClick={() => navigate("/register")}
             >
-              {t("home.getStarted")}
+              {user ? t("common.startPlaying") : t("home.getStarted")}
             </Button>
-          </Box>
-
-          {/* Decorative elements */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: -30,
-              right: -30,
-              width: 150,
-              height: 150,
-              borderRadius: "50%",
-              bgcolor: "rgba(255,255,255,0.1)",
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: -40,
-              left: -40,
-              width: 180,
-              height: 180,
-              borderRadius: "50%",
-              bgcolor: "rgba(255,255,255,0.1)",
-            }}
-          />
-        </Paper>
+          </Paper>
+        </Box>
       </Container>
     </Box>
   );

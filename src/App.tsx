@@ -27,22 +27,51 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+
+            {/* Rota pública para a Home */}
             <Route
-              path="/*"
+              path="/"
+              element={
+                <MainLayout>
+                  <Home />
+                </MainLayout>
+              }
+            />
+
+            {/* Rotas protegidas */}
+            <Route
+              path="/partidas"
               element={
                 <ProtectedRoute>
                   <MainLayout>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/partidas" element={<Partidas />} />
-                      <Route path="/criar-sala" element={<CriarSala />} />
-                      <Route path="/perfil" element={<Perfil />} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
+                    <Partidas />
                   </MainLayout>
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/criar-sala"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <CriarSala />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/perfil"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Perfil />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Rota de fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
       </AuthProvider>
