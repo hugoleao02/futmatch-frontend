@@ -74,28 +74,33 @@ export const authService = {
         throw new Error("Token não encontrado");
       }
 
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-
+      // Não precisamos definir headers manualmente, pois o interceptor já faz isso
+      // Vamos garantir que o token esteja sendo enviado corretamente
       try {
-        const response = await api.get<Jogador>("/jogadores/me", { headers });
+        const response = await api.get<Jogador>("/auth/me");
         return response.data;
-      } catch (apiError) {
+      } catch (authError) {
+        // Tenta rota alternativa
         try {
-          const response = await api.get<Jogador>("/auth/me", { headers });
+          const response = await api.get<Jogador>("/jogadores/me");
           return response.data;
-        } catch (altError) {
+        } catch (jogadoresError) {
+          // Se ambas as rotas falharem, tenta extrair dados do token
           const userData = this.getUserFromToken();
           if (userData) {
             return userData;
           }
 
-          throw altError;
+          throw jogadoresError;
         }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        console.error(
+          "Erro ao obter perfil:",
+          error.response?.status,
+          error.response?.data
+        );
       }
       throw error;
     }
