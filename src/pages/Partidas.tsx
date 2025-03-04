@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Card,
@@ -23,6 +23,9 @@ import {
   Fade,
   Stack,
   Badge,
+  CircularProgress,
+  Alert,
+  SelectChangeEvent,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -33,85 +36,149 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { useTranslation } from "react-i18next";
+import apiService from "../services/apiService";
 
-// Dados mockados para o MVP
-const mockPartidas = [
-  {
-    id: 1,
-    titulo: "Pelada no Parque",
-    local: "Parque da Cidade",
-    data: "2024-03-10",
-    hora: "15:00",
-    jogadores: 8,
-    maxJogadores: 10,
-    nivel: "Intermediário",
-    distancia: "2,5 km",
-  },
-  {
-    id: 2,
-    titulo: "Futebol Society",
-    local: "Campo Society Central",
-    data: "2024-03-11",
-    hora: "19:00",
-    jogadores: 12,
-    maxJogadores: 14,
-    nivel: "Avançado",
-    distancia: "4,8 km",
-  },
-  {
-    id: 3,
-    titulo: "Pelada dos Amigos",
-    local: "Quadra Municipal",
-    data: "2024-03-12",
-    hora: "20:00",
-    jogadores: 6,
-    maxJogadores: 12,
-    nivel: "Iniciante",
-    distancia: "1,2 km",
-  },
-  {
-    id: 4,
-    titulo: "Futebol de Quinta",
-    local: "Arena Soccer Club",
-    data: "2024-03-14",
-    hora: "21:00",
-    jogadores: 10,
-    maxJogadores: 14,
-    nivel: "Intermediário",
-    distancia: "3,7 km",
-  },
-];
+// Definindo interfaces para os tipos necessários
+interface PartidaUI {
+  id: string;
+  titulo: string;
+  local: string;
+  dataHora: string;
+  maxJogadores: number;
+  nivelHabilidade: string;
+  jogadoresConfirmados: Array<{
+    id: string;
+    nome: string;
+    posicao?: string;
+    avatar?: string;
+  }>;
+  jogadoresEspera: Array<{
+    id: string;
+    nome: string;
+    posicao?: string;
+    avatar?: string;
+  }>;
+}
+
+interface FiltroPartida {
+  nivelHabilidade: string;
+  busca: string;
+}
 
 const Partidas: React.FC = () => {
   const navigate = useNavigate();
-  const [nivel, setNivel] = useState("");
-  const [busca, setBusca] = useState("");
+  const [partidas, setPartidas] = useState<PartidaUI[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filtros, setFiltros] = useState<FiltroPartida>({
+    nivelHabilidade: "",
+    busca: "",
+  });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const { t } = useTranslation();
 
-  const handleNivelChange = (event: any) => {
-    setNivel(event.target.value);
+  useEffect(() => {
+    carregarPartidas();
+  }, []);
+
+  const carregarPartidas = async () => {
+    try {
+      setLoading(true);
+      const data = await apiService.listarPartidas(filtros);
+      setPartidas(data);
+      setError(null);
+    } catch (err) {
+      console.error("Erro ao carregar partidas:", err);
+      setError(
+        "Não foi possível carregar as partidas. Tente novamente mais tarde."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNivelChange = (event: SelectChangeEvent) => {
+    const novoFiltro = {
+      ...filtros,
+      nivelHabilidade: event.target.value,
+    };
+    setFiltros(novoFiltro);
+    aplicarFiltros(novoFiltro);
+  };
+
+  const handleBuscaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const novoFiltro = {
+      ...filtros,
+      busca: event.target.value,
+    };
+    setFiltros(novoFiltro);
+  };
+
+  const aplicarFiltros = async (filtrosAtualizados: FiltroPartida) => {
+    try {
+      setLoading(true);
+      const data = await apiService.listarPartidas(filtrosAtualizados);
+      setPartidas(data);
+      setError(null);
+    } catch (err) {
+      console.error("Erro ao filtrar partidas:", err);
+      setError(
+        "Não foi possível aplicar os filtros. Tente novamente mais tarde."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Função para determinar a cor do chip de nível
   const getNivelColor = (nivel: string) => {
     switch (nivel) {
-      case "Iniciante":
+      case "INICIANTE":
         return "success";
-      case "Intermediário":
+      case "INTERMEDIARIO":
         return "primary";
-      case "Avançado":
+      case "AVANCADO":
         return "secondary";
       default:
         return "default";
     }
   };
 
+  const getNivelLabel = (nivel: string) => {
+    switch (nivel) {
+      case "INICIANTE":
+        return "Iniciante";
+      case "INTERMEDIARIO":
+        return "Intermediário";
+      case "AVANCADO":
+        return "Avançado";
+      default:
+        return nivel;
+    }
+  };
+
   // Função para calcular a porcentagem de ocupação
   const getOcupacaoPercent = (atual: number, max: number) => {
     return (atual / max) * 100;
+  };
+
+  const formatarData = (dataString: string) => {
+    const data = new Date(dataString);
+    return data.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const formatarHora = (dataString: string) => {
+    const data = new Date(dataString);
+    return data.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -162,7 +229,7 @@ const Partidas: React.FC = () => {
               variant="contained"
               color="secondary"
               startIcon={<AddIcon />}
-              onClick={() => navigate("/criar-sala")}
+              onClick={() => navigate("/criar-partida")}
               size={isMobile ? "medium" : "large"}
               sx={{
                 px: { xs: 2, sm: 3 },
@@ -219,8 +286,9 @@ const Partidas: React.FC = () => {
                 fullWidth
                 placeholder={t("matches.search")}
                 variant="outlined"
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
+                value={filtros.busca}
+                onChange={handleBuscaChange}
+                onKeyPress={(e) => e.key === "Enter" && aplicarFiltros(filtros)}
                 size={isMobile ? "small" : "medium"}
                 InputProps={{
                   startAdornment: (
@@ -241,7 +309,7 @@ const Partidas: React.FC = () => {
                   </Box>
                 </InputLabel>
                 <Select
-                  value={nivel}
+                  value={filtros.nivelHabilidade}
                   label={
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <FilterListIcon sx={{ mr: 1, fontSize: 20 }} />
@@ -252,267 +320,301 @@ const Partidas: React.FC = () => {
                   sx={{ borderRadius: 2 }}
                 >
                   <MenuItem value="">Todos os níveis</MenuItem>
-                  <MenuItem value="Iniciante">Iniciante</MenuItem>
-                  <MenuItem value="Intermediário">Intermediário</MenuItem>
-                  <MenuItem value="Avançado">Avançado</MenuItem>
+                  <MenuItem value="INICIANTE">Iniciante</MenuItem>
+                  <MenuItem value="INTERMEDIARIO">Intermediário</MenuItem>
+                  <MenuItem value="AVANCADO">Avançado</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
           </Grid>
         </Paper>
 
+        {/* Estado de carregamento */}
+        {loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+            <CircularProgress />
+          </Box>
+        )}
+
+        {/* Mensagem de erro */}
+        {error && !loading && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+
         {/* Lista de partidas */}
-        <Typography
-          variant="h5"
-          component="h2"
-          sx={{
-            mb: 3,
-            fontWeight: "bold",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <SportsSoccerIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-          Partidas Próximas
-        </Typography>
+        {!loading && !error && (
+          <>
+            <Typography
+              variant="h5"
+              component="h2"
+              sx={{
+                mb: 3,
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <SportsSoccerIcon
+                sx={{ mr: 1, color: theme.palette.primary.main }}
+              />
+              Partidas Próximas
+            </Typography>
 
-        <Grid container spacing={{ xs: 2, sm: 3 }}>
-          {mockPartidas.map((partida) => (
-            <Grid item xs={12} sm={6} md={6} key={partida.id}>
-              <Fade in={true} timeout={500 + partida.id * 100}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    "&:hover": {
-                      transform: "translateY(-8px)",
-                      boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
-                    },
-                    borderRadius: 3,
-                    overflow: "hidden",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      bgcolor: theme.palette.primary.main,
-                      backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
-                      color: "white",
-                      p: 2,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                      {partida.titulo}
-                    </Typography>
-                    <Chip
-                      label={partida.nivel}
-                      color={getNivelColor(partida.nivel) as any}
-                      size="small"
+            <Grid container spacing={{ xs: 2, sm: 3 }}>
+              {partidas.map((partida, index) => (
+                <Grid item xs={12} sm={6} md={6} key={partida.id}>
+                  <Fade in={true} timeout={500 + index * 100}>
+                    <Card
                       sx={{
-                        fontWeight: "bold",
-                        color: "white",
-                        bgcolor:
-                          getNivelColor(partida.nivel) === "success"
-                            ? theme.palette.success.main
-                            : getNivelColor(partida.nivel) === "secondary"
-                            ? theme.palette.secondary.main
-                            : theme.palette.primary.dark,
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        transition: "transform 0.3s, box-shadow 0.3s",
+                        "&:hover": {
+                          transform: "translateY(-8px)",
+                          boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
+                        },
+                        borderRadius: 3,
+                        overflow: "hidden",
                       }}
-                    />
-                  </Box>
-
-                  <CardContent sx={{ p: 3, flexGrow: 1 }}>
-                    <Stack spacing={2}>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Avatar
-                          sx={{
-                            bgcolor: `${theme.palette.primary.light}20`,
-                            color: theme.palette.primary.main,
-                            width: 36,
-                            height: 36,
-                            mr: 2,
-                          }}
-                        >
-                          <LocationOnIcon />
-                        </Avatar>
-                        <Box>
-                          <Typography variant="body2" color="text.secondary">
-                            Local
-                          </Typography>
-                          <Typography variant="body1" fontWeight="medium">
-                            {partida.local}
-                          </Typography>
-                        </Box>
+                    >
+                      <Box
+                        sx={{
+                          bgcolor: theme.palette.primary.main,
+                          backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
+                          color: "white",
+                          p: 2,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                          {partida.titulo}
+                        </Typography>
                         <Chip
-                          label={partida.distancia}
+                          label={getNivelLabel(partida.nivelHabilidade)}
+                          color={getNivelColor(partida.nivelHabilidade) as any}
                           size="small"
-                          variant="outlined"
-                          sx={{ ml: "auto" }}
+                          sx={{
+                            fontWeight: "bold",
+                            color: "white",
+                            bgcolor:
+                              getNivelColor(partida.nivelHabilidade) ===
+                              "success"
+                                ? theme.palette.success.main
+                                : getNivelColor(partida.nivelHabilidade) ===
+                                  "secondary"
+                                ? theme.palette.secondary.main
+                                : theme.palette.primary.dark,
+                          }}
                         />
                       </Box>
 
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Avatar
-                          sx={{
-                            bgcolor: `${theme.palette.primary.light}20`,
-                            color: theme.palette.primary.main,
-                            width: 36,
-                            height: 36,
-                            mr: 2,
-                          }}
-                        >
-                          <AccessTimeIcon />
-                        </Avatar>
-                        <Box>
-                          <Typography variant="body2" color="text.secondary">
-                            Data e Hora
-                          </Typography>
-                          <Typography variant="body1" fontWeight="medium">
-                            {partida.data} às {partida.hora}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Avatar
-                          sx={{
-                            bgcolor: `${theme.palette.primary.light}20`,
-                            color: theme.palette.primary.main,
-                            width: 36,
-                            height: 36,
-                            mr: 2,
-                          }}
-                        >
-                          <GroupIcon />
-                        </Avatar>
-                        <Box sx={{ flexGrow: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            Jogadores
-                          </Typography>
+                      <CardContent sx={{ p: 3, flexGrow: 1 }}>
+                        <Stack spacing={2}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Typography
-                              variant="body1"
-                              fontWeight="medium"
-                              sx={{ mr: 1 }}
-                            >
-                              {partida.jogadores}/{partida.maxJogadores}
-                            </Typography>
-                            <Box
+                            <Avatar
                               sx={{
-                                flexGrow: 1,
-                                height: 6,
-                                bgcolor: "rgba(0,0,0,0.08)",
-                                borderRadius: 3,
-                                overflow: "hidden",
+                                bgcolor: `${theme.palette.primary.light}20`,
+                                color: theme.palette.primary.main,
+                                width: 36,
+                                height: 36,
+                                mr: 2,
                               }}
                             >
-                              <Box
-                                sx={{
-                                  width: `${getOcupacaoPercent(
-                                    partida.jogadores,
-                                    partida.maxJogadores
-                                  )}%`,
-                                  height: "100%",
-                                  bgcolor:
-                                    getOcupacaoPercent(
-                                      partida.jogadores,
-                                      partida.maxJogadores
-                                    ) > 80
-                                      ? theme.palette.error.main
-                                      : getOcupacaoPercent(
-                                          partida.jogadores,
-                                          partida.maxJogadores
-                                        ) > 50
-                                      ? theme.palette.warning.main
-                                      : theme.palette.success.main,
-                                  borderRadius: 3,
-                                }}
-                              />
+                              <LocationOnIcon />
+                            </Avatar>
+                            <Box>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                Local
+                              </Typography>
+                              <Typography variant="body1" fontWeight="medium">
+                                {partida.local}
+                              </Typography>
                             </Box>
                           </Box>
-                        </Box>
+
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <Avatar
+                              sx={{
+                                bgcolor: `${theme.palette.primary.light}20`,
+                                color: theme.palette.primary.main,
+                                width: 36,
+                                height: 36,
+                                mr: 2,
+                              }}
+                            >
+                              <AccessTimeIcon />
+                            </Avatar>
+                            <Box>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                Data e Hora
+                              </Typography>
+                              <Typography variant="body1" fontWeight="medium">
+                                {formatarData(partida.dataHora)} às{" "}
+                                {formatarHora(partida.dataHora)}
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <Avatar
+                              sx={{
+                                bgcolor: `${theme.palette.primary.light}20`,
+                                color: theme.palette.primary.main,
+                                width: 36,
+                                height: 36,
+                                mr: 2,
+                              }}
+                            >
+                              <GroupIcon />
+                            </Avatar>
+                            <Box sx={{ flexGrow: 1 }}>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                Jogadores
+                              </Typography>
+                              <Box
+                                sx={{ display: "flex", alignItems: "center" }}
+                              >
+                                <Typography
+                                  variant="body1"
+                                  fontWeight="medium"
+                                  sx={{ mr: 1 }}
+                                >
+                                  {partida.jogadoresConfirmados.length}/
+                                  {partida.maxJogadores}
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    flexGrow: 1,
+                                    height: 6,
+                                    bgcolor: "rgba(0,0,0,0.08)",
+                                    borderRadius: 3,
+                                    overflow: "hidden",
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: `${getOcupacaoPercent(
+                                        partida.jogadoresConfirmados.length,
+                                        partida.maxJogadores
+                                      )}%`,
+                                      height: "100%",
+                                      bgcolor:
+                                        getOcupacaoPercent(
+                                          partida.jogadoresConfirmados.length,
+                                          partida.maxJogadores
+                                        ) > 80
+                                          ? theme.palette.error.main
+                                          : getOcupacaoPercent(
+                                              partida.jogadoresConfirmados
+                                                .length,
+                                              partida.maxJogadores
+                                            ) > 50
+                                          ? theme.palette.warning.main
+                                          : theme.palette.success.main,
+                                      borderRadius: 3,
+                                    }}
+                                  />
+                                </Box>
+                              </Box>
+                            </Box>
+                          </Box>
+                        </Stack>
+                      </CardContent>
+
+                      <Divider />
+
+                      <Box
+                        sx={{
+                          p: 2,
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          size="medium"
+                          onClick={() => navigate(`/partidas/${partida.id}`)}
+                          sx={{
+                            borderRadius: 2,
+                            px: 3,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Participar
+                        </Button>
                       </Box>
-                    </Stack>
-                  </CardContent>
-
-                  <Divider />
-
-                  <Box
-                    sx={{ p: 2, display: "flex", justifyContent: "flex-end" }}
-                  >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="medium"
-                      onClick={() => navigate(`/partida/${partida.id}`)}
-                      sx={{
-                        borderRadius: 2,
-                        px: 3,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Participar
-                    </Button>
-                  </Box>
-                </Card>
-              </Fade>
+                    </Card>
+                  </Fade>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
 
-        {mockPartidas.length === 0 && (
-          <Paper
-            sx={{
-              textAlign: "center",
-              py: 6,
-              px: 3,
-              borderRadius: 3,
-              bgcolor: "rgba(0,0,0,0.02)",
-              border: "1px dashed rgba(0,0,0,0.1)",
-            }}
-          >
-            <Avatar
-              sx={{
-                width: 80,
-                height: 80,
-                mx: "auto",
-                mb: 2,
-                bgcolor: `${theme.palette.primary.light}30`,
-                color: theme.palette.primary.main,
-              }}
-            >
-              <SportsSoccerIcon sx={{ fontSize: 40 }} />
-            </Avatar>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              Nenhuma partida encontrada
-            </Typography>
-            <Typography
-              color="text.secondary"
-              sx={{ mb: 3, maxWidth: 500, mx: "auto" }}
-            >
-              Não encontramos partidas com os filtros selecionados. Tente outros
-              filtros ou crie sua própria partida.
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={() => navigate("/criar-sala")}
-              sx={{
-                mt: 2,
-                borderRadius: 2,
-                px: 3,
-                py: 1,
-                fontWeight: "bold",
-              }}
-            >
-              Criar Nova Partida
-            </Button>
-          </Paper>
+            {partidas.length === 0 && !loading && (
+              <Paper
+                sx={{
+                  textAlign: "center",
+                  py: 6,
+                  px: 3,
+                  borderRadius: 3,
+                  bgcolor: "rgba(0,0,0,0.02)",
+                  border: "1px dashed rgba(0,0,0,0.1)",
+                }}
+              >
+                <Avatar
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    mx: "auto",
+                    mb: 2,
+                    bgcolor: `${theme.palette.primary.light}30`,
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  <SportsSoccerIcon sx={{ fontSize: 40 }} />
+                </Avatar>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  Nenhuma partida encontrada
+                </Typography>
+                <Typography
+                  color="text.secondary"
+                  sx={{ mb: 3, maxWidth: 500, mx: "auto" }}
+                >
+                  Não encontramos partidas com os filtros selecionados. Tente
+                  outros filtros ou crie sua própria partida.
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  onClick={() => navigate("/criar-partida")}
+                  sx={{
+                    mt: 2,
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Criar Nova Partida
+                </Button>
+              </Paper>
+            )}
+          </>
         )}
       </Container>
     </Box>
