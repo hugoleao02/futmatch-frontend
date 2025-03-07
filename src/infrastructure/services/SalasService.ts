@@ -62,16 +62,13 @@ export interface FiltroSalaDTO {
   busca?: string;
 }
 
-// Criar uma instância do HttpClient
-const httpClient = new HttpClient(API_CONFIG.BASE_URL);
-
 // Funções do serviço
 export const listarSalas = async (filtros?: FiltroSalaDTO): Promise<Sala[]> => {
   try {
     const endpoint = filtros ? "/salas/filtrar" : "/salas";
     const config = filtros ? { params: filtros } : undefined;
 
-    return await httpClient.get<Sala[]>(endpoint, config);
+    return await HttpClient.get<Sala[]>(endpoint, config);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.isNetworkError) {
@@ -84,7 +81,7 @@ export const listarSalas = async (filtros?: FiltroSalaDTO): Promise<Sala[]> => {
 
 export const obterSala = async (id: number): Promise<Sala> => {
   try {
-    return await httpClient.get<Sala>(`/salas/${id}`);
+    return await HttpClient.get<Sala>(`/salas/${id}`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -99,7 +96,7 @@ export const obterSala = async (id: number): Promise<Sala> => {
 
 export const criarSala = async (salaData: CriarSalaDTO): Promise<Sala> => {
   try {
-    return await httpClient.post<Sala>("/salas", salaData);
+    return await HttpClient.post<Sala>("/salas", salaData);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 400) {
@@ -116,7 +113,7 @@ export const criarSala = async (salaData: CriarSalaDTO): Promise<Sala> => {
 
 export const entrarNaSala = async (salaId: number): Promise<Sala> => {
   try {
-    return await httpClient.post<Sala>(`/salas/${salaId}/entrar`);
+    return await HttpClient.post<Sala>(`/salas/${salaId}/entrar`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -135,7 +132,7 @@ export const entrarNaSala = async (salaId: number): Promise<Sala> => {
 
 export const sairDaSala = async (salaId: number): Promise<void> => {
   try {
-    await httpClient.post<void>(`/salas/${salaId}/sair`);
+    await HttpClient.post<void>(`/salas/${salaId}/sair`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -154,7 +151,7 @@ export const sairDaSala = async (salaId: number): Promise<void> => {
 
 export const deletarSala = async (salaId: number): Promise<void> => {
   try {
-    await httpClient.delete<void>(`/salas/${salaId}`);
+    await HttpClient.delete<void>(`/salas/${salaId}`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -175,7 +172,7 @@ export const buscarPorLocalizacao = async (
   localizacao: string
 ): Promise<Sala[]> => {
   try {
-    return await httpClient.get<Sala[]>(
+    return await HttpClient.get<Sala[]>(
       `/salas/buscar?localizacao=${encodeURIComponent(localizacao)}`
     );
   } catch (error) {
@@ -190,7 +187,7 @@ export const buscarPorLocalizacao = async (
 
 export const filtrarSalas = async (filtros: FiltroSalaDTO): Promise<Sala[]> => {
   try {
-    return await httpClient.get<Sala[]>("/salas/filtrar", {
+    return await HttpClient.get<Sala[]>("/salas/filtrar", {
       params: filtros,
     });
   } catch (error) {
@@ -205,7 +202,7 @@ export const filtrarSalas = async (filtros: FiltroSalaDTO): Promise<Sala[]> => {
 
 export const listarMensagens = async (salaId: number): Promise<Mensagem[]> => {
   try {
-    return await httpClient.get<Mensagem[]>(`/salas/${salaId}/mensagens`);
+    return await HttpClient.get<Mensagem[]>(`/salas/${salaId}/mensagens`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -224,7 +221,7 @@ export const enviarMensagem = async (
   mensagemData: EnviarMensagemDTO
 ): Promise<Mensagem> => {
   try {
-    return await httpClient.post<Mensagem>(
+    return await HttpClient.post<Mensagem>(
       `/salas/${mensagemData.salaId}/mensagens`,
       mensagemData
     );

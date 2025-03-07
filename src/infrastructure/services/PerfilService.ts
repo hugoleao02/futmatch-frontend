@@ -36,13 +36,10 @@ export interface Estatisticas {
   ultimasPartidas: PartidaResumo[];
 }
 
-// Criar uma instância do HttpClient
-const httpClient = new HttpClient(API_CONFIG.BASE_URL);
-
 // Funções do serviço
 export const obterPerfil = async (): Promise<User> => {
   try {
-    const response = await httpClient.get<any>("/jogadores/me");
+    const response = await HttpClient.get<any>("/jogadores/me");
     return UserAdapter.fromApiResponse(response);
   } catch (error) {
     if (error instanceof ApiError) {
@@ -58,7 +55,7 @@ export const obterPerfil = async (): Promise<User> => {
 
 export const obterJogadorPorId = async (id: number): Promise<User> => {
   try {
-    const response = await httpClient.get<any>(`/jogadores/${id}`);
+    const response = await HttpClient.get<any>(`/jogadores/${id}`);
     return UserAdapter.fromApiResponse(response);
   } catch (error) {
     if (error instanceof ApiError) {
@@ -76,7 +73,7 @@ export const atualizarPerfil = async (
   perfilData: AtualizarPerfilDTO
 ): Promise<User> => {
   try {
-    const response = await httpClient.put<any>("/jogadores/me", perfilData);
+    const response = await HttpClient.put<any>("/jogadores/me", perfilData);
     return UserAdapter.fromApiResponse(response);
   } catch (error) {
     if (error instanceof ApiError) {
@@ -100,7 +97,7 @@ export const obterEstatisticas = async (
       ? `/jogadores/${jogadorId}/estatisticas`
       : "/jogadores/me/estatisticas";
 
-    return await httpClient.get<Estatisticas>(endpoint);
+    return await HttpClient.get<Estatisticas>(endpoint);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {

@@ -5,13 +5,10 @@ import { UserAdapter } from "../adapters/UserAdapter";
 import { API_CONFIG } from "../../config/api";
 import { saveToken, removeToken, getUserFromToken } from "./TokenService";
 
-// Criar uma instância do HttpClient
-const httpClient = new HttpClient(API_CONFIG.BASE_URL);
-
 // Funções do serviço
 export const login = async (credentials: LoginDTO): Promise<string> => {
   try {
-    const response = await httpClient.post<{ token: string } | string>(
+    const response = await HttpClient.post<{ token: string } | string>(
       API_CONFIG.AUTH.LOGIN_ENDPOINT,
       credentials
     );
@@ -42,7 +39,7 @@ export const login = async (credentials: LoginDTO): Promise<string> => {
 
 export const register = async (userData: RegisterDTO): Promise<User> => {
   try {
-    const response = await httpClient.post<any>(
+    const response = await HttpClient.post<any>(
       API_CONFIG.AUTH.REGISTER_ENDPOINT,
       userData
     );
@@ -65,13 +62,13 @@ export const register = async (userData: RegisterDTO): Promise<User> => {
 export const getProfile = async (): Promise<User> => {
   try {
     try {
-      const response = await httpClient.get<any>(
+      const response = await HttpClient.get<any>(
         API_CONFIG.AUTH.PROFILE_ENDPOINT
       );
       return UserAdapter.fromApiResponse(response);
     } catch (authError) {
       try {
-        const response = await httpClient.get<any>(
+        const response = await HttpClient.get<any>(
           API_CONFIG.AUTH.PROFILE_FALLBACK_ENDPOINT
         );
         return UserAdapter.fromApiResponse(response);

@@ -44,9 +44,6 @@ export interface FiltroPartidaDTO {
   busca?: string;
 }
 
-// Criar uma instância do HttpClient
-const httpClient = new HttpClient(API_CONFIG.BASE_URL);
-
 // Funções do serviço
 export const listarPartidas = async (
   filtros?: FiltroPartidaDTO
@@ -55,7 +52,7 @@ export const listarPartidas = async (
     const endpoint = filtros ? "/partidas/filtrar" : "/partidas";
     const config = filtros ? { params: filtros } : undefined;
 
-    return await httpClient.get<Partida[]>(endpoint, config);
+    return await HttpClient.get<Partida[]>(endpoint, config);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.isNetworkError) {
@@ -68,7 +65,7 @@ export const listarPartidas = async (
 
 export const listarMinhasPartidas = async (): Promise<Partida[]> => {
   try {
-    return await httpClient.get<Partida[]>("/partidas/minhas");
+    return await HttpClient.get<Partida[]>("/partidas/minhas");
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 401) {
@@ -83,7 +80,7 @@ export const listarMinhasPartidas = async (): Promise<Partida[]> => {
 
 export const listarPartidasEmAndamento = async (): Promise<Partida[]> => {
   try {
-    return await httpClient.get<Partida[]>("/partidas/em-andamento");
+    return await HttpClient.get<Partida[]>("/partidas/em-andamento");
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 401) {
@@ -98,7 +95,7 @@ export const listarPartidasEmAndamento = async (): Promise<Partida[]> => {
 
 export const obterPartida = async (id: number): Promise<Partida> => {
   try {
-    return await httpClient.get<Partida>(`/partidas/${id}`);
+    return await HttpClient.get<Partida>(`/partidas/${id}`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -115,7 +112,7 @@ export const criarPartida = async (
   partidaData: CriarPartidaDTO
 ): Promise<Partida> => {
   try {
-    return await httpClient.post<Partida>("/partidas", partidaData);
+    return await HttpClient.post<Partida>("/partidas", partidaData);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 400) {
@@ -133,7 +130,7 @@ export const atualizarPlacar = async (
   placarData: AtualizarPlacarDTO
 ): Promise<Partida> => {
   try {
-    return await httpClient.put<Partida>(`/partidas/${id}/placar`, placarData);
+    return await HttpClient.put<Partida>(`/partidas/${id}/placar`, placarData);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -150,7 +147,7 @@ export const atualizarPlacar = async (
 
 export const participarPartida = async (id: number): Promise<void> => {
   try {
-    await httpClient.post<void>(`/partidas/${id}/participar`);
+    await HttpClient.post<void>(`/partidas/${id}/participar`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -167,7 +164,7 @@ export const participarPartida = async (id: number): Promise<void> => {
 
 export const sairPartida = async (id: number): Promise<void> => {
   try {
-    await httpClient.post<void>(`/partidas/${id}/sair`);
+    await HttpClient.post<void>(`/partidas/${id}/sair`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
@@ -184,7 +181,7 @@ export const sairPartida = async (id: number): Promise<void> => {
 
 export const excluirPartida = async (id: number): Promise<void> => {
   try {
-    await httpClient.delete<void>(`/partidas/${id}`);
+    await HttpClient.delete<void>(`/partidas/${id}`);
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) {
