@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Card,
@@ -14,6 +14,7 @@ import {
   Chip,
   Stack,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
@@ -26,7 +27,21 @@ import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useTranslation } from "react-i18next";
 import Logo from "../components/common/Logo";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../presentation/hooks/useAuth";
+import SportsIcon from "@mui/icons-material/Sports";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { listarPartidasEmAndamento } from "../infrastructure/services/PartidasService";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+
+// Interface para as partidas em destaque
+interface PartidaDestaque {
+  id: number;
+  title: string;
+  location: string;
+  time: string;
+  players: string;
+  level: string;
+}
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -34,51 +49,72 @@ const Home: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [partidasDestaque, setPartidasDestaque] = useState<PartidaDestaque[]>(
+    []
+  );
+
+  useEffect(() => {
+    const carregarPartidasDestaque = async () => {
+      try {
+        setLoading(true);
+
+        // Buscar partidas em destaque da API
+        const partidasData = await listarPartidasEmAndamento();
+
+        const partidasFormatadas = partidasData.slice(0, 3).map((partida) => ({
+          id: partida.id,
+          title: partida.titulo || "",
+          location: partida.local || "",
+          time: new Date(partida.dataHora || partida.data).toLocaleString(
+            "pt-BR",
+            {
+              weekday: "long",
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          ),
+          players: `${partida.jogadoresConfirmados?.length || 0}/${
+            partida.maxJogadores || 0
+          }`,
+          level: partida.nivelHabilidade || "",
+        }));
+
+        setPartidasDestaque(partidasFormatadas);
+      } catch (error) {
+        setPartidasDestaque([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarPartidasDestaque();
+  }, []);
 
   const features = [
     {
       title: t("home.features.findMatches.title"),
       description: t("home.features.findMatches.description"),
-      icon: <LocationOnIcon sx={{ fontSize: isMobile ? 30 : 40 }} />,
-      action: () => navigate("/partidas"),
+      icon: <SportsIcon fontSize="large" />,
+      action: () => navigate("/dashboard/partidas"),
       color: theme.palette.primary.main,
       bgColor: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
     },
     {
       title: t("home.features.createRoom.title"),
       description: t("home.features.createRoom.description"),
-      icon: <GroupIcon sx={{ fontSize: isMobile ? 30 : 40 }} />,
-      action: () => navigate("/criar-sala"),
+      icon: <AddCircleIcon fontSize="large" />,
+      action: () => navigate("/dashboard/criar-sala"),
       color: theme.palette.secondary.main,
       bgColor: `linear-gradient(135deg, ${theme.palette.secondary.light} 0%, ${theme.palette.secondary.main} 100%)`,
     },
     {
       title: t("home.features.ranking.title"),
       description: t("home.features.ranking.description"),
-      icon: <EmojiEventsIcon sx={{ fontSize: isMobile ? 30 : 40 }} />,
-      action: () => navigate("/ranking"),
+      icon: <EmojiEventsIcon fontSize="large" />,
+      action: () => navigate("/dashboard/ranking"),
       color: theme.palette.success.main,
       bgColor: `linear-gradient(135deg, ${theme.palette.success.light} 0%, ${theme.palette.success.main} 100%)`,
-    },
-  ];
-
-  // Partidas em destaque (mockadas)
-  const featuredMatches = [
-    {
-      id: 1,
-      title: "Pelada no Parque",
-      location: "Parque da Cidade",
-      time: "Hoje, 15:00",
-      players: "8/10",
-      level: "Intermediário",
-    },
-    {
-      id: 2,
-      title: "Futebol Society",
-      location: "Campo Society Central",
-      time: "Amanhã, 19:00",
-      players: "12/14",
-      level: "Avançado",
     },
   ];
 
@@ -148,7 +184,7 @@ const Home: React.FC = () => {
                     color="secondary"
                     size={isMobile ? "medium" : "large"}
                     startIcon={<SportsSoccerIcon />}
-                    onClick={() => navigate("/partidas")}
+                    onClick={() => navigate("/dashboard/partidas")}
                     sx={{
                       px: { xs: 3, sm: 4 },
                       py: { xs: 1, sm: 1.5 },
@@ -162,7 +198,7 @@ const Home: React.FC = () => {
                   <Button
                     variant="outlined"
                     size={isMobile ? "medium" : "large"}
-                    onClick={() => navigate("/criar-sala")}
+                    onClick={() => navigate("/dashboard/criar-sala")}
                     sx={{
                       px: { xs: 3, sm: 4 },
                       py: { xs: 1, sm: 1.5 },
@@ -361,7 +397,7 @@ const Home: React.FC = () => {
             <Button
               variant="text"
               endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate("/partidas")}
+              onClick={() => navigate("/dashboard/partidas")}
               sx={{ fontWeight: "medium" }}
             >
               {t("common.viewAll")}
@@ -369,104 +405,136 @@ const Home: React.FC = () => {
           </Box>
 
           <Grid container spacing={3}>
-            {featuredMatches.map((match) => (
-              <Grid item xs={12} sm={6} key={match.id}>
-                <Paper
-                  elevation={2}
-                  sx={{
-                    p: 3,
-                    borderRadius: 4,
-                    transition: "transform 0.2s, box-shadow 0.2s",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: theme.shadows[6],
-                    },
-                  }}
-                >
-                  <Box
+            {loading ? (
+              // Mostrar indicador de carregamento
+              Array.from(new Array(3)).map((_, index) => (
+                <Grid item xs={12} sm={6} key={index}>
+                  <Paper
                     sx={{
+                      p: 2,
                       display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      mb: 2,
+                      flexDirection: "column",
+                      height: 200,
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    <Box>
-                      <Typography
-                        variant="h6"
-                        component="h3"
-                        sx={{ fontWeight: "bold", mb: 0.5 }}
-                      >
-                        {match.title}
+                    <CircularProgress />
+                  </Paper>
+                </Grid>
+              ))
+            ) : partidasDestaque.length > 0 ? (
+              // Mostrar partidas em destaque
+              partidasDestaque.map((partida) => (
+                <Grid item xs={12} sm={6} key={partida.id}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "100%",
+                      cursor: "pointer",
+                      transition: "transform 0.2s, box-shadow 0.2s",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                        boxShadow: 4,
+                      },
+                    }}
+                    onClick={
+                      user
+                        ? () => navigate(`/dashboard/partidas/${partida.id}`)
+                        : () => navigate("/login")
+                    }
+                  >
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="h6" component="h3" gutterBottom>
+                        {partida.title}
                       </Typography>
                       <Box
                         sx={{
                           display: "flex",
                           alignItems: "center",
-                          color: "text.secondary",
+                          mb: 1,
                         }}
                       >
                         <LocationOnIcon
                           fontSize="small"
-                          sx={{ mr: 0.5, color: "primary.main" }}
-                        />
-                        <Typography variant="body2">
-                          {match.location}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Chip
-                      label={match.level}
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                    />
-                  </Box>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Box>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 0.5 }}
-                      >
-                        {match.time}
-                      </Typography>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <GroupIcon
-                          fontSize="small"
-                          sx={{ mr: 0.5, color: "primary.main" }}
+                          sx={{ mr: 1, color: "text.secondary" }}
                         />
                         <Typography variant="body2" color="text.secondary">
-                          {match.players}
+                          {partida.location}
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          mb: 1,
+                        }}
+                      >
+                        <AccessTimeIcon
+                          fontSize="small"
+                          sx={{ mr: 1, color: "text.secondary" }}
+                        />
+                        <Typography variant="body2" color="text.secondary">
+                          {partida.time}
                         </Typography>
                       </Box>
                     </Box>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      onClick={
-                        user
-                          ? () => navigate(`/partidas/${match.id}`)
-                          : () => navigate("/login")
-                      }
-                      sx={{ borderRadius: 2 }}
+                    <Box
+                      sx={{
+                        mt: "auto",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
                     >
-                      {user ? t("common.join") : t("auth.login.title")}
-                    </Button>
-                  </Box>
+                      <Chip
+                        size="small"
+                        label={partida.players}
+                        icon={<GroupIcon />}
+                        color="primary"
+                        variant="outlined"
+                      />
+                      <Chip
+                        size="small"
+                        label={partida.level}
+                        color={
+                          partida.level === "AVANCADO"
+                            ? "error"
+                            : partida.level === "INTERMEDIARIO"
+                            ? "warning"
+                            : "success"
+                        }
+                      />
+                    </Box>
+                  </Paper>
+                </Grid>
+              ))
+            ) : (
+              // Mostrar mensagem de erro
+              <Grid item xs={12}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography variant="body1" color="error">
+                    {t("home.errorLoadingMatches")}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => window.location.reload()}
+                  >
+                    {t("common.refresh")}
+                  </Button>
                 </Paper>
               </Grid>
-            ))}
+            )}
           </Grid>
         </Box>
 
@@ -514,7 +582,9 @@ const Home: React.FC = () => {
               variant="contained"
               color="secondary"
               size="large"
-              onClick={() => navigate(user ? "/partidas" : "/register")}
+              onClick={() =>
+                navigate(user ? "/dashboard/partidas" : "/register")
+              }
               sx={{
                 px: 4,
                 py: 1.5,

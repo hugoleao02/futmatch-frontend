@@ -16,7 +16,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../presentation/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import { loginSchema, LoginFormValues } from "../schemas";
@@ -26,7 +26,8 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import Logo from "../components/common/Logo";
-import { getToken } from "../services/tokenService";
+import { getToken } from "../infrastructure/services/TokenService";
+import { LoginDTO } from "../core/domain/dto/AuthDTO";
 
 interface LocationState {
   message?: string;
@@ -52,14 +53,12 @@ const Login: React.FC = () => {
   });
 
   useEffect(() => {
-    // Verifica se há mensagem de sucesso do registro
     const state = location.state as LocationState;
     if (state?.message) {
       setSuccess(state.message);
       if (state.email) {
         setInitialValues((prev) => ({ ...prev, email: state.email || "" }));
       }
-      // Limpa o estado para não mostrar a mensagem novamente após refresh
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -70,40 +69,29 @@ const Login: React.FC = () => {
   ) => {
     try {
       setError("");
-      console.log("Iniciando login com valores:", values);
-      console.log("Token antes do login:", getToken());
 
-      await login(values);
+      const loginDTO: LoginDTO = {
+        email: values.email,
+        senha: values.senha,
+      };
 
-      console.log("Login realizado com sucesso");
-      console.log("Token após login (imediato):", getToken());
+      await login(loginDTO);
 
-      // Verificar o token após um pequeno atraso
-      setTimeout(() => {
-        console.log("Token após login (com delay):", getToken());
+      const tokenAtual = getToken();
 
-        // Tentar salvar novamente o token diretamente
-        const tokenAtual = getToken();
-        if (!tokenAtual) {
-          console.log("Tentando salvar token diretamente da página de login");
-          // Tentar obter o token de alguma forma e salvá-lo
-          // Esta é uma solução temporária para diagnóstico
-          window.sessionStorage.setItem("tokenBackup", "token_teste_login");
-          console.log(
-            "Token de backup salvo em sessionStorage:",
-            window.sessionStorage.getItem("tokenBackup")
-          );
-        }
-      }, 500);
+      if (!tokenAtual) {
+        window.sessionStorage.setItem("tokenBackup", "token_teste_login");
+      }
 
-      // Redireciona para a página anterior ou para a home
       const state = location.state as LocationState;
       const from = state?.from?.pathname || "/";
-      console.log("Redirecionando para:", from);
       navigate(from, { replace: true });
     } catch (error) {
-      console.error("Erro durante o login:", error);
-      setError(t("auth.errors.invalidCredentials"));
+      if (error instanceof Error) {
+        setError(error.message || t("auth.errors.invalidCredentials"));
+      } else {
+        setError(t("auth.errors.invalidCredentials"));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -249,7 +237,7 @@ const Login: React.FC = () => {
                     label={t("auth.login.password")}
                     type={showPassword ? "text" : "password"}
                     id="senha"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     error={touched.senha && Boolean(errors.senha)}
                     helperText={touched.senha && errors.senha}
                     InputProps={{
@@ -277,6 +265,9 @@ const Login: React.FC = () => {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
+                      },
+                      "& input::-ms-reveal, & input::-ms-clear": {
+                        display: "none",
                       },
                     }}
                   />

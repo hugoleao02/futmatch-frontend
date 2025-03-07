@@ -36,7 +36,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { useTranslation } from "react-i18next";
-import apiService from "../services/apiService";
+import {
+  Partida,
+  FiltroPartidaDTO,
+  listarPartidas,
+} from "../infrastructure/services";
 
 // Definindo interfaces para os tipos necessários
 interface PartidaUI {
@@ -67,10 +71,10 @@ interface FiltroPartida {
 
 const Partidas: React.FC = () => {
   const navigate = useNavigate();
-  const [partidas, setPartidas] = useState<PartidaUI[]>([]);
+  const [partidas, setPartidas] = useState<Partida[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filtros, setFiltros] = useState<FiltroPartida>({
+  const [filtros, setFiltros] = useState<FiltroPartidaDTO>({
     nivelHabilidade: "",
     busca: "",
   });
@@ -86,13 +90,12 @@ const Partidas: React.FC = () => {
   const carregarPartidas = async () => {
     try {
       setLoading(true);
-      const data = await apiService.listarPartidas(filtros);
+      const data = await listarPartidas();
       setPartidas(data);
       setError(null);
     } catch (err) {
-      console.error("Erro ao carregar partidas:", err);
       setError(
-        "Não foi possível carregar as partidas. Tente novamente mais tarde."
+        err instanceof Error ? err.message : "Erro ao carregar partidas"
       );
     } finally {
       setLoading(false);
@@ -100,33 +103,31 @@ const Partidas: React.FC = () => {
   };
 
   const handleNivelChange = (event: SelectChangeEvent) => {
-    const novoFiltro = {
+    setFiltros({
       ...filtros,
       nivelHabilidade: event.target.value,
-    };
-    setFiltros(novoFiltro);
-    aplicarFiltros(novoFiltro);
+    });
+    aplicarFiltros({
+      ...filtros,
+      nivelHabilidade: event.target.value,
+    });
   };
 
   const handleBuscaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const novoFiltro = {
+    setFiltros({
       ...filtros,
       busca: event.target.value,
-    };
-    setFiltros(novoFiltro);
+    });
   };
 
-  const aplicarFiltros = async (filtrosAtualizados: FiltroPartida) => {
+  const aplicarFiltros = async (filtrosAtualizados: FiltroPartidaDTO) => {
     try {
       setLoading(true);
-      const data = await apiService.listarPartidas(filtrosAtualizados);
+      const data = await listarPartidas(filtrosAtualizados);
       setPartidas(data);
       setError(null);
     } catch (err) {
-      console.error("Erro ao filtrar partidas:", err);
-      setError(
-        "Não foi possível aplicar os filtros. Tente novamente mais tarde."
-      );
+      setError(err instanceof Error ? err.message : "Erro ao filtrar partidas");
     } finally {
       setLoading(false);
     }
@@ -229,7 +230,7 @@ const Partidas: React.FC = () => {
               variant="contained"
               color="secondary"
               startIcon={<AddIcon />}
-              onClick={() => navigate("/criar-partida")}
+              onClick={() => navigate("/dashboard/criar-partida")}
               size={isMobile ? "medium" : "large"}
               sx={{
                 px: { xs: 2, sm: 3 },
@@ -395,18 +396,21 @@ const Partidas: React.FC = () => {
                           {partida.titulo}
                         </Typography>
                         <Chip
-                          label={getNivelLabel(partida.nivelHabilidade)}
-                          color={getNivelColor(partida.nivelHabilidade) as any}
+                          label={getNivelLabel(partida.nivelHabilidade || "")}
+                          color={
+                            getNivelColor(partida.nivelHabilidade || "") as any
+                          }
                           size="small"
                           sx={{
                             fontWeight: "bold",
                             color: "white",
                             bgcolor:
-                              getNivelColor(partida.nivelHabilidade) ===
+                              getNivelColor(partida.nivelHabilidade || "") ===
                               "success"
                                 ? theme.palette.success.main
-                                : getNivelColor(partida.nivelHabilidade) ===
-                                  "secondary"
+                                : getNivelColor(
+                                    partida.nivelHabilidade || ""
+                                  ) === "secondary"
                                 ? theme.palette.secondary.main
                                 : theme.palette.primary.dark,
                           }}
@@ -460,8 +464,8 @@ const Partidas: React.FC = () => {
                                 Data e Hora
                               </Typography>
                               <Typography variant="body1" fontWeight="medium">
-                                {formatarData(partida.dataHora)} às{" "}
-                                {formatarHora(partida.dataHora)}
+                                {formatarData(partida.dataHora || "")} às{" "}
+                                {formatarHora(partida.dataHora || "")}
                               </Typography>
                             </Box>
                           </Box>
@@ -493,8 +497,8 @@ const Partidas: React.FC = () => {
                                   fontWeight="medium"
                                   sx={{ mr: 1 }}
                                 >
-                                  {partida.jogadoresConfirmados.length}/
-                                  {partida.maxJogadores}
+                                  {partida.jogadoresConfirmados?.length || 0}/
+                                  {partida.maxJogadores || 0}
                                 </Typography>
                                 <Box
                                   sx={{
@@ -508,20 +512,22 @@ const Partidas: React.FC = () => {
                                   <Box
                                     sx={{
                                       width: `${getOcupacaoPercent(
-                                        partida.jogadoresConfirmados.length,
-                                        partida.maxJogadores
+                                        partida.jogadoresConfirmados?.length ||
+                                          0,
+                                        partida.maxJogadores || 0
                                       )}%`,
                                       height: "100%",
                                       bgcolor:
                                         getOcupacaoPercent(
-                                          partida.jogadoresConfirmados.length,
-                                          partida.maxJogadores
+                                          partida.jogadoresConfirmados
+                                            ?.length || 0,
+                                          partida.maxJogadores || 0
                                         ) > 80
                                           ? theme.palette.error.main
                                           : getOcupacaoPercent(
                                               partida.jogadoresConfirmados
-                                                .length,
-                                              partida.maxJogadores
+                                                ?.length || 0,
+                                              partida.maxJogadores || 0
                                             ) > 50
                                           ? theme.palette.warning.main
                                           : theme.palette.success.main,
@@ -548,7 +554,9 @@ const Partidas: React.FC = () => {
                           variant="contained"
                           color="primary"
                           size="medium"
-                          onClick={() => navigate(`/partidas/${partida.id}`)}
+                          onClick={() =>
+                            navigate(`/dashboard/partidas/${partida.id}`)
+                          }
                           sx={{
                             borderRadius: 2,
                             px: 3,
@@ -601,7 +609,7 @@ const Partidas: React.FC = () => {
                   variant="contained"
                   color="primary"
                   startIcon={<AddIcon />}
-                  onClick={() => navigate("/criar-partida")}
+                  onClick={() => navigate("/dashboard/criar-partida")}
                   sx={{
                     mt: 2,
                     borderRadius: 2,

@@ -17,7 +17,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useTranslation } from "react-i18next";
-import { FiltroSalaDTO } from "../../types/api";
+import { FiltroSalaDTO } from "../../infrastructure/services";
 
 interface SalaFiltrosProps {
   filtros: FiltroSalaDTO;

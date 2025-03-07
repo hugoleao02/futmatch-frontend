@@ -46,8 +46,8 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { useTranslation } from "react-i18next";
-import { Partida, Jogador } from "../types/api";
-import { apiService } from "../services/apiService";
+import { useAuth } from "../presentation/hooks/useAuth";
+import { PartidasService } from "../infrastructure/services";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -77,6 +77,7 @@ const DetalhesPartida: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const [partida, setPartida] = useState<Partida | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,19 +98,12 @@ const DetalhesPartida: React.FC = () => {
     severity: "success",
   });
 
-  // Simulação de usuário logado (em produção, viria do contexto de autenticação)
-  const usuarioLogado = {
-    id: "1",
-    nome: "Usuário Atual",
-    avatar: "",
-  };
-
   useEffect(() => {
     const carregarPartida = async () => {
       try {
         setLoading(true);
         if (id) {
-          const data = await apiService.obterPartida(id);
+          const data = await PartidasService.obterPartida(id);
           setPartida(data);
         }
       } catch (err) {
@@ -143,29 +137,29 @@ const DetalhesPartida: React.FC = () => {
 
       switch (dialogAction) {
         case "participar":
-          await apiService.participarPartida(id);
+          await PartidasService.participarPartida(id);
           setSnackbar({
             open: true,
             message: "Você foi adicionado à partida com sucesso!",
             severity: "success",
           });
           // Atualizar a lista de jogadores
-          const partidaAtualizada = await apiService.obterPartida(id);
+          const partidaAtualizada = await PartidasService.obterPartida(id);
           setPartida(partidaAtualizada);
           break;
         case "sair":
-          await apiService.sairPartida(id);
+          await PartidasService.sairPartida(id);
           setSnackbar({
             open: true,
             message: "Você saiu da partida com sucesso!",
             severity: "success",
           });
           // Atualizar a lista de jogadores
-          const partidaAtualizadaSaida = await apiService.obterPartida(id);
+          const partidaAtualizadaSaida = await PartidasService.obterPartida(id);
           setPartida(partidaAtualizadaSaida);
           break;
         case "excluir":
-          await apiService.excluirPartida(id);
+          await PartidasService.excluirPartida(id);
           setSnackbar({
             open: true,
             message: "Partida excluída com sucesso!",
@@ -173,7 +167,7 @@ const DetalhesPartida: React.FC = () => {
           });
           // Redirecionar para a lista de partidas após exclusão
           setTimeout(() => {
-            navigate("/partidas");
+            navigate("/dashboard/partidas");
           }, 1500);
           break;
       }
@@ -200,13 +194,11 @@ const DetalhesPartida: React.FC = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const isOrganizador = partida?.organizadorId === usuarioLogado.id;
+  const isOrganizador = partida?.organizadorId === user?.id;
   const isParticipante = partida?.jogadoresConfirmados.some(
-    (j) => j.id === usuarioLogado.id
+    (j) => j.id === user?.id
   );
-  const isEmEspera = partida?.jogadoresEspera.some(
-    (j) => j.id === usuarioLogado.id
-  );
+  const isEmEspera = partida?.jogadoresEspera.some((j) => j.id === user?.id);
   const partidaCheia = partida
     ? partida.jogadoresConfirmados.length >= partida.maxJogadores
     : false;
@@ -267,30 +259,53 @@ const DetalhesPartida: React.FC = () => {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
           alignItems: "center",
-          height: "70vh",
+          justifyContent: "center",
+          minHeight: "50vh",
+          p: 3,
         }}
       >
-        <CircularProgress />
+        <CircularProgress size={60} />
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          {t("common.loading")}
+        </Typography>
       </Box>
     );
   }
 
-  if (error || !partida) {
+  if (error) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error || "Partida não encontrada"}
-        </Alert>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/partidas")}
-          variant="outlined"
-        >
-          Voltar para Partidas
-        </Button>
-      </Container>
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">{error}</Alert>
+        <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/dashboard/partidas")}
+            variant="outlined"
+          >
+            {t("common.backToMatches")}
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (!partida) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="warning">{t("match.notFound")}</Alert>
+        <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/dashboard/partidas")}
+            variant="text"
+            sx={{ mb: 2 }}
+          >
+            {t("common.backToMatches")}
+          </Button>
+        </Box>
+      </Box>
     );
   }
 
@@ -299,7 +314,7 @@ const DetalhesPartida: React.FC = () => {
       <Box sx={{ mb: 4 }}>
         <Button
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/partidas")}
+          onClick={() => navigate("/dashboard/partidas")}
           variant="text"
           sx={{ mb: 2 }}
         >
@@ -400,7 +415,9 @@ const DetalhesPartida: React.FC = () => {
                 <Box sx={{ display: "flex", mt: { xs: 2, sm: 0 } }}>
                   <IconButton
                     color="inherit"
-                    onClick={() => navigate(`/editar-partida/${partida.id}`)}
+                    onClick={() =>
+                      navigate(`/dashboard/editar-partida/${partida.id}`)
+                    }
                     sx={{ ml: 1, bgcolor: "rgba(255,255,255,0.1)" }}
                   >
                     <EditIcon />
@@ -583,26 +600,28 @@ const DetalhesPartida: React.FC = () => {
                     <Tabs
                       value={tabValue}
                       onChange={handleTabChange}
+                      aria-label="partida tabs"
                       variant="fullWidth"
+                      sx={{
+                        borderBottom: 1,
+                        borderColor: "divider",
+                        mb: 2,
+                      }}
                     >
                       <Tab
-                        label={
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <CheckCircleIcon sx={{ mr: 1, fontSize: 20 }} />
-                            <span>
-                              Confirmados ({partida.jogadoresConfirmados.length}
-                              )
-                            </span>
-                          </Box>
-                        }
+                        label={t("match.details")}
+                        id="partida-tab-0"
+                        aria-controls="partida-tabpanel-0"
                       />
                       <Tab
                         label={
                           <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <HourglassEmptyIcon sx={{ mr: 1, fontSize: 20 }} />
-                            <span>
-                              Em Espera ({partida.jogadoresEspera.length})
-                            </span>
+                            {t("match.players")}
+                            <Chip
+                              size="small"
+                              label={`${partida.jogadoresConfirmados.length}/${partida.maxJogadores}`}
+                              sx={{ ml: 1 }}
+                            />
                           </Box>
                         }
                       />
@@ -642,14 +661,13 @@ const DetalhesPartida: React.FC = () => {
                                   <Typography
                                     variant="body1"
                                     fontWeight={
-                                      jogador.id === usuarioLogado.id
+                                      jogador.id === user?.id
                                         ? "bold"
                                         : "normal"
                                     }
                                   >
                                     {jogador.nome}
-                                    {jogador.id === usuarioLogado.id &&
-                                      " (Você)"}
+                                    {jogador.id === user?.id && " (Você)"}
                                   </Typography>
                                 </Box>
                               }
@@ -699,13 +717,11 @@ const DetalhesPartida: React.FC = () => {
                                 <Typography
                                   variant="body1"
                                   fontWeight={
-                                    jogador.id === usuarioLogado.id
-                                      ? "bold"
-                                      : "normal"
+                                    jogador.id === user?.id ? "bold" : "normal"
                                   }
                                 >
                                   {jogador.nome}
-                                  {jogador.id === usuarioLogado.id && " (Você)"}
+                                  {jogador.id === user?.id && " (Você)"}
                                 </Typography>
                               }
                               secondary={

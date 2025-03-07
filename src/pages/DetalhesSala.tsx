@@ -38,8 +38,13 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import StarIcon from "@mui/icons-material/Star";
 import dayjs from "dayjs";
-import apiService from "../services/apiService";
-import { Sala, Jogador, MensagemSala, EnviarMensagemDTO } from "../types/api";
+import {
+  SalasService,
+  Sala,
+  Mensagem,
+  EnviarMensagemDTO,
+} from "../infrastructure/services";
+import { Jogador } from "../types/api";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -75,7 +80,7 @@ const DetalhesSala: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState(0);
-  const [mensagens, setMensagens] = useState<MensagemSala[]>([]);
+  const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [novaMensagem, setNovaMensagem] = useState("");
   const [enviandoMensagem, setEnviandoMensagem] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -90,7 +95,7 @@ const DetalhesSala: React.FC = () => {
     setError(null);
 
     try {
-      const salaData = await apiService.salas.buscarPorId(Number(id));
+      const salaData = await SalasService.buscarPorId(Number(id));
       setSala(salaData);
 
       // Carregar mensagens da sala
@@ -112,7 +117,7 @@ const DetalhesSala: React.FC = () => {
     if (!id) return;
 
     try {
-      const mensagensData = await apiService.salas.listarMensagens(Number(id));
+      const mensagensData = await SalasService.listarMensagens(Number(id));
       setMensagens(mensagensData);
     } catch (err: any) {
       console.error("Erro ao carregar mensagens:", err);
@@ -144,7 +149,7 @@ const DetalhesSala: React.FC = () => {
         conteudo: novaMensagem.trim(),
       };
 
-      await apiService.salas.enviarMensagem(mensagemData);
+      await SalasService.enviarMensagem(mensagemData);
       setNovaMensagem("");
       carregarMensagens();
     } catch (err: any) {
@@ -160,7 +165,7 @@ const DetalhesSala: React.FC = () => {
     setLoading(true);
 
     try {
-      await apiService.salas.entrarNaSala(Number(id));
+      await SalasService.entrarNaSala(Number(id));
       carregarSala();
     } catch (err: any) {
       console.error("Erro ao entrar na sala:", err);
@@ -180,7 +185,7 @@ const DetalhesSala: React.FC = () => {
     setConfirmDialogOpen(false);
 
     try {
-      await apiService.salas.sairDaSala(Number(id));
+      await SalasService.sairDaSala(Number(id));
       carregarSala();
     } catch (err: any) {
       console.error("Erro ao sair da sala:", err);
@@ -199,8 +204,8 @@ const DetalhesSala: React.FC = () => {
     setConfirmDialogOpen(false);
 
     try {
-      await apiService.salas.deletarSala(Number(id));
-      navigate("/salas");
+      await SalasService.deletarSala(Number(id));
+      navigate("/dashboard/salas");
     } catch (err: any) {
       console.error("Erro ao deletar sala:", err);
       setError(
@@ -213,12 +218,12 @@ const DetalhesSala: React.FC = () => {
 
   const handleEditarSala = () => {
     if (!id) return;
-    navigate(`/salas/${id}/editar`);
+    navigate(`/dashboard/salas/${id}/editar`);
   };
 
   const handleCriarPartida = () => {
     if (!id) return;
-    navigate(`/salas/${id}/criar-partida`);
+    navigate(`/dashboard/salas/${id}/criar-partida`);
   };
 
   const handleConfirmDialog = (action: "sair" | "deletar") => {
@@ -284,7 +289,10 @@ const DetalhesSala: React.FC = () => {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
         <Alert severity="error">{error}</Alert>
         <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
-          <Button variant="outlined" onClick={() => navigate("/salas")}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/dashboard/salas")}
+          >
             {t("Voltar para Salas")}
           </Button>
         </Box>
@@ -297,7 +305,10 @@ const DetalhesSala: React.FC = () => {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
         <Alert severity="warning">{t("Sala não encontrada")}</Alert>
         <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
-          <Button variant="outlined" onClick={() => navigate("/salas")}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/dashboard/salas")}
+          >
             {t("Voltar para Salas")}
           </Button>
         </Box>

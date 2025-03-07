@@ -12,8 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AddIcon from "@mui/icons-material/Add";
-import apiService from "../services/apiService";
-import { Sala, FiltroSalaDTO } from "../types/api";
+import { SalasService, Sala, FiltroSalaDTO } from "../infrastructure/services";
 import SalaCard from "../components/salas/SalaCard";
 import SalaFiltros from "../components/salas/SalaFiltros";
 import SalaEmptyState from "../components/salas/SalaEmptyState";
@@ -35,15 +34,19 @@ const ListarSalas: React.FC = () => {
     nivelMinimo: undefined,
     nivelMaximo: undefined,
     minimoFairPlay: undefined,
-    isPublica: true,
   });
 
-  const carregarSalas = async () => {
-    setLoading(true);
-    setError(null);
+  const salasService = new SalasService();
 
+  useEffect(() => {
+    carregarSalas();
+  }, []);
+
+  const carregarSalas = async () => {
     try {
-      let resultado;
+      setLoading(true);
+
+      let resultado: Sala[];
 
       // Se tiver filtros ativos, usa a busca com filtros
       if (
@@ -58,31 +61,24 @@ const ListarSalas: React.FC = () => {
         };
 
         if (searchTerm) {
-          filtrosAplicados.localizacao = searchTerm;
+          filtrosAplicados.busca = searchTerm;
         }
 
-        resultado = await apiService.salas.filtrarSalas(filtrosAplicados);
+        resultado = await salasService.filtrarSalas(filtrosAplicados);
       } else {
-        // Caso contrário, lista todas as salas ativas
-        resultado = await apiService.salas.listarSalasAtivas();
+        // Caso contrário, lista todas as salas
+        resultado = await salasService.listarSalas();
       }
 
       setSalas(resultado);
       setTotalPages(Math.ceil(resultado.length / 6)); // 6 salas por página
-    } catch (err: any) {
-      console.error("Erro ao carregar salas:", err);
-      setError(
-        err.response?.data?.message ||
-          "Erro ao carregar salas. Tente novamente."
-      );
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao carregar salas");
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    carregarSalas();
-  }, []);
 
   const handleSearch = () => {
     carregarSalas();
@@ -100,11 +96,11 @@ const ListarSalas: React.FC = () => {
   };
 
   const handleCriarSala = () => {
-    navigate("/criar-sala");
+    navigate("/dashboard/criar-sala");
   };
 
   const handleVerSala = (salaId: number) => {
-    navigate(`/salas/${salaId}`);
+    navigate(`/dashboard/salas/${salaId}`);
   };
 
   const limparFiltros = () => {
@@ -113,7 +109,6 @@ const ListarSalas: React.FC = () => {
       nivelMinimo: undefined,
       nivelMaximo: undefined,
       minimoFairPlay: undefined,
-      isPublica: true,
     });
     setSearchTerm("");
   };

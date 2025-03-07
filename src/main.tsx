@@ -1,3 +1,7 @@
+// Polyfills para compatibilidade com navegadores mais antigos
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
@@ -7,7 +11,13 @@ import { ptBR } from "date-fns/locale";
 import "./i18n";
 import { SnackbarProvider } from "notistack";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+// Verificar se o elemento root existe
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Elemento root não encontrado");
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
       <SnackbarProvider maxSnack={3}>

@@ -1,24 +1,19 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../presentation/hooks/useAuth";
 import { CircularProgress, Box } from "@mui/material";
-import { hasToken } from "../../services/tokenService";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+/**
+ * Componente que protege rotas que requerem autenticação
+ * Redireciona para a página de login se o usuário não estiver autenticado
+ */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading, loadUser } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
-
-  // Verificação adicional para garantir que o usuário está autenticado
-  useEffect(() => {
-    // Se não temos usuário mas temos token, tenta carregar o usuário
-    if (!user && hasToken() && !loading) {
-      loadUser();
-    }
-  }, [user, loading, loadUser]);
 
   if (loading) {
     return (
@@ -35,10 +30,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  // Verificação dupla: usuário e token
-  if (!user || !hasToken()) {
-    // Redireciona para o login, mas salva a localização atual
-    // para poder voltar depois do login
+  if (!user) {
+    // Redireciona para o login se não estiver autenticado
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

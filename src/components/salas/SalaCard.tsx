@@ -13,7 +13,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PeopleIcon from "@mui/icons-material/People";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
-import { Sala } from "../../types/api";
+import { Sala } from "../../infrastructure/services";
 
 interface SalaCardProps {
   sala: Sala;
@@ -23,17 +23,21 @@ interface SalaCardProps {
 const SalaCard: React.FC<SalaCardProps> = ({ sala, onVerDetalhes }) => {
   const { t } = useTranslation();
 
-  const getNivelLabel = (min: number, max: number) => {
+  const getNivelLabel = (min: number | undefined, max: number | undefined) => {
+    if (!min || !max) return t("Todos os níveis");
     if (min <= 3 && max <= 3) return t("Iniciante");
     if (min >= 8) return t("Avançado");
     return t("Intermediário");
   };
 
-  const getNivelColor = (min: number, max: number) => {
+  const getNivelColor = (min: number | undefined, max: number | undefined) => {
+    if (!min || !max) return "default";
     if (min <= 3 && max <= 3) return "success";
-    if (min >= 8) return "error";
-    return "warning";
+    if (min >= 8) return "secondary";
+    return "primary";
   };
+
+  const isPublica = sala.status === "ABERTA";
 
   return (
     <Card
@@ -60,7 +64,7 @@ const SalaCard: React.FC<SalaCardProps> = ({ sala, onVerDetalhes }) => {
             color={getNivelColor(sala.nivelMinimo, sala.nivelMaximo) as any}
             sx={{ mr: 1 }}
           />
-          {sala.isPublica ? (
+          {isPublica ? (
             <Chip size="small" label={t("Pública")} />
           ) : (
             <Chip size="small" label={t("Privada")} color="default" />
@@ -88,12 +92,10 @@ const SalaCard: React.FC<SalaCardProps> = ({ sala, onVerDetalhes }) => {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <PeopleIcon
-            fontSize="small"
-            sx={{ mr: 1, color: "text.secondary" }}
-          />
-          <Typography variant="body2" color="text.secondary">
-            {sala.jogadores.length}/{sala.numeroJogadores} {t("jogadores")}
+          <PeopleIcon fontSize="small" sx={{ mr: 0.5, opacity: 0.7 }} />
+          <Typography variant="body2">
+            {sala.participantes?.length || 0}/{sala.capacidade || 0}{" "}
+            {t("jogadores")}
           </Typography>
         </Box>
       </CardContent>

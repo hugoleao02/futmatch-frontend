@@ -35,15 +35,12 @@ import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupIcon from "@mui/icons-material/Group";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { CriarPartidaDTO } from "../types/api";
-import { apiService } from "../services/apiService";
-
+import { PartidasService, CriarPartidaDTO } from "../infrastructure/services";
 // Passos do formulário
 const steps = ["Informações Básicas", "Configurações", "Confirmação"];
 
@@ -120,23 +117,17 @@ const CriarPartida: React.FC = () => {
       try {
         setLoading(true);
         const partidaData: CriarPartidaDTO = {
-          titulo: values.titulo,
+          data: values.dataHora.toISOString(),
           local: values.local,
-          dataHora: values.dataHora.toISOString(),
-          descricao: values.descricao,
-          maxJogadores: values.maxJogadores,
-          nivelHabilidade: values.nivelHabilidade,
-          duracaoMinutos: values.duracaoMinutos,
-          valorPorJogador: values.valorPorJogador || 0,
-          tipoInscricao: values.tipoInscricao,
-          permitirSubstituicoes: values.permitirSubstituicoes,
-          coordenadas: values.coordenadas,
+          timeA: "Time A",
+          timeB: "Time B",
+          salaId: 1, // Ajuste conforme necessário
         };
 
-        await apiService.criarPartida(partidaData);
+        await PartidasService.criarPartida(partidaData);
         setSuccess(true);
         setTimeout(() => {
-          navigate("/partidas");
+          navigate("/dashboard/partidas");
         }, 2000);
       } catch (err) {
         console.error("Erro ao criar partida:", err);
@@ -609,7 +600,7 @@ const CriarPartida: React.FC = () => {
       >
         <IconButton
           sx={{ position: "absolute", top: 16, left: 16 }}
-          onClick={() => navigate("/partidas")}
+          onClick={() => navigate("/dashboard/partidas")}
           aria-label="voltar"
         >
           <ArrowBackIcon />
@@ -651,7 +642,7 @@ const CriarPartida: React.FC = () => {
                 Sua partida foi criada e já está disponível para os jogadores.
               </Typography>
               <Button
-                onClick={() => navigate("/partidas")}
+                onClick={() => navigate("/dashboard/partidas")}
                 variant="contained"
                 color="primary"
                 sx={{ mt: 2, mr: 1 }}

@@ -14,19 +14,19 @@ const baseTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1E88E5", // Azul moderno
-      light: "#42A5F5",
-      dark: "#1565C0",
+      main: "#1976d2",
+      light: "#42a5f5",
+      dark: "#1565c0",
       contrastText: "#FFFFFF",
     },
     secondary: {
-      main: "#FF6D00", // Laranja vibrante
-      light: "#FF9E40",
-      dark: "#E65100",
+      main: "#9c27b0",
+      light: "#ba68c8",
+      dark: "#7b1fa2",
       contrastText: "#FFFFFF",
     },
     background: {
-      default: "#F8F9FA",
+      default: "#f5f5f5",
       paper: "#FFFFFF",
     },
     text: {
@@ -56,30 +56,30 @@ const baseTheme = createTheme({
     divider: "rgba(0, 0, 0, 0.08)",
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: ["Roboto", "Arial", "sans-serif"].join(","),
     h1: {
-      fontWeight: 700,
-      letterSpacing: "-0.01562em",
+      fontSize: "2.5rem",
+      fontWeight: 500,
     },
     h2: {
-      fontWeight: 600,
-      letterSpacing: "-0.00833em",
+      fontSize: "2rem",
+      fontWeight: 500,
     },
     h3: {
-      fontWeight: 600,
-      letterSpacing: "0em",
+      fontSize: "1.75rem",
+      fontWeight: 500,
     },
     h4: {
-      fontWeight: 600,
-      letterSpacing: "0.00735em",
+      fontSize: "1.5rem",
+      fontWeight: 500,
     },
     h5: {
+      fontSize: "1.25rem",
       fontWeight: 500,
-      letterSpacing: "0em",
     },
     h6: {
+      fontSize: "1rem",
       fontWeight: 500,
-      letterSpacing: "0.0075em",
     },
     subtitle1: {
       fontWeight: 500,
@@ -139,42 +139,19 @@ const baseTheme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
           textTransform: "none",
-          fontWeight: 600,
-          padding: "10px 20px",
+          borderRadius: 8,
+        },
+        contained: {
           boxShadow: "none",
-          "&:hover": {
-            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-          },
-        },
-        sizeLarge: {
-          padding: "12px 24px",
-          fontSize: "1rem",
-        },
-        sizeSmall: {
-          padding: "6px 16px",
-          fontSize: "0.875rem",
-        },
-        containedPrimary: {
-          background: "linear-gradient(45deg, #1976D2 30%, #2196F3 90%)",
-        },
-        containedSecondary: {
-          background: "linear-gradient(45deg, #E65100 30%, #FF9800 90%)",
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-          overflow: "hidden",
-          transition: "transform 0.3s, box-shadow 0.3s",
-          "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: "0px 8px 25px rgba(0, 0, 0, 0.08)",
-          },
+          borderRadius: 12,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
         },
       },
     },

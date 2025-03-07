@@ -22,7 +22,7 @@ import {
   Grid,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../presentation/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import { registerSchema, RegisterFormValues, PosicaoType } from "../schemas";
@@ -279,6 +279,9 @@ const Register: React.FC = () => {
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
                           },
+                          "& input::-ms-reveal, & input::-ms-clear": {
+                            display: "none",
+                          },
                         }}
                       />
                     </Grid>
@@ -322,6 +325,9 @@ const Register: React.FC = () => {
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
+                          },
+                          "& input::-ms-reveal, & input::-ms-clear": {
+                            display: "none",
                           },
                         }}
                       />

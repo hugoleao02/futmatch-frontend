@@ -25,7 +25,12 @@ import {
   InputBase,
   alpha,
 } from "@mui/material";
-import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import {
+  Link as RouterLink,
+  useNavigate,
+  useLocation,
+  Outlet,
+} from "react-router-dom";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -45,7 +50,7 @@ import LogoutDialog from "../common/LogoutDialog";
 import { useSnackbar } from "notistack";
 import { hasToken, getToken } from "../../services/tokenService";
 
-const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const MainLayout: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, logout, loadUser } = useAuth();
   const navigate = useNavigate();
@@ -98,12 +103,17 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const navigateTo = (path: string) => {
-    navigate(path);
+    // Adiciona o prefixo /dashboard se o caminho não começar com /
+    const fullPath = path.startsWith("/") ? path : `/dashboard/${path}`;
+    navigate(fullPath);
     setDrawerOpen(false);
   };
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    // Verifica se o caminho atual corresponde ao caminho fornecido
+    // considerando o novo prefixo /dashboard
+    const fullPath = path.startsWith("/") ? path : `/dashboard/${path}`;
+    return location.pathname === fullPath;
   };
 
   const drawer = (
@@ -118,7 +128,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           color: "white",
           cursor: "pointer",
         }}
-        onClick={() => navigateTo("/")}
+        onClick={() => navigateTo("/dashboard")}
       >
         <Avatar
           sx={{
@@ -145,14 +155,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <List sx={{ px: 2, py: 1 }}>
         <ListItem
           button
-          onClick={() => navigateTo("/partidas")}
+          onClick={() => navigateTo("/dashboard/partidas")}
           sx={{
             borderRadius: 2,
             mb: 1,
-            bgcolor: isActive("/partidas")
+            bgcolor: isActive("/dashboard/partidas")
               ? alpha(theme.palette.primary.main, 0.1)
               : "transparent",
-            color: isActive("/partidas")
+            color: isActive("/dashboard/partidas")
               ? theme.palette.primary.main
               : "inherit",
             "&:hover": {
@@ -162,7 +172,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         >
           <ListItemIcon
             sx={{
-              color: isActive("/partidas")
+              color: isActive("/dashboard/partidas")
                 ? theme.palette.primary.main
                 : "inherit",
             }}
@@ -176,14 +186,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <>
             <ListItem
               button
-              onClick={() => navigateTo("/perfil")}
+              onClick={() => navigateTo("/dashboard/perfil")}
               sx={{
                 borderRadius: 2,
                 mb: 1,
-                bgcolor: isActive("/perfil")
+                bgcolor: isActive("/dashboard/perfil")
                   ? alpha(theme.palette.primary.main, 0.1)
                   : "transparent",
-                color: isActive("/perfil")
+                color: isActive("/dashboard/perfil")
                   ? theme.palette.primary.main
                   : "inherit",
                 "&:hover": {
@@ -193,7 +203,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             >
               <ListItemIcon
                 sx={{
-                  color: isActive("/perfil")
+                  color: isActive("/dashboard/perfil")
                     ? theme.palette.primary.main
                     : "inherit",
                 }}
@@ -205,14 +215,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
             <ListItem
               button
-              onClick={() => navigateTo("/criar-sala")}
+              onClick={() => navigateTo("/dashboard/criar-sala")}
               sx={{
                 borderRadius: 2,
                 mb: 1,
-                bgcolor: isActive("/criar-sala")
+                bgcolor: isActive("/dashboard/criar-sala")
                   ? alpha(theme.palette.primary.main, 0.1)
                   : "transparent",
-                color: isActive("/criar-sala")
+                color: isActive("/dashboard/criar-sala")
                   ? theme.palette.primary.main
                   : "inherit",
                 "&:hover": {
@@ -222,7 +232,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             >
               <ListItemIcon
                 sx={{
-                  color: isActive("/criar-sala")
+                  color: isActive("/dashboard/criar-sala")
                     ? theme.palette.primary.main
                     : "inherit",
                 }}
@@ -370,7 +380,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               alignItems: "center",
               cursor: "pointer",
             }}
-            onClick={() => navigateTo("/")}
+            onClick={() => navigateTo("/dashboard")}
           >
             <Logo variant="h6" darkMode={true} iconSize={28} />
           </Box>
@@ -411,11 +421,11 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <Button
                 color="inherit"
                 component={RouterLink}
-                to="/"
+                to="/dashboard"
                 sx={{
                   mx: 1,
-                  opacity: isActive("/") ? 1 : 0.8,
-                  fontWeight: isActive("/") ? "bold" : "medium",
+                  opacity: isActive("/dashboard") ? 1 : 0.8,
+                  fontWeight: isActive("/dashboard") ? "bold" : "medium",
                   "&:hover": { opacity: 1 },
                 }}
               >
@@ -424,11 +434,13 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <Button
                 color="inherit"
                 component={RouterLink}
-                to="/partidas"
+                to="/dashboard/partidas"
                 sx={{
                   mx: 1,
-                  opacity: isActive("/partidas") ? 1 : 0.8,
-                  fontWeight: isActive("/partidas") ? "bold" : "medium",
+                  opacity: isActive("/dashboard/partidas") ? 1 : 0.8,
+                  fontWeight: isActive("/dashboard/partidas")
+                    ? "bold"
+                    : "medium",
                   "&:hover": { opacity: 1 },
                 }}
               >
@@ -440,11 +452,13 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   <Button
                     color="inherit"
                     component={RouterLink}
-                    to="/perfil"
+                    to="/dashboard/perfil"
                     sx={{
                       mx: 1,
-                      opacity: isActive("/perfil") ? 1 : 0.8,
-                      fontWeight: isActive("/perfil") ? "bold" : "medium",
+                      opacity: isActive("/dashboard/perfil") ? 1 : 0.8,
+                      fontWeight: isActive("/dashboard/perfil")
+                        ? "bold"
+                        : "medium",
                       "&:hover": { opacity: 1 },
                     }}
                   >
@@ -530,11 +544,13 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <Button
                 color="inherit"
                 component={RouterLink}
-                to="/partidas"
+                to="/dashboard/partidas"
                 sx={{
                   mx: 1,
-                  opacity: isActive("/partidas") ? 1 : 0.8,
-                  fontWeight: isActive("/partidas") ? "bold" : "medium",
+                  opacity: isActive("/dashboard/partidas") ? 1 : 0.8,
+                  fontWeight: isActive("/dashboard/partidas")
+                    ? "bold"
+                    : "medium",
                   "&:hover": { opacity: 1 },
                 }}
               >
@@ -547,11 +563,13 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   <Button
                     color="inherit"
                     component={RouterLink}
-                    to="/perfil"
+                    to="/dashboard/perfil"
                     sx={{
                       mx: 1,
-                      opacity: isActive("/perfil") ? 1 : 0.8,
-                      fontWeight: isActive("/perfil") ? "bold" : "medium",
+                      opacity: isActive("/dashboard/perfil") ? 1 : 0.8,
+                      fontWeight: isActive("/dashboard/perfil")
+                        ? "bold"
+                        : "medium",
                       "&:hover": { opacity: 1 },
                     }}
                   >
@@ -664,7 +682,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           flexDirection: "column",
         }}
       >
-        {children}
+        <Outlet />
       </Container>
 
       <Box
