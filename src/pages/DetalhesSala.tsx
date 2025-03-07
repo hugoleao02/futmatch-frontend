@@ -89,38 +89,26 @@ const DetalhesSala: React.FC = () => {
   );
 
   const carregarSala = async () => {
-    if (!id) return;
-
-    setLoading(true);
-    setError(null);
-
     try {
-      const salaData = await SalasService.buscarPorId(Number(id));
+      setLoading(true);
+      const salaData = await SalasService.obterSala(Number(id));
       setSala(salaData);
-
-      // Carregar mensagens da sala
-      if (tabValue === 1) {
-        carregarMensagens();
-      }
     } catch (err: any) {
-      console.error("Erro ao carregar detalhes da sala:", err);
-      setError(
-        err.response?.data?.message ||
-          "Erro ao carregar detalhes da sala. Tente novamente."
-      );
+      setError(err.message || "Erro ao carregar sala");
     } finally {
       setLoading(false);
     }
   };
 
   const carregarMensagens = async () => {
-    if (!id) return;
-
     try {
+      setCarregandoMensagens(true);
       const mensagensData = await SalasService.listarMensagens(Number(id));
       setMensagens(mensagensData);
     } catch (err: any) {
       console.error("Erro ao carregar mensagens:", err);
+    } finally {
+      setCarregandoMensagens(false);
     }
   };
 
@@ -139,14 +127,13 @@ const DetalhesSala: React.FC = () => {
   };
 
   const handleEnviarMensagem = async () => {
-    if (!id || !novaMensagem.trim()) return;
-
-    setEnviandoMensagem(true);
+    if (!novaMensagem.trim()) return;
 
     try {
+      setEnviandoMensagem(true);
       const mensagemData: EnviarMensagemDTO = {
+        conteudo: novaMensagem,
         salaId: Number(id),
-        conteudo: novaMensagem.trim(),
       };
 
       await SalasService.enviarMensagem(mensagemData);
@@ -160,57 +147,36 @@ const DetalhesSala: React.FC = () => {
   };
 
   const handleEntrarSala = async () => {
-    if (!id) return;
-
-    setLoading(true);
-
     try {
+      setLoading(true);
       await SalasService.entrarNaSala(Number(id));
       carregarSala();
     } catch (err: any) {
-      console.error("Erro ao entrar na sala:", err);
-      setError(
-        err.response?.data?.message ||
-          "Erro ao entrar na sala. Tente novamente."
-      );
+      setError(err.message || "Erro ao entrar na sala");
     } finally {
       setLoading(false);
     }
   };
 
   const handleSairSala = async () => {
-    if (!id) return;
-
-    setLoading(true);
-    setConfirmDialogOpen(false);
-
     try {
+      setLoading(true);
       await SalasService.sairDaSala(Number(id));
       carregarSala();
     } catch (err: any) {
-      console.error("Erro ao sair da sala:", err);
-      setError(
-        err.response?.data?.message || "Erro ao sair da sala. Tente novamente."
-      );
+      setError(err.message || "Erro ao sair da sala");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeletarSala = async () => {
-    if (!id) return;
-
-    setLoading(true);
-    setConfirmDialogOpen(false);
-
     try {
+      setLoading(true);
       await SalasService.deletarSala(Number(id));
       navigate("/dashboard/salas");
     } catch (err: any) {
-      console.error("Erro ao deletar sala:", err);
-      setError(
-        err.response?.data?.message || "Erro ao deletar sala. Tente novamente."
-      );
+      setError(err.message || "Erro ao deletar sala");
     } finally {
       setLoading(false);
     }

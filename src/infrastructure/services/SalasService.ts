@@ -52,186 +52,197 @@ export interface FiltroSalaDTO {
   busca?: string;
 }
 
-export class SalasService {
-  private httpClient: HttpClient;
+// Criar uma instância do HttpClient
+const httpClient = new HttpClient(API_CONFIG.BASE_URL);
 
-  constructor() {
-    this.httpClient = new HttpClient(API_CONFIG.BASE_URL);
-  }
+// Funções do serviço
+export const listarSalas = async (filtros?: FiltroSalaDTO): Promise<Sala[]> => {
+  try {
+    const endpoint = filtros ? "/salas/filtrar" : "/salas";
+    const config = filtros ? { params: filtros } : undefined;
 
-  async listarSalas(filtros?: FiltroSalaDTO): Promise<Sala[]> {
-    try {
-      const endpoint = filtros ? "/salas/filtrar" : "/salas";
-      const config = filtros ? { params: filtros } : undefined;
-
-      return await this.httpClient.get<Sala[]>(endpoint, config);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+    return await httpClient.get<Sala[]>(endpoint, config);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async obterSala(id: number): Promise<Sala> {
-    try {
-      return await this.httpClient.get<Sala>(`/salas/${id}`);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Sala não encontrada");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const obterSala = async (id: number): Promise<Sala> => {
+  try {
+    return await httpClient.get<Sala>(`/salas/${id}`);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) {
+        throw new Error("Sala não encontrada");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async criarSala(salaData: CriarSalaDTO): Promise<Sala> {
-    try {
-      return await this.httpClient.post<Sala>("/salas", salaData);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 400) {
-          throw new Error("Dados da sala inválidos");
-        } else if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const criarSala = async (salaData: CriarSalaDTO): Promise<Sala> => {
+  try {
+    return await httpClient.post<Sala>("/salas", salaData);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 400) {
+        throw new Error("Dados da sala inválidos");
+      } else if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async entrarNaSala(salaId: number): Promise<Sala> {
-    try {
-      return await this.httpClient.post<Sala>(`/salas/${salaId}/entrar`);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Sala não encontrada");
-        } else if (error.status === 400) {
-          throw new Error("Não é possível entrar nesta sala");
-        } else if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const entrarNaSala = async (salaId: number): Promise<Sala> => {
+  try {
+    return await httpClient.post<Sala>(`/salas/${salaId}/entrar`);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) {
+        throw new Error("Sala não encontrada");
+      } else if (error.status === 400) {
+        throw new Error("Não é possível entrar nesta sala");
+      } else if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async sairDaSala(salaId: number): Promise<void> {
-    try {
-      await this.httpClient.post<void>(`/salas/${salaId}/sair`);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Sala não encontrada");
-        } else if (error.status === 400) {
-          throw new Error("Não é possível sair desta sala");
-        } else if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const sairDaSala = async (salaId: number): Promise<void> => {
+  try {
+    await httpClient.post<void>(`/salas/${salaId}/sair`);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) {
+        throw new Error("Sala não encontrada");
+      } else if (error.status === 400) {
+        throw new Error("Não é possível sair desta sala");
+      } else if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async deletarSala(salaId: number): Promise<void> {
-    try {
-      await this.httpClient.delete<void>(`/salas/${salaId}`);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Sala não encontrada");
-        } else if (error.status === 403) {
-          throw new Error("Você não tem permissão para deletar esta sala");
-        } else if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const deletarSala = async (salaId: number): Promise<void> => {
+  try {
+    await httpClient.delete<void>(`/salas/${salaId}`);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) {
+        throw new Error("Sala não encontrada");
+      } else if (error.status === 403) {
+        throw new Error("Você não tem permissão para deletar esta sala");
+      } else if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async buscarPorLocalizacao(localizacao: string): Promise<Sala[]> {
-    try {
-      return await this.httpClient.get<Sala[]>(
-        `/salas/buscar?localizacao=${encodeURIComponent(localizacao)}`
-      );
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const buscarPorLocalizacao = async (
+  localizacao: string
+): Promise<Sala[]> => {
+  try {
+    return await httpClient.get<Sala[]>(
+      `/salas/buscar?localizacao=${encodeURIComponent(localizacao)}`
+    );
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async filtrarSalas(filtros: FiltroSalaDTO): Promise<Sala[]> {
-    try {
-      return await this.httpClient.get<Sala[]>("/salas/filtrar", {
-        params: filtros,
-      });
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const filtrarSalas = async (filtros: FiltroSalaDTO): Promise<Sala[]> => {
+  try {
+    return await httpClient.get<Sala[]>("/salas/filtrar", {
+      params: filtros,
+    });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async listarMensagens(salaId: number): Promise<Mensagem[]> {
-    try {
-      return await this.httpClient.get<Mensagem[]>(
-        `/salas/${salaId}/mensagens`
-      );
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Sala não encontrada");
-        } else if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const listarMensagens = async (salaId: number): Promise<Mensagem[]> => {
+  try {
+    return await httpClient.get<Mensagem[]>(`/salas/${salaId}/mensagens`);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) {
+        throw new Error("Sala não encontrada");
+      } else if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async enviarMensagem(mensagemData: EnviarMensagemDTO): Promise<Mensagem> {
-    try {
-      return await this.httpClient.post<Mensagem>(
-        `/salas/${mensagemData.salaId}/mensagens`,
-        mensagemData
-      );
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Sala não encontrada");
-        } else if (error.status === 400) {
-          throw new Error("Mensagem inválida");
-        } else if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const enviarMensagem = async (
+  mensagemData: EnviarMensagemDTO
+): Promise<Mensagem> => {
+  try {
+    return await httpClient.post<Mensagem>(
+      `/salas/${mensagemData.salaId}/mensagens`,
+      mensagemData
+    );
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) {
+        throw new Error("Sala não encontrada");
+      } else if (error.status === 400) {
+        throw new Error("Mensagem inválida");
+      } else if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
-}
+};
+
+export const SalasService = {
+  listarSalas,
+  obterSala,
+  criarSala,
+  entrarNaSala,
+  sairDaSala,
+  deletarSala,
+  buscarPorLocalizacao,
+  filtrarSalas,
+  listarMensagens,
+  enviarMensagem,
+};

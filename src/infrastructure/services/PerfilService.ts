@@ -36,84 +36,88 @@ export interface Estatisticas {
   ultimasPartidas: PartidaResumo[];
 }
 
-export class PerfilService {
-  private httpClient: HttpClient;
+// Criar uma instância do HttpClient
+const httpClient = new HttpClient(API_CONFIG.BASE_URL);
 
-  constructor() {
-    this.httpClient = new HttpClient(API_CONFIG.BASE_URL);
-  }
-
-  async obterPerfil(): Promise<User> {
-    try {
-      const response = await this.httpClient.get<any>("/jogadores/me");
-      return UserAdapter.fromApiResponse(response);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+// Funções do serviço
+export const obterPerfil = async (): Promise<User> => {
+  try {
+    const response = await httpClient.get<any>("/jogadores/me");
+    return UserAdapter.fromApiResponse(response);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async obterJogadorPorId(id: number): Promise<User> {
-    try {
-      const response = await this.httpClient.get<any>(`/jogadores/${id}`);
-      return UserAdapter.fromApiResponse(response);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Jogador não encontrado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const obterJogadorPorId = async (id: number): Promise<User> => {
+  try {
+    const response = await httpClient.get<any>(`/jogadores/${id}`);
+    return UserAdapter.fromApiResponse(response);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) {
+        throw new Error("Jogador não encontrado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async atualizarPerfil(perfilData: AtualizarPerfilDTO): Promise<User> {
-    try {
-      const response = await this.httpClient.put<any>(
-        "/jogadores/me",
-        perfilData
-      );
-      return UserAdapter.fromApiResponse(response);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 400) {
-          throw new Error("Dados do perfil inválidos");
-        } else if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+export const atualizarPerfil = async (
+  perfilData: AtualizarPerfilDTO
+): Promise<User> => {
+  try {
+    const response = await httpClient.put<any>("/jogadores/me", perfilData);
+    return UserAdapter.fromApiResponse(response);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 400) {
+        throw new Error("Dados do perfil inválidos");
+      } else if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
+};
 
-  async obterEstatisticas(jogadorId?: number): Promise<Estatisticas> {
-    try {
-      const endpoint = jogadorId
-        ? `/jogadores/${jogadorId}/estatisticas`
-        : "/jogadores/me/estatisticas";
+export const obterEstatisticas = async (
+  jogadorId?: number
+): Promise<Estatisticas> => {
+  try {
+    const endpoint = jogadorId
+      ? `/jogadores/${jogadorId}/estatisticas`
+      : "/jogadores/me/estatisticas";
 
-      return await this.httpClient.get<Estatisticas>(endpoint);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Jogador não encontrado");
-        } else if (error.status === 401) {
-          throw new Error("Não autorizado");
-        } else if (error.isNetworkError) {
-          throw new Error("Não foi possível conectar ao servidor");
-        }
+    return await httpClient.get<Estatisticas>(endpoint);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) {
+        throw new Error("Jogador não encontrado");
+      } else if (error.status === 401) {
+        throw new Error("Não autorizado");
+      } else if (error.isNetworkError) {
+        throw new Error("Não foi possível conectar ao servidor");
       }
-      throw error;
     }
+    throw error;
   }
-}
+};
+
+export const PerfilService = {
+  obterPerfil,
+  obterJogadorPorId,
+  atualizarPerfil,
+  obterEstatisticas,
+};

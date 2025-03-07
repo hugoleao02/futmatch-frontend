@@ -29,14 +29,7 @@ const ListarSalas: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [filtros, setFiltros] = useState<FiltroSalaDTO>({
-    localizacao: "",
-    nivelMinimo: undefined,
-    nivelMaximo: undefined,
-    minimoFairPlay: undefined,
-  });
-
-  const salasService = new SalasService();
+  const [filtros, setFiltros] = useState<FiltroSalaDTO>({});
 
   useEffect(() => {
     carregarSalas();
@@ -45,33 +38,18 @@ const ListarSalas: React.FC = () => {
   const carregarSalas = async () => {
     try {
       setLoading(true);
+      let data: Sala[] = [];
 
-      let resultado: Sala[];
-
-      // Se tiver filtros ativos, usa a busca com filtros
-      if (
-        searchTerm ||
-        filtros.localizacao ||
-        filtros.nivelMinimo !== undefined ||
-        filtros.nivelMaximo !== undefined ||
-        filtros.minimoFairPlay !== undefined
-      ) {
-        const filtrosAplicados: FiltroSalaDTO = {
-          ...filtros,
-        };
-
-        if (searchTerm) {
-          filtrosAplicados.busca = searchTerm;
-        }
-
-        resultado = await salasService.filtrarSalas(filtrosAplicados);
+      if (searchTerm) {
+        data = await SalasService.buscarPorLocalizacao(searchTerm);
+      } else if (Object.keys(filtros).length > 0) {
+        data = await SalasService.filtrarSalas(filtros);
       } else {
-        // Caso contrário, lista todas as salas
-        resultado = await salasService.listarSalas();
+        data = await SalasService.listarSalas();
       }
 
-      setSalas(resultado);
-      setTotalPages(Math.ceil(resultado.length / 6)); // 6 salas por página
+      setSalas(data);
+      setTotalPages(Math.ceil(data.length / 6)); // 6 salas por página
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao carregar salas");
@@ -104,12 +82,7 @@ const ListarSalas: React.FC = () => {
   };
 
   const limparFiltros = () => {
-    setFiltros({
-      localizacao: "",
-      nivelMinimo: undefined,
-      nivelMaximo: undefined,
-      minimoFairPlay: undefined,
-    });
+    setFiltros({});
     setSearchTerm("");
   };
 

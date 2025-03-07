@@ -17,8 +17,6 @@ export const AuthContext = createContext<AuthContextType>(
   {} as AuthContextType
 );
 
-const authService = new AuthService();
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -37,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const loadUser = async (): Promise<User | null> => {
     try {
       setLoading(true);
-      const userData = await authService.getProfile();
+      const userData = await AuthService.getProfile();
 
       if (userData) {
         setUser(userData);
@@ -56,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (credentials: LoginDTO): Promise<void> => {
     try {
       setLoading(true);
-      await authService.login(credentials);
+      await AuthService.login(credentials);
       await loadUser();
     } catch (error) {
       setUser(null);
@@ -69,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const register = async (userData: RegisterDTO): Promise<User> => {
     try {
       setLoading(true);
-      const response = await authService.register(userData);
+      const response = await AuthService.register(userData);
       return response;
     } catch (error) {
       throw error;
@@ -79,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = (): void => {
-    authService.logout();
+    AuthService.logout();
     setUser(null);
   };
 

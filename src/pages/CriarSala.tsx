@@ -25,8 +25,6 @@ const CriarSala: React.FC = () => {
     capacidade: "10",
   });
 
-  const salasService = new SalasService();
-
   const handleChange =
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormData({
@@ -49,7 +47,7 @@ const CriarSala: React.FC = () => {
         capacidade: parseInt(formData.capacidade, 10),
       };
 
-      const novaSala = await salasService.criarSala(salaData);
+      const novaSala = await SalasService.criarSala(salaData);
 
       // Redirecionar para a página da sala criada
       navigate(`/dashboard/salas/${novaSala.id}`);

@@ -25,15 +25,24 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PersonIcon from "@mui/icons-material/Person";
 import { useAuth } from "../presentation/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { PerfilService, Estatisticas } from "../infrastructure/services";
+import {
+  PerfilService,
+  Estatisticas,
+  AtualizarPerfilDTO,
+} from "../infrastructure/services";
+import { useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 
 const Perfil: React.FC = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [estatisticas, setEstatisticas] = useState<Estatisticas | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const perfilService = new PerfilService();
+  const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const carregarEstatisticas = async () => {
@@ -41,12 +50,15 @@ const Perfil: React.FC = () => {
 
       try {
         setLoading(true);
-        const data = await perfilService.obterEstatisticas();
+        const data = await PerfilService.obterEstatisticas();
         setEstatisticas(data);
         setError(null);
-      } catch (err) {
+      } catch (error) {
+        console.error("Erro ao carregar estatísticas:", error);
         setError(
-          err instanceof Error ? err.message : "Erro ao carregar estatísticas"
+          error instanceof Error
+            ? error.message
+            : "Erro ao carregar estatísticas"
         );
       } finally {
         setLoading(false);
@@ -55,6 +67,24 @@ const Perfil: React.FC = () => {
 
     carregarEstatisticas();
   }, [user]);
+
+  const handleSubmit = async (values: AtualizarPerfilDTO) => {
+    try {
+      setSubmitting(true);
+      await PerfilService.atualizarPerfil(values);
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+      setError(
+        error instanceof Error ? error.message : "Erro ao atualizar perfil"
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
