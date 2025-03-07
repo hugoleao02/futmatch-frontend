@@ -83,6 +83,7 @@ const DetalhesSala: React.FC = () => {
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [novaMensagem, setNovaMensagem] = useState("");
   const [enviandoMensagem, setEnviandoMensagem] = useState(false);
+  const [carregandoMensagens, setCarregandoMensagens] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<"sair" | "deletar" | null>(
     null
@@ -205,13 +206,15 @@ const DetalhesSala: React.FC = () => {
     }
   };
 
-  const getNivelLabel = (min: number, max: number) => {
-    if (min <= 3 && max <= 3) return t("Iniciante");
-    if (min >= 8) return t("Avançado");
-    return t("Intermediário");
+  const getNivelLabel = (min?: number, max?: number) => {
+    if (!min || !max) return "Todos os níveis";
+    if (min <= 3 && max <= 3) return "Iniciante";
+    if (min >= 8) return "Avançado";
+    return "Intermediário";
   };
 
-  const getNivelColor = (min: number, max: number) => {
+  const getNivelColor = (min?: number, max?: number) => {
+    if (!min || !max) return "default";
     if (min <= 3 && max <= 3) return "success";
     if (min >= 8) return "error";
     return "warning";
@@ -329,7 +332,7 @@ const DetalhesSala: React.FC = () => {
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <PeopleIcon sx={{ mr: 1, color: "text.secondary" }} />
                 <Typography variant="body1">
-                  {sala.jogadores.length}/{sala.numeroJogadores}{" "}
+                  {sala.jogadores?.length || 0}/{sala.numeroJogadores || 0}{" "}
                   {t("jogadores")}
                 </Typography>
               </Box>
@@ -611,16 +614,17 @@ const DetalhesSala: React.FC = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Typography variant="h6" gutterBottom>
-                {t("Membros")} ({sala.jogadores.length}/{sala.numeroJogadores})
+                {t("Membros")} ({sala.jogadores?.length || 0}/
+                {sala.numeroJogadores || 0})
               </Typography>
 
-              {sala.jogadores.length === 0 ? (
+              {!sala.jogadores || sala.jogadores.length === 0 ? (
                 <Typography variant="body1" color="text.secondary">
                   {t("Nenhum membro na sala ainda.")}
                 </Typography>
               ) : (
                 <List>
-                  {sala.jogadores.map((jogador) => (
+                  {sala.jogadores?.map((jogador) => (
                     <ListItem
                       key={jogador.id}
                       secondaryAction={

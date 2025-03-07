@@ -21,6 +21,14 @@ export interface Sala {
     nome: string;
     avatar?: string;
   };
+  isPublica?: boolean;
+  aceitaAutomatico?: boolean;
+  jogadores?: any[];
+  restricoesPosicao?: Record<string, number>;
+  regrasPersonalizadas?: string;
+  dataUltimaAtividade?: string;
+  moderadores?: any[];
+  criadoPor?: string;
 }
 
 export interface CriarSalaDTO {
@@ -37,6 +45,8 @@ export interface Mensagem {
   jogadorId: number;
   jogadorNome: string;
   salaId: number;
+  isAnuncio?: boolean;
+  dataHora?: string;
 }
 
 export interface EnviarMensagemDTO {
