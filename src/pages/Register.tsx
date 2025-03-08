@@ -69,6 +69,10 @@ const Register: React.FC = () => {
   ) => {
     try {
       setError("");
+      if (!values.posicao) {
+        throw new Error(t("auth.register.errors.positionRequired"));
+      }
+
       const jogadorDTO = {
         apelido: values.apelido,
         email: values.email,
@@ -86,7 +90,11 @@ const Register: React.FC = () => {
       });
     } catch (error: unknown) {
       console.error("Erro no registro:", error);
-      setError(t("auth.register.error"));
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(t("auth.register.error"));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -106,10 +114,23 @@ const Register: React.FC = () => {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
+        background: `url('/soccer-field-bg.jpg')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `linear-gradient(135deg, rgba(40, 167, 69, 0.95), rgba(27, 126, 49, 0.9))`,
+          backdropFilter: "blur(8px)",
+        },
       }}
     >
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
         <Box
           sx={{
             marginTop: isMobile ? 4 : 8,
@@ -127,9 +148,16 @@ const Register: React.FC = () => {
               flexDirection: "column",
               alignItems: "center",
               width: "100%",
-              borderRadius: 4,
+              borderRadius: 3,
               position: "relative",
               overflow: "hidden",
+              background: "rgba(255, 255, 255, 0.98)",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+              transition: "transform 0.2s ease-in-out",
+              "&:hover": {
+                transform: "translateY(-4px)",
+              },
             }}
           >
             <Box
@@ -138,31 +166,40 @@ const Register: React.FC = () => {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: "8px",
+                height: "6px",
                 background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               }}
             />
 
             <Box sx={{ mb: 4, mt: 2, textAlign: "center" }}>
-              <Logo variant="h4" iconSize={40} />
+              <Logo variant="h3" iconSize={48} />
             </Box>
 
             <Avatar
               sx={{
                 mb: 2,
                 bgcolor: theme.palette.secondary.main,
-                width: 56,
-                height: 56,
+                width: 64,
+                height: 64,
+                boxShadow: "0 4px 12px rgba(255, 193, 7, 0.2)",
               }}
             >
-              <PersonAddAltOutlinedIcon fontSize="large" />
+              <SportsSoccerIcon sx={{ fontSize: 36 }} />
             </Avatar>
 
             <Typography
               component="h1"
               variant="h4"
               gutterBottom
-              sx={{ fontWeight: 700, mb: 3 }}
+              sx={{
+                fontWeight: 700,
+                mb: 3,
+                background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+                textAlign: "center",
+              }}
             >
               {t("auth.register.title")}
             </Typography>
@@ -174,6 +211,17 @@ const Register: React.FC = () => {
                   width: "100%",
                   mb: 3,
                   borderRadius: 2,
+                  animation: "slideIn 0.3s ease-out",
+                  "@keyframes slideIn": {
+                    from: {
+                      opacity: 0,
+                      transform: "translateY(-10px)",
+                    },
+                    to: {
+                      opacity: 1,
+                      transform: "translateY(0)",
+                    },
+                  },
                 }}
               >
                 {error}
@@ -210,6 +258,13 @@ const Register: React.FC = () => {
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                            },
+                            "&.Mui-focused": {
+                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
+                            },
                           },
                         }}
                       />
@@ -236,6 +291,13 @@ const Register: React.FC = () => {
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                            },
+                            "&.Mui-focused": {
+                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
+                            },
                           },
                         }}
                       />
@@ -278,9 +340,13 @@ const Register: React.FC = () => {
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
-                          },
-                          "& input::-ms-reveal, & input::-ms-clear": {
-                            display: "none",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                            },
+                            "&.Mui-focused": {
+                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
+                            },
                           },
                         }}
                       />
@@ -309,7 +375,7 @@ const Register: React.FC = () => {
                           endAdornment: (
                             <InputAdornment position="end">
                               <IconButton
-                                aria-label="toggle password visibility"
+                                aria-label="toggle confirm password visibility"
                                 onClick={handleToggleConfirmPasswordVisibility}
                                 edge="end"
                               >
@@ -325,9 +391,13 @@ const Register: React.FC = () => {
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
-                          },
-                          "& input::-ms-reveal, & input::-ms-clear": {
-                            display: "none",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                            },
+                            "&.Mui-focused": {
+                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
+                            },
                           },
                         }}
                       />
@@ -336,8 +406,9 @@ const Register: React.FC = () => {
                     <Grid item xs={12}>
                       <Field
                         as={TextField}
-                        fullWidth
                         select
+                        required
+                        fullWidth
                         name="posicao"
                         label={t("auth.register.position")}
                         error={touched.posicao && Boolean(errors.posicao)}
@@ -352,17 +423,19 @@ const Register: React.FC = () => {
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                            },
+                            "&.Mui-focused": {
+                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
+                            },
                           },
                         }}
                       >
-                        <MenuItem value="">
-                          <em>{t("common.select")}</em>
-                        </MenuItem>
-                        {posicoes.map((posicao) => (
-                          <MenuItem key={posicao} value={posicao}>
-                            {t(
-                              `auth.register.positions.${posicao?.toLowerCase()}`
-                            )}
+                        {posicoes.map((posicao: PosicaoType) => (
+                          <MenuItem key={posicao!} value={posicao!}>
+                            {t(`positions.${posicao!.toLowerCase()}`)}
                           </MenuItem>
                         ))}
                       </Field>
@@ -373,59 +446,51 @@ const Register: React.FC = () => {
                     type="submit"
                     fullWidth
                     variant="contained"
-                    size="large"
+                    disabled={isSubmitting}
                     sx={{
-                      mt: 4,
-                      mb: 3,
+                      mt: 3,
+                      mb: 2,
                       py: 1.5,
+                      fontSize: "1.1rem",
+                      fontWeight: 600,
                       borderRadius: 2,
-                      fontWeight: "bold",
-                      boxShadow: 4,
-                      background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
+                      background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
+                      transition: "all 0.3s ease",
                       "&:hover": {
-                        background: `linear-gradient(90deg, ${theme.palette.secondary.dark}, ${theme.palette.secondary.main})`,
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 6px 16px rgba(255, 193, 7, 0.25)",
                       },
                     }}
-                    disabled={isSubmitting}
                   >
                     {isSubmitting ? (
-                      <>
-                        <CircularProgress
-                          size={24}
-                          sx={{ mr: 1, color: "white" }}
-                        />
-                        {t("common.loading")}
-                      </>
+                      <CircularProgress size={24} color="inherit" />
                     ) : (
                       t("auth.register.submit")
                     )}
                   </Button>
 
-                  <Divider sx={{ my: 2 }}>
-                    <Typography
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      mt: 2,
+                    }}
+                  >
+                    <Link
+                      href="/login"
                       variant="body2"
-                      color="text.secondary"
-                      sx={{ px: 1 }}
-                    >
-                      ou
-                    </Typography>
-                  </Divider>
-
-                  <Box sx={{ textAlign: "center", mt: 2 }}>
-                    <Typography variant="body1" sx={{ mb: 1 }}>
-                      {t("auth.register.loginLink").split("?")[0]}?
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      onClick={() => navigate("/login")}
                       sx={{
-                        borderRadius: 2,
-                        px: 3,
-                        fontWeight: "medium",
+                        color: theme.palette.primary.main,
+                        textDecoration: "none",
+                        fontWeight: 500,
+                        transition: "color 0.2s ease",
+                        "&:hover": {
+                          color: theme.palette.primary.dark,
+                        },
                       }}
                     >
-                      {t("auth.register.loginLink").split("?")[1]}
-                    </Button>
+                      {t("auth.register.hasAccount")}
+                    </Link>
                   </Box>
                 </Form>
               )}

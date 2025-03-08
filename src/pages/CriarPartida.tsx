@@ -27,6 +27,7 @@ import {
   Snackbar,
   CircularProgress,
   IconButton,
+  SelectChangeEvent,
 } from "@mui/material";
 import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -40,9 +41,38 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupIcon from "@mui/icons-material/Group";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { PartidasService, CriarPartidaDTO } from "../infrastructure/services";
 // Passos do formulário
-const steps = ["Informações Básicas", "Configurações", "Confirmação"];
+const steps = ["Informações Básicas", "Local e Horário", "Configurações"];
+
+interface FormData {
+  title: string;
+  description: string;
+  date: Date | null;
+  location: string;
+  address: string;
+  maxPlayers: number;
+  minPlayers: number;
+  price: string;
+  gameType: string;
+  duration: number;
+  skillLevel: string;
+}
+
+const initialFormData: FormData = {
+  title: "",
+  description: "",
+  date: null,
+  location: "",
+  address: "",
+  maxPlayers: 14,
+  minPlayers: 10,
+  price: "",
+  gameType: "society",
+  duration: 60,
+  skillLevel: "casual",
+};
 
 const CriarPartida: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -53,58 +83,52 @@ const CriarPartida: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslation();
+  const [formData, setFormData] = useState<FormData>(initialFormData);
 
   // Validação do formulário
   const validationSchema = [
     // Etapa 1: Informações Básicas
     Yup.object({
-      titulo: Yup.string().required("O título da partida é obrigatório"),
-      local: Yup.string().required("O local da partida é obrigatório"),
-      dataHora: Yup.date()
+      title: Yup.string().required("O título da partida é obrigatório"),
+      location: Yup.string().required("O local da partida é obrigatório"),
+      date: Yup.date()
         .required("A data e hora são obrigatórias")
         .min(new Date(), "A data deve ser no futuro"),
-      descricao: Yup.string().max(
+      description: Yup.string().max(
         500,
         "A descrição deve ter no máximo 500 caracteres"
       ),
     }),
     // Etapa 2: Configurações
     Yup.object({
-      maxJogadores: Yup.number()
+      maxPlayers: Yup.number()
         .required("O número máximo de jogadores é obrigatório")
         .min(2, "Mínimo de 2 jogadores")
         .max(22, "Máximo de 22 jogadores"),
-      nivelHabilidade: Yup.string().required(
-        "O nível de habilidade é obrigatório"
-      ),
-      duracaoMinutos: Yup.number()
+      skillLevel: Yup.string().required("O nível de habilidade é obrigatório"),
+      duration: Yup.number()
         .required("A duração da partida é obrigatória")
         .min(30, "Mínimo de 30 minutos")
         .max(180, "Máximo de 180 minutos"),
-      valorPorJogador: Yup.number()
-        .min(0, "O valor não pode ser negativo")
-        .nullable(),
-      tipoInscricao: Yup.string().required("O tipo de inscrição é obrigatório"),
+      price: Yup.number().min(0, "O valor não pode ser negativo").nullable(),
+      gameType: Yup.string().required("O tipo de inscrição é obrigatório"),
     }),
   ];
 
   // Configuração do formulário com Formik
   const formik = useFormik({
     initialValues: {
-      titulo: "",
-      local: "",
-      dataHora: new Date(new Date().setHours(new Date().getHours() + 1)),
-      descricao: "",
-      maxJogadores: 10,
-      nivelHabilidade: "INTERMEDIARIO",
-      duracaoMinutos: 90,
-      valorPorJogador: 0,
-      tipoInscricao: "ABERTA",
-      permitirSubstituicoes: true,
-      coordenadas: {
-        latitude: 0,
-        longitude: 0,
-      },
+      title: "",
+      description: "",
+      date: new Date(new Date().setHours(new Date().getHours() + 1)),
+      location: "",
+      address: "",
+      maxPlayers: 10,
+      skillLevel: "INTERMEDIARIO",
+      duration: 90,
+      price: "0",
+      gameType: "ABERTA",
+      minPlayers: 10,
     },
     validationSchema: validationSchema[activeStep],
     onSubmit: async (values) => {
@@ -117,8 +141,8 @@ const CriarPartida: React.FC = () => {
       try {
         setLoading(true);
         const partidaData: CriarPartidaDTO = {
-          data: values.dataHora.toISOString(),
-          local: values.local,
+          data: values.date?.toISOString() || "",
+          local: values.location,
           timeA: "Time A",
           timeB: "Time B",
           salaId: 1, // Ajuste conforme necessário
@@ -173,417 +197,261 @@ const CriarPartida: React.FC = () => {
     }
   };
 
-  // Renderização dos passos do formulário
-  const getStepContent = (step: number) => {
+  const handleNext = () => {
+    setActiveStep((prevStep) => prevStep + 1);
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    // Aqui você implementaria a lógica para criar a partida
+    console.log(formData);
+    navigate("/dashboard/partidas");
+  };
+
+  const handleInputChange =
+    (field: keyof FormData) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setFormData({
+        ...formData,
+        [field]: event.target.value,
+      });
+    };
+
+  const handleSelectChange =
+    (field: keyof FormData) => (event: SelectChangeEvent) => {
+      setFormData({
+        ...formData,
+        [field]: event.target.value,
+      });
+    };
+
+  const handleDateChange = (newDate: Date | null) => {
+    setFormData({
+      ...formData,
+      date: newDate,
+    });
+  };
+
+  const renderStepContent = (step: number) => {
     switch (step) {
       case 0:
         return (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Informações Básicas da Partida
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="titulo"
-                  name="titulo"
-                  label="Título da Partida"
-                  value={formik.values.titulo}
-                  onChange={formik.handleChange}
-                  error={formik.touched.titulo && Boolean(formik.errors.titulo)}
-                  helperText={formik.touched.titulo && formik.errors.titulo}
-                  placeholder="Ex: Pelada de Quarta no Parque"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="local"
-                  name="local"
-                  label="Local da Partida"
-                  value={formik.values.local}
-                  onChange={formik.handleChange}
-                  error={formik.touched.local && Boolean(formik.errors.local)}
-                  helperText={formik.touched.local && formik.errors.local}
-                  placeholder="Ex: Quadra do Parque da Cidade"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LocationOnIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <LocalizationProvider
-                  dateAdapter={AdapterDateFns}
-                  adapterLocale={ptBR}
-                >
-                  <DateTimePicker
-                    label="Data e Hora"
-                    value={formik.values.dataHora}
-                    onChange={(newValue) => {
-                      formik.setFieldValue("dataHora", newValue);
-                    }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error:
-                          formik.touched.dataHora &&
-                          Boolean(formik.errors.dataHora),
-                        helperText:
-                          formik.touched.dataHora &&
-                          (formik.errors.dataHora as string),
-                        InputProps: {
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <AccessTimeIcon color="action" />
-                            </InputAdornment>
-                          ),
-                        },
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="descricao"
-                  name="descricao"
-                  label="Descrição (opcional)"
-                  multiline
-                  rows={4}
-                  value={formik.values.descricao}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.descricao && Boolean(formik.errors.descricao)
-                  }
-                  helperText={
-                    formik.touched.descricao && formik.errors.descricao
-                  }
-                  placeholder="Descreva detalhes sobre a partida, regras específicas, etc."
-                />
-              </Grid>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Título da Partida"
+                value={formData.title}
+                onChange={handleInputChange("title")}
+                error={formData.title === ""}
+                helperText={
+                  formData.title === "" ? "O título é obrigatório" : undefined
+                }
+                required
+              />
             </Grid>
-          </Box>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Descrição"
+                value={formData.description}
+                onChange={handleInputChange("description")}
+                error={formData.description === ""}
+                helperText={
+                  formData.description === ""
+                    ? "A descrição é obrigatória"
+                    : undefined
+                }
+                multiline
+                rows={4}
+                placeholder="Descreva os detalhes da partida, regras especiais, etc."
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Tipo de Jogo</InputLabel>
+                <Select
+                  value={formData.gameType}
+                  onChange={handleSelectChange("gameType")}
+                  label="Tipo de Jogo"
+                >
+                  <MenuItem value="ABERTA">
+                    Aberta (qualquer um pode participar)
+                  </MenuItem>
+                  <MenuItem value="APROVACAO">
+                    Aprovação (organizador aprova participantes)
+                  </MenuItem>
+                  <MenuItem value="CONVITE">
+                    Convite (apenas convidados podem participar)
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Nível de Habilidade</InputLabel>
+                <Select
+                  value={formData.skillLevel}
+                  onChange={handleSelectChange("skillLevel")}
+                  label="Nível de Habilidade"
+                >
+                  <MenuItem value="INICIANTE">Iniciante</MenuItem>
+                  <MenuItem value="INTERMEDIARIO">Intermediário</MenuItem>
+                  <MenuItem value="AVANCADO">Avançado</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
         );
       case 1:
         return (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Configurações da Partida
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  id="maxJogadores"
-                  name="maxJogadores"
-                  label="Máximo de Jogadores"
-                  type="number"
-                  value={formik.values.maxJogadores}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.maxJogadores &&
-                    Boolean(formik.errors.maxJogadores)
-                  }
-                  helperText={
-                    formik.touched.maxJogadores && formik.errors.maxJogadores
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <GroupIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={ptBR}
+              >
+                <DateTimePicker
+                  label="Data e Hora"
+                  value={formData.date}
+                  onChange={handleDateChange}
+                  sx={{ width: "100%" }}
                 />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  id="duracaoMinutos"
-                  name="duracaoMinutos"
-                  label="Duração (minutos)"
-                  type="number"
-                  value={formik.values.duracaoMinutos}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.duracaoMinutos &&
-                    Boolean(formik.errors.duracaoMinutos)
-                  }
-                  helperText={
-                    formik.touched.duracaoMinutos &&
-                    formik.errors.duracaoMinutos
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccessTimeIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  fullWidth
-                  error={
-                    formik.touched.nivelHabilidade &&
-                    Boolean(formik.errors.nivelHabilidade)
-                  }
-                >
-                  <InputLabel id="nivelHabilidade-label">
-                    Nível de Habilidade
-                  </InputLabel>
-                  <Select
-                    labelId="nivelHabilidade-label"
-                    id="nivelHabilidade"
-                    name="nivelHabilidade"
-                    value={formik.values.nivelHabilidade}
-                    onChange={formik.handleChange}
-                    label="Nível de Habilidade"
-                  >
-                    <MenuItem value="INICIANTE">Iniciante</MenuItem>
-                    <MenuItem value="INTERMEDIARIO">Intermediário</MenuItem>
-                    <MenuItem value="AVANCADO">Avançado</MenuItem>
-                  </Select>
-                  {formik.touched.nivelHabilidade &&
-                    formik.errors.nivelHabilidade && (
-                      <FormHelperText>
-                        {formik.errors.nivelHabilidade}
-                      </FormHelperText>
-                    )}
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  id="valorPorJogador"
-                  name="valorPorJogador"
-                  label="Valor por Jogador (R$)"
-                  type="number"
-                  value={formik.values.valorPorJogador}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.valorPorJogador &&
-                    Boolean(formik.errors.valorPorJogador)
-                  }
-                  helperText={
-                    formik.touched.valorPorJogador &&
-                    formik.errors.valorPorJogador
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AttachMoneyIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl
-                  fullWidth
-                  error={
-                    formik.touched.tipoInscricao &&
-                    Boolean(formik.errors.tipoInscricao)
-                  }
-                >
-                  <InputLabel id="tipoInscricao-label">
-                    Tipo de Inscrição
-                  </InputLabel>
-                  <Select
-                    labelId="tipoInscricao-label"
-                    id="tipoInscricao"
-                    name="tipoInscricao"
-                    value={formik.values.tipoInscricao}
-                    onChange={formik.handleChange}
-                    label="Tipo de Inscrição"
-                  >
-                    <MenuItem value="ABERTA">
-                      Aberta (qualquer um pode participar)
-                    </MenuItem>
-                    <MenuItem value="APROVACAO">
-                      Aprovação (organizador aprova participantes)
-                    </MenuItem>
-                    <MenuItem value="CONVITE">
-                      Convite (apenas convidados podem participar)
-                    </MenuItem>
-                  </Select>
-                  {formik.touched.tipoInscricao &&
-                    formik.errors.tipoInscricao && (
-                      <FormHelperText>
-                        {formik.errors.tipoInscricao}
-                      </FormHelperText>
-                    )}
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formik.values.permitirSubstituicoes}
-                      onChange={(e) =>
-                        formik.setFieldValue(
-                          "permitirSubstituicoes",
-                          e.target.checked
-                        )
-                      }
-                      name="permitirSubstituicoes"
-                      color="primary"
-                    />
-                  }
-                  label="Permitir substituições automáticas"
-                />
-                <FormHelperText>
-                  Se ativado, jogadores na lista de espera serão automaticamente
-                  adicionados quando alguém desistir
-                </FormHelperText>
-              </Grid>
+              </LocalizationProvider>
             </Grid>
-          </Box>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Local"
+                value={formData.location}
+                onChange={handleInputChange("location")}
+                error={formData.location === ""}
+                helperText={
+                  formData.location === "" ? "O local é obrigatório" : undefined
+                }
+                required
+                placeholder="Nome do local (ex: Arena Soccer Club)"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Endereço"
+                value={formData.address}
+                onChange={handleInputChange("address")}
+                error={formData.address === ""}
+                helperText={
+                  formData.address === ""
+                    ? "O endereço é obrigatório"
+                    : undefined
+                }
+                required
+                placeholder="Endereço completo"
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Duração (minutos)"
+                value={formData.duration}
+                onChange={handleInputChange("duration")}
+                error={formData.duration < 30 || formData.duration > 180}
+                helperText={
+                  formData.duration < 30
+                    ? "Mínimo de 30 minutos"
+                    : formData.duration > 180
+                    ? "Máximo de 180 minutos"
+                    : undefined
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">min</InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+          </Grid>
         );
       case 2:
         return (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Confirme os Detalhes da Partida
-            </Typography>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                mb: 3,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-                bgcolor: "background.paper",
-              }}
-            >
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="h5" gutterBottom fontWeight="bold">
-                    {formik.values.titulo}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <LocationOnIcon color="primary" sx={{ mr: 1 }} />
-                    <Typography variant="body1">
-                      {formik.values.local}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12}>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <AccessTimeIcon color="primary" sx={{ mr: 1 }} />
-                    <Typography variant="body1">
-                      {formik.values.dataHora.toLocaleDateString("pt-BR", {
-                        weekday: "long",
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider sx={{ my: 1 }} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    Máximo de Jogadores
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {formik.values.maxJogadores} jogadores
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    Duração
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {formik.values.duracaoMinutos} minutos
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    Nível de Habilidade
-                  </Typography>
-                  <Chip
-                    label={getNivelHabilidadeLabel(
-                      formik.values.nivelHabilidade
-                    )}
-                    color={
-                      formik.values.nivelHabilidade === "INICIANTE"
-                        ? "success"
-                        : formik.values.nivelHabilidade === "AVANCADO"
-                        ? "secondary"
-                        : "primary"
-                    }
-                    size="small"
-                    sx={{ mt: 0.5 }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    Valor por Jogador
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {formik.values.valorPorJogador
-                      ? `R$ ${formik.values.valorPorJogador.toFixed(2)}`
-                      : "Gratuito"}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="body2" color="text.secondary">
-                    Tipo de Inscrição
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {getTipoInscricaoLabel(formik.values.tipoInscricao)}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="body2" color="text.secondary">
-                    Substituições Automáticas
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {formik.values.permitirSubstituicoes
-                      ? "Ativadas"
-                      : "Desativadas"}
-                  </Typography>
-                </Grid>
-                {formik.values.descricao && (
-                  <Grid item xs={12}>
-                    <Divider sx={{ my: 1 }} />
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      gutterBottom
-                    >
-                      Descrição
-                    </Typography>
-                    <Typography variant="body1">
-                      {formik.values.descricao}
-                    </Typography>
-                  </Grid>
-                )}
-              </Grid>
-            </Paper>
-            <Alert severity="info" sx={{ mb: 2 }}>
-              Ao confirmar, você será o organizador desta partida e poderá
-              gerenciar os participantes e detalhes.
-            </Alert>
-          </Box>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Número Mínimo de Jogadores"
+                value={formData.minPlayers}
+                onChange={handleInputChange("minPlayers")}
+                error={formData.minPlayers < 2 || formData.minPlayers > 22}
+                helperText={
+                  formData.minPlayers < 2
+                    ? "Mínimo de 2 jogadores"
+                    : formData.minPlayers > 22
+                    ? "Máximo de 22 jogadores"
+                    : undefined
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <GroupIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Número Máximo de Jogadores"
+                value={formData.maxPlayers}
+                onChange={handleInputChange("maxPlayers")}
+                error={formData.maxPlayers < 2 || formData.maxPlayers > 22}
+                helperText={
+                  formData.maxPlayers < 2
+                    ? "Mínimo de 2 jogadores"
+                    : formData.maxPlayers > 22
+                    ? "Máximo de 22 jogadores"
+                    : undefined
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <GroupIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Valor por Jogador"
+                value={formData.price}
+                onChange={handleInputChange("price")}
+                error={formData.price === ""}
+                helperText={
+                  formData.price === "" ? "O valor é obrigatório" : undefined
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">R$</InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Alert severity="info">
+                O valor total será dividido igualmente entre todos os
+                participantes.
+              </Alert>
+            </Grid>
+          </Grid>
         );
       default:
-        return "Passo desconhecido";
+        return null;
     }
   };
 
@@ -616,7 +484,7 @@ const CriarPartida: React.FC = () => {
             Criar Nova Partida
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Preencha os detalhes para organizar sua partida de futebol
+            Organize sua partida e convide seus amigos
           </Typography>
         </Box>
 
@@ -654,8 +522,8 @@ const CriarPartida: React.FC = () => {
               </Button>
             </Box>
           ) : (
-            <form onSubmit={formik.handleSubmit}>
-              {getStepContent(activeStep)}
+            <form onSubmit={handleSubmit}>
+              {renderStepContent(activeStep)}
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}
               >
@@ -677,7 +545,7 @@ const CriarPartida: React.FC = () => {
                   {loading ? (
                     <CircularProgress size={24} />
                   ) : activeStep === steps.length - 1 ? (
-                    "Criar Partida"
+                    <SportsSoccerIcon />
                   ) : (
                     "Próximo"
                   )}

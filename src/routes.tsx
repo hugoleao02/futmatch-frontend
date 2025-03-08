@@ -10,22 +10,29 @@ import DetalhesPartida from "./pages/DetalhesPartida";
 import CriarSala from "./pages/CriarSala";
 import ListarSalas from "./pages/ListarSalas";
 import DetalhesSala from "./pages/DetalhesSala";
+import Ranking from "./pages/Ranking";
 import { MainLayout, ProtectedRoute } from "./components";
+import { useAuth } from "./presentation/hooks/useAuth";
 
 /**
  * Componente que define as rotas da aplicação
  */
 const AppRoutes: React.FC = () => {
+  const { user } = useAuth();
+
   return (
     <Routes>
-      {/* Rota raiz que vai direto para a Home */}
-      <Route path="/" element={<Home />} />
+      {/* Rota raiz que redireciona para dashboard se autenticado ou mostra a Home pública */}
+      <Route
+        path="/"
+        element={user ? <Navigate to="/dashboard" replace /> : <Home />}
+      />
 
       {/* Rotas públicas */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Rotas protegidas */}
+      {/* Rotas protegidas dentro do MainLayout */}
       <Route
         path="/dashboard"
         element={
@@ -42,6 +49,7 @@ const AppRoutes: React.FC = () => {
         <Route path="criar-sala" element={<CriarSala />} />
         <Route path="salas" element={<ListarSalas />} />
         <Route path="salas/:id" element={<DetalhesSala />} />
+        <Route path="ranking" element={<Ranking />} />
       </Route>
 
       {/* Rota para qualquer caminho não encontrado */}

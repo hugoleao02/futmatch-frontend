@@ -1,377 +1,601 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
+  Container,
+  Typography,
   Box,
   Paper,
-  Typography,
   Grid,
   Avatar,
   Chip,
+  Button,
+  Divider,
   List,
   ListItem,
-  ListItemIcon,
+  ListItemAvatar,
   ListItemText,
-  Divider,
-  Card,
-  CardContent,
-  CircularProgress,
-  Alert,
+  IconButton,
+  useTheme,
+  Tab,
+  Tabs,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Rating,
+  LinearProgress,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import StarIcon from "@mui/icons-material/Star";
-import AssistantIcon from "@mui/icons-material/Assistant";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import PersonIcon from "@mui/icons-material/Person";
-import { useAuth } from "../presentation/hooks/useAuth";
-import { useTranslation } from "react-i18next";
-import {
-  PerfilService,
-  Estatisticas,
-  AtualizarPerfilDTO,
-} from "../infrastructure/services";
-import { useTheme } from "@mui/material/styles";
-import { useMediaQuery } from "@mui/material";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
+import GroupsIcon from "@mui/icons-material/Groups";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  avatar: string;
+  position: string;
+  level: number;
+  xp: number;
+  nextLevelXp: number;
+  matches: number;
+  wins: number;
+  goals: number;
+  assists: number;
+  fairPlay: number;
+  streak: number;
+  badges: string[];
+  bio: string;
+}
+
+// Mock do usuário
+const mockUser: User = {
+  id: 1,
+  name: "João Silva",
+  email: "joao.silva@email.com",
+  avatar: "",
+  position: "Atacante",
+  level: 8,
+  xp: 7500,
+  nextLevelXp: 10000,
+  matches: 45,
+  wins: 32,
+  goals: 67,
+  assists: 25,
+  fairPlay: 95,
+  streak: 5,
+  badges: ["Artilheiro", "MVP", "Fair Play"],
+  bio: "Apaixonado por futebol desde criança. Jogo como atacante e adoro fazer gols!",
+};
+
+interface Match {
+  id: number;
+  title: string;
+  date: string;
+  location: string;
+  result: string;
+  score: string;
+  goals: number;
+  assists: number;
+  rating: number;
+}
+
+// Mock do histórico de partidas
+const mockMatchHistory: Match[] = [
+  {
+    id: 1,
+    title: "Pelada dos Amigos",
+    date: "2024-03-15T19:00:00",
+    location: "Arena Soccer Club",
+    result: "Vitória",
+    score: "5 - 3",
+    goals: 2,
+    assists: 1,
+    rating: 4.5,
+  },
+  {
+    id: 2,
+    title: "Futebol Society",
+    date: "2024-03-10T20:00:00",
+    location: "Soccer House",
+    result: "Derrota",
+    score: "2 - 3",
+    goals: 1,
+    assists: 0,
+    rating: 4.0,
+  },
+  {
+    id: 3,
+    title: "Rachão de Quinta",
+    date: "2024-03-05T18:30:00",
+    location: "Clube Atlético",
+    result: "Vitória",
+    score: "4 - 2",
+    goals: 3,
+    assists: 1,
+    rating: 5.0,
+  },
+];
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel = (props: TabPanelProps) => {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`profile-tabpanel-${index}`}
+      aria-labelledby={`profile-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+};
 
 const Perfil: React.FC = () => {
-  const { user } = useAuth();
-  const { t } = useTranslation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [estatisticas, setEstatisticas] = useState<Estatisticas | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [editData, setEditData] = useState({
+    name: mockUser.name,
+    position: mockUser.position,
+    bio: mockUser.bio,
+  });
 
-  useEffect(() => {
-    const carregarEstatisticas = async () => {
-      if (!user) return;
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
 
-      try {
-        setLoading(true);
-        const data = await PerfilService.obterEstatisticas();
-        setEstatisticas(data);
-        setError(null);
-      } catch (error) {
-        console.error("Erro ao carregar estatísticas:", error);
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Erro ao carregar estatísticas"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleEditClick = () => {
+    setOpenEditDialog(true);
+  };
 
-    carregarEstatisticas();
-  }, [user]);
+  const handleEditSave = () => {
+    // Implementar lógica para salvar as alterações
+    setOpenEditDialog(false);
+  };
 
-  const handleSubmit = async (values: AtualizarPerfilDTO) => {
-    try {
-      setSubmitting(true);
-      await PerfilService.atualizarPerfil(values);
-      setSuccess(true);
-      setTimeout(() => {
-        setSuccess(false);
-      }, 3000);
-    } catch (error) {
-      console.error("Erro ao atualizar perfil:", error);
-      setError(
-        error instanceof Error ? error.message : "Erro ao atualizar perfil"
-      );
-    } finally {
-      setSubmitting(false);
+  const getBadgeColor = (badge: string) => {
+    switch (badge) {
+      case "Artilheiro":
+        return "error";
+      case "MVP":
+        return "success";
+      case "Fair Play":
+        return "info";
+      default:
+        return "default";
     }
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert severity="error" sx={{ mt: 2 }}>
-        {error}
-      </Alert>
-    );
-  }
-
-  if (!user) {
-    return (
-      <Alert severity="warning" sx={{ mt: 2 }}>
-        {t("profile.notLoggedIn")}
-      </Alert>
-    );
-  }
-
-  // Função para obter o label da posição
-  const getPosicaoLabel = (posicao?: string) => {
-    if (!posicao) return "Não informada";
-
-    const posicoes: Record<string, string> = {
-      GOLEIRO: "Goleiro",
-      ZAGUEIRO: "Zagueiro",
-      LATERAL: "Lateral",
-      VOLANTE: "Volante",
-      MEIA: "Meia",
-      ATACANTE: "Atacante",
-    };
-
-    return posicoes[posicao] || posicao;
+  const getResultColor = (result: string) => {
+    switch (result) {
+      case "Vitória":
+        return "success";
+      case "Derrota":
+        return "error";
+      default:
+        return "warning";
+    }
   };
 
-  // Nível baseado na pontuação
-  const getNivel = (nivelHabilidade: number) => {
-    if (nivelHabilidade < 3) return "Iniciante";
-    if (nivelHabilidade < 7) return "Intermediário";
-    return "Avançado";
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }).format(date);
   };
 
   return (
-    <Box>
-      <Paper sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: 3 }}>
-        <Grid container spacing={3} alignItems="center">
-          <Grid item xs={12} md={3} sx={{ textAlign: "center" }}>
-            <Avatar
-              sx={{
-                width: 120,
-                height: 120,
-                margin: "0 auto",
-                bgcolor: "primary.main",
-                boxShadow: 2,
-              }}
-            >
-              <Typography variant="h4">
-                {user.apelido.charAt(0).toUpperCase()}
-              </Typography>
-            </Avatar>
-          </Grid>
-          <Grid item xs={12} md={9}>
-            <Typography variant="h4" gutterBottom fontWeight="bold">
-              {user.apelido}
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-              <Chip
-                icon={<PersonIcon />}
-                label={getPosicaoLabel(user.posicao)}
-                size="small"
-                sx={{ borderRadius: 2 }}
-              />
-              <Chip
-                icon={<LocationOnIcon />}
-                label={estatisticas?.cidade || "Não informada"}
-                size="small"
-                sx={{ borderRadius: 2 }}
-              />
-              <Chip
-                icon={<StarIcon />}
-                label={getNivel(user.nivelHabilidade)}
-                color="primary"
-                size="small"
-                sx={{ borderRadius: 2 }}
-              />
-            </Box>
-          </Grid>
-        </Grid>
-      </Paper>
-
+    <Container maxWidth="lg">
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%", borderRadius: 3, boxShadow: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                {t("profile.stats.title")}
+        {/* Perfil Principal */}
+        <Grid item xs={12} md={4}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              textAlign: "center",
+              position: "relative",
+            }}
+          >
+            <IconButton
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+              }}
+              onClick={handleEditClick}
+            >
+              <EditIcon />
+            </IconButton>
+
+            <Box sx={{ position: "relative", display: "inline-block" }}>
+              <Avatar
+                src={mockUser.avatar}
+                sx={{
+                  width: 120,
+                  height: 120,
+                  mx: "auto",
+                  mb: 2,
+                  border: "4px solid",
+                  borderColor: "primary.main",
+                }}
+              >
+                {mockUser.name.charAt(0)}
+              </Avatar>
+              <IconButton
+                sx={{
+                  position: "absolute",
+                  bottom: 16,
+                  right: -8,
+                  bgcolor: "background.paper",
+                  "&:hover": {
+                    bgcolor: "background.paper",
+                  },
+                }}
+                size="small"
+              >
+                <PhotoCameraIcon fontSize="small" />
+              </IconButton>
+            </Box>
+
+            <Typography variant="h5" gutterBottom>
+              {mockUser.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {mockUser.email}
+            </Typography>
+            <Chip
+              label={mockUser.position}
+              color="primary"
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Nível {mockUser.level}
               </Typography>
-              <List>
-                <ListItem>
-                  <ListItemIcon>
-                    <SportsSoccerIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t("profile.stats.matchesPlayed")}
-                    secondary={estatisticas?.totalPartidas || 0}
-                    secondaryTypographyProps={{
-                      color: "primary",
-                      fontWeight: "bold",
-                    }}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <EmojiEventsIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t("profile.stats.matchesOrganized")}
-                    secondary={estatisticas?.partidasOrganizadas || 0}
-                    secondaryTypographyProps={{
-                      color: "primary",
-                      fontWeight: "bold",
-                    }}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <StarIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t("profile.stats.rating")}
-                    secondary={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        {estatisticas?.mediaAvaliacao || 0}
-                        <StarIcon sx={{ color: "warning.main", ml: 0.5 }} />
-                      </Box>
-                    }
-                    secondaryTypographyProps={{
-                      color: "primary",
-                      fontWeight: "bold",
-                    }}
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
+              <LinearProgress
+                variant="determinate"
+                value={(mockUser.xp / mockUser.nextLevelXp) * 100}
+                sx={{
+                  height: 8,
+                  borderRadius: 4,
+                  bgcolor: "background.default",
+                  "& .MuiLinearProgress-bar": {
+                    borderRadius: 4,
+                  },
+                }}
+              />
+              <Typography variant="caption" color="text.secondary">
+                {mockUser.xp}/{mockUser.nextLevelXp} XP
+              </Typography>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="body1" color="text.secondary">
+              {mockUser.bio}
+            </Typography>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {mockUser.badges.map((badge) => (
+                <Chip
+                  key={badge}
+                  label={badge}
+                  color={getBadgeColor(badge) as any}
+                  size="small"
+                />
+              ))}
+            </Box>
+          </Paper>
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%", borderRadius: 3, boxShadow: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                {t("profile.stats.performance")}
-              </Typography>
-              <List>
-                <ListItem>
-                  <ListItemIcon>
-                    <SportsSoccerIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t("profile.stats.goals")}
-                    secondary={estatisticas?.gols || 0}
-                    secondaryTypographyProps={{
-                      color: "primary",
-                      fontWeight: "bold",
-                    }}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <AssistantIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t("profile.stats.assists")}
-                    secondary={estatisticas?.assistencias || 0}
-                    secondaryTypographyProps={{
-                      color: "primary",
-                      fontWeight: "bold",
-                    }}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <ThumbUpIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t("profile.stats.fairPlay")}
-                    secondary={estatisticas?.fairPlayScore || 0}
-                    secondaryTypographyProps={{
-                      color: "primary",
-                      fontWeight: "bold",
-                    }}
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
+        {/* Conteúdo Principal */}
+        <Grid item xs={12} md={8}>
+          <Paper
+            elevation={3}
+            sx={{
+              borderRadius: 2,
+              overflow: "hidden",
+            }}
+          >
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                aria-label="profile tabs"
+                variant="fullWidth"
+              >
+                <Tab
+                  icon={<SportsSoccerIcon />}
+                  label="Estatísticas"
+                  id="profile-tab-0"
+                />
+                <Tab
+                  icon={<EmojiEventsIcon />}
+                  label="Histórico"
+                  id="profile-tab-1"
+                />
+              </Tabs>
+            </Box>
 
-        <Grid item xs={12}>
-          <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                {t("profile.recentMatches")}
-              </Typography>
-              <List>
-                {estatisticas?.ultimasPartidas &&
-                estatisticas.ultimasPartidas.length > 0 ? (
-                  estatisticas.ultimasPartidas.map((partida, index) => (
-                    <React.Fragment key={index}>
-                      <ListItem>
-                        <ListItemIcon>
-                          <SportsSoccerIcon
-                            color={
-                              partida.resultado === "Vitória"
-                                ? "success"
-                                : partida.resultado === "Derrota"
-                                ? "error"
-                                : "info"
-                            }
-                          />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={`${partida.local} - ${new Date(
-                            partida.data
-                          ).toLocaleDateString()}`}
-                          secondary={
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                              }}
-                            >
-                              <Typography
-                                variant="body2"
-                                color={
-                                  partida.resultado === "Vitória"
-                                    ? "success.main"
-                                    : partida.resultado === "Derrota"
-                                    ? "error.main"
-                                    : "info.main"
-                                }
-                                fontWeight="bold"
-                              >
-                                {partida.resultado}
-                              </Typography>
-                              <Box
-                                sx={{ display: "flex", alignItems: "center" }}
-                              >
-                                {partida.avaliacao}
-                                <StarIcon
-                                  sx={{
-                                    color: "warning.main",
-                                    ml: 0.5,
-                                    fontSize: 16,
-                                  }}
-                                />
-                              </Box>
-                            </Box>
-                          }
-                        />
-                      </ListItem>
-                      {index < estatisticas.ultimasPartidas.length - 1 && (
-                        <Divider />
-                      )}
-                    </React.Fragment>
-                  ))
-                ) : (
-                  <ListItem>
-                    <ListItemText
-                      primary={t("profile.noRecentMatches")}
-                      primaryTypographyProps={{ color: "text.secondary" }}
+            <TabPanel value={tabValue} index={0}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <SportsSoccerIcon
+                      sx={{ fontSize: 40, color: "primary.main", mb: 1 }}
                     />
-                  </ListItem>
-                )}
+                    <Typography variant="h4" gutterBottom>
+                      {mockUser.matches}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Partidas Jogadas
+                    </Typography>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <EmojiEventsIcon
+                      sx={{ fontSize: 40, color: "warning.main", mb: 1 }}
+                    />
+                    <Typography variant="h4" gutterBottom>
+                      {mockUser.wins}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Vitórias
+                    </Typography>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <StarIcon
+                      sx={{ fontSize: 40, color: "error.main", mb: 1 }}
+                    />
+                    <Typography variant="h4" gutterBottom>
+                      {mockUser.goals}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Gols Marcados
+                    </Typography>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <WhatshotIcon
+                      sx={{ fontSize: 40, color: "secondary.main", mb: 1 }}
+                    />
+                    <Typography variant="h4" gutterBottom>
+                      {mockUser.assists}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Assistências
+                    </Typography>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <GroupsIcon
+                      sx={{ fontSize: 40, color: "info.main", mb: 1 }}
+                    />
+                    <Typography variant="h4" gutterBottom>
+                      {mockUser.fairPlay}%
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Fair Play
+                    </Typography>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <WhatshotIcon
+                      sx={{ fontSize: 40, color: "success.main", mb: 1 }}
+                    />
+                    <Typography variant="h4" gutterBottom>
+                      {mockUser.streak}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Sequência de Vitórias
+                    </Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={1}>
+              <List>
+                {mockMatchHistory.map((match, index) => (
+                  <React.Fragment key={match.id}>
+                    {index > 0 && <Divider component="li" />}
+                    <ListItem
+                      alignItems="flex-start"
+                      secondaryAction={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "flex-end",
+                          }}
+                        >
+                          <Chip
+                            label={match.result}
+                            color={getResultColor(match.result) as any}
+                            size="small"
+                            sx={{ mb: 1 }}
+                          />
+                          <Rating value={match.rating} readOnly size="small" />
+                        </Box>
+                      }
+                    >
+                      <ListItemAvatar>
+                        <Avatar>
+                          <SportsSoccerIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={match.title}
+                        secondary={
+                          <React.Fragment>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              color="text.primary"
+                            >
+                              {formatDate(match.date)}
+                            </Typography>
+                            {" — "}
+                            {match.location}
+                            <br />
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              {match.score} • {match.goals} gols •{" "}
+                              {match.assists} assistências
+                            </Typography>
+                          </React.Fragment>
+                        }
+                      />
+                    </ListItem>
+                  </React.Fragment>
+                ))}
               </List>
-            </CardContent>
-          </Card>
+            </TabPanel>
+          </Paper>
         </Grid>
       </Grid>
-    </Box>
+
+      {/* Diálogo de Edição */}
+      <Dialog
+        open={openEditDialog}
+        onClose={() => setOpenEditDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Editar Perfil</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Nome"
+              value={editData.name}
+              onChange={(e) =>
+                setEditData({ ...editData, name: e.target.value })
+              }
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              label="Posição"
+              select
+              value={editData.position}
+              onChange={(e) =>
+                setEditData({ ...editData, position: e.target.value })
+              }
+              SelectProps={{
+                native: true,
+              }}
+              sx={{ mb: 2 }}
+            >
+              <option value="goleiro">Goleiro</option>
+              <option value="zagueiro">Zagueiro</option>
+              <option value="lateral">Lateral</option>
+              <option value="meio-campo">Meio-Campo</option>
+              <option value="atacante">Atacante</option>
+            </TextField>
+            <TextField
+              fullWidth
+              label="Bio"
+              multiline
+              rows={4}
+              value={editData.bio}
+              onChange={(e) =>
+                setEditData({ ...editData, bio: e.target.value })
+              }
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditDialog(false)}>Cancelar</Button>
+          <Button onClick={handleEditSave} variant="contained">
+            Salvar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 };
 

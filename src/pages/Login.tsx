@@ -107,10 +107,23 @@ const Login: React.FC = () => {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
+        background: `url('/soccer-field-bg.jpg')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `linear-gradient(135deg, rgba(40, 167, 69, 0.95), rgba(27, 126, 49, 0.9))`,
+          backdropFilter: "blur(8px)",
+        },
       }}
     >
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
         <Box
           sx={{
             marginTop: isMobile ? 4 : 8,
@@ -128,9 +141,16 @@ const Login: React.FC = () => {
               flexDirection: "column",
               alignItems: "center",
               width: "100%",
-              borderRadius: 4,
+              borderRadius: 3,
               position: "relative",
               overflow: "hidden",
+              background: "rgba(255, 255, 255, 0.98)",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+              transition: "transform 0.2s ease-in-out",
+              "&:hover": {
+                transform: "translateY(-4px)",
+              },
             }}
           >
             <Box
@@ -139,31 +159,40 @@ const Login: React.FC = () => {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: "8px",
+                height: "6px",
                 background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               }}
             />
 
             <Box sx={{ mb: 4, mt: 2, textAlign: "center" }}>
-              <Logo variant="h4" iconSize={40} />
+              <Logo variant="h3" iconSize={48} />
             </Box>
 
             <Avatar
               sx={{
                 mb: 2,
                 bgcolor: theme.palette.primary.main,
-                width: 56,
-                height: 56,
+                width: 64,
+                height: 64,
+                boxShadow: "0 4px 12px rgba(40, 167, 69, 0.2)",
               }}
             >
-              <LockOutlinedIcon fontSize="large" />
+              <SportsSoccerIcon sx={{ fontSize: 36 }} />
             </Avatar>
 
             <Typography
               component="h1"
               variant="h4"
               gutterBottom
-              sx={{ fontWeight: 700, mb: 3 }}
+              sx={{
+                fontWeight: 700,
+                mb: 3,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+                textAlign: "center",
+              }}
             >
               {t("auth.login.title")}
             </Typography>
@@ -175,6 +204,17 @@ const Login: React.FC = () => {
                   width: "100%",
                   mb: 3,
                   borderRadius: 2,
+                  animation: "slideIn 0.3s ease-out",
+                  "@keyframes slideIn": {
+                    from: {
+                      opacity: 0,
+                      transform: "translateY(-10px)",
+                    },
+                    to: {
+                      opacity: 1,
+                      transform: "translateY(0)",
+                    },
+                  },
                 }}
               >
                 {error}
@@ -188,6 +228,7 @@ const Login: React.FC = () => {
                   width: "100%",
                   mb: 3,
                   borderRadius: 2,
+                  animation: "slideIn 0.3s ease-out",
                 }}
               >
                 {success}
@@ -224,6 +265,13 @@ const Login: React.FC = () => {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                        },
+                        "&.Mui-focused": {
+                          boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
+                        },
                       },
                     }}
                   />
@@ -237,7 +285,7 @@ const Login: React.FC = () => {
                     label={t("auth.login.password")}
                     type={showPassword ? "text" : "password"}
                     id="senha"
-                    autoComplete="new-password"
+                    autoComplete="current-password"
                     error={touched.senha && Boolean(errors.senha)}
                     helperText={touched.senha && errors.senha}
                     InputProps={{
@@ -265,9 +313,13 @@ const Login: React.FC = () => {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
-                      },
-                      "& input::-ms-reveal, & input::-ms-clear": {
-                        display: "none",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                        },
+                        "&.Mui-focused": {
+                          boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
+                        },
                       },
                     }}
                   />
@@ -276,50 +328,130 @@ const Login: React.FC = () => {
                     type="submit"
                     fullWidth
                     variant="contained"
-                    size="large"
+                    disabled={isSubmitting}
                     sx={{
-                      mt: 4,
-                      mb: 3,
+                      mt: 3,
+                      mb: 2,
                       py: 1.5,
+                      fontSize: "1.1rem",
+                      fontWeight: 600,
                       borderRadius: 2,
-                      fontWeight: "bold",
-                      boxShadow: 4,
-                      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                      transition: "all 0.3s ease",
                       "&:hover": {
-                        background: `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 6px 16px rgba(40, 167, 69, 0.25)",
                       },
                     }}
-                    disabled={isSubmitting}
                   >
                     {isSubmitting
                       ? t("common.loading")
                       : t("auth.login.submit")}
                   </Button>
 
-                  <Divider sx={{ my: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 1,
+                      mt: 2,
+                    }}
+                  >
+                    <Link
+                      href="#"
+                      variant="body2"
+                      sx={{
+                        color: theme.palette.primary.main,
+                        textDecoration: "none",
+                        transition: "color 0.2s ease",
+                        "&:hover": {
+                          color: theme.palette.primary.dark,
+                        },
+                      }}
+                    >
+                      {t("auth.login.forgotPassword")}
+                    </Link>
+
+                    <Link
+                      href="/register"
+                      variant="body2"
+                      sx={{
+                        color: theme.palette.secondary.main,
+                        textDecoration: "none",
+                        fontWeight: 500,
+                        transition: "color 0.2s ease",
+                        "&:hover": {
+                          color: theme.palette.secondary.dark,
+                        },
+                      }}
+                    >
+                      {t("auth.login.noAccount")}
+                    </Link>
+                  </Box>
+
+                  <Divider sx={{ my: 4 }}>
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      sx={{ px: 1 }}
+                      sx={{ px: 2 }}
                     >
-                      ou
+                      {t("auth.login.or")}
                     </Typography>
                   </Divider>
 
-                  <Box sx={{ textAlign: "center", mt: 2 }}>
-                    <Typography variant="body1" sx={{ mb: 1 }}>
-                      {t("auth.login.registerLink").split("?")[0]}?
-                    </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 2,
+                    }}
+                  >
                     <Button
                       variant="outlined"
-                      onClick={() => navigate("/register")}
+                      startIcon={
+                        <img
+                          src="/google-icon.png"
+                          alt="Google"
+                          style={{ width: 20, height: 20 }}
+                        />
+                      }
                       sx={{
                         borderRadius: 2,
                         px: 3,
-                        fontWeight: "medium",
+                        py: 1,
+                        borderColor: "rgba(0, 0, 0, 0.12)",
+                        color: "text.primary",
+                        "&:hover": {
+                          backgroundColor: "rgba(0, 0, 0, 0.04)",
+                        },
                       }}
                     >
-                      {t("auth.login.registerLink").split("?")[1]}
+                      Google
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      startIcon={
+                        <img
+                          src="/facebook-icon.png"
+                          alt="Facebook"
+                          style={{ width: 20, height: 20 }}
+                        />
+                      }
+                      sx={{
+                        borderRadius: 2,
+                        px: 3,
+                        py: 1,
+                        borderColor: "rgba(0, 0, 0, 0.12)",
+                        color: "text.primary",
+                        "&:hover": {
+                          backgroundColor: "rgba(0, 0, 0, 0.04)",
+                        },
+                      }}
+                    >
+                      Facebook
                     </Button>
                   </Box>
                 </Form>
