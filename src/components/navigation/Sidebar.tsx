@@ -20,6 +20,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../presentation/hooks/useAuth";
+import Logo from "../common/Logo";
 
 const Sidebar: React.FC = () => {
   const theme = useTheme();
@@ -99,25 +100,7 @@ const Sidebar: React.FC = () => {
           },
         }}
       >
-        <Avatar
-          sx={{
-            width: 80,
-            height: 80,
-            bgcolor: "secondary.main",
-            mb: 2,
-            transform: "scale(1.1)",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.15)",
-            },
-            boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-          }}
-        >
-          <SportsSoccerIcon sx={{ fontSize: 40 }} />
-        </Avatar>
-        <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: 1 }}>
-          FutMatch
-        </Typography>
+        <Logo variant="h5" iconSize={40} darkMode={true} sx={{ mb: 2 }} />
         <Typography
           variant="body2"
           sx={{
