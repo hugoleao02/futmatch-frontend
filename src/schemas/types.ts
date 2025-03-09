@@ -22,7 +22,7 @@ export interface LoginFormValues {
  * Interface para o formulário de registro
  */
 export interface RegisterFormValues {
-  apelido: string;
+  nome: string;
   email: string;
   senha: string;
   confirmSenha: string;

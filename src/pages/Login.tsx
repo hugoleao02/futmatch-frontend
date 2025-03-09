@@ -37,6 +37,11 @@ interface LocationState {
   };
 }
 
+interface LoginFormValues {
+  email: string;
+  senha: string;
+}
+
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();

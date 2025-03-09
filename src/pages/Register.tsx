@@ -25,8 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../presentation/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, FormikHelpers } from "formik";
-import { registerSchema, RegisterFormValues, PosicaoType } from "../schemas";
-import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
+import { registerSchema, RegisterFormValues } from "../schemas";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
@@ -46,17 +45,17 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const posicoes: PosicaoType[] = [
-    "GOLEIRO",
-    "ZAGUEIRO",
-    "LATERAL",
-    "VOLANTE",
-    "MEIA",
-    "ATACANTE",
+  const posicoes = [
+    { value: "GOLEIRO", label: "Goleiro" },
+    { value: "ZAGUEIRO", label: "Zagueiro" },
+    { value: "LATERAL", label: "Lateral" },
+    { value: "VOLANTE", label: "Volante" },
+    { value: "MEIA", label: "Meia" },
+    { value: "ATACANTE", label: "Atacante" },
   ];
 
   const initialValues: RegisterFormValues = {
-    apelido: "",
+    nome: "",
     email: "",
     senha: "",
     confirmSenha: "",
@@ -74,13 +73,12 @@ const Register: React.FC = () => {
       }
 
       const jogadorDTO = {
-        apelido: values.apelido,
+        nome: values.nome,
         email: values.email,
         senha: values.senha,
         posicao: values.posicao,
       };
 
-      console.log("Enviando DTO:", jogadorDTO);
       await register(jogadorDTO);
       navigate("/login", {
         state: {
@@ -241,13 +239,13 @@ const Register: React.FC = () => {
                         as={TextField}
                         required
                         fullWidth
-                        id="apelido"
+                        id="nome"
                         label={t("auth.register.nickname")}
-                        name="apelido"
+                        name="nome"
                         autoComplete="nickname"
                         autoFocus
-                        error={touched.apelido && Boolean(errors.apelido)}
-                        helperText={touched.apelido && errors.apelido}
+                        error={touched.nome && Boolean(errors.nome)}
+                        helperText={touched.nome && errors.nome}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
@@ -327,13 +325,7 @@ const Register: React.FC = () => {
                                 aria-label="toggle password visibility"
                                 onClick={handleTogglePasswordVisibility}
                                 edge="end"
-                              >
-                                {showPassword ? (
-                                  <VisibilityOffOutlinedIcon />
-                                ) : (
-                                  <VisibilityOutlinedIcon />
-                                )}
-                              </IconButton>
+                              ></IconButton>
                             </InputAdornment>
                           ),
                         }}
@@ -433,9 +425,9 @@ const Register: React.FC = () => {
                           },
                         }}
                       >
-                        {posicoes.map((posicao: PosicaoType) => (
-                          <MenuItem key={posicao!} value={posicao!}>
-                            {t(`positions.${posicao!.toLowerCase()}`)}
+                        {posicoes.map((posicao) => (
+                          <MenuItem key={posicao.value} value={posicao.value}>
+                            {posicao.label}
                           </MenuItem>
                         ))}
                       </Field>

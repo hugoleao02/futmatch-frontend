@@ -4,7 +4,7 @@ export const API_CONFIG = {
   WITH_CREDENTIALS: true,
   AUTH: {
     LOGIN_ENDPOINT: "/auth/login",
-    REGISTER_ENDPOINT: "/auth/register",
+    REGISTER_ENDPOINT: "/auth/registrar",
     PROFILE_ENDPOINT: "/auth/me",
     PROFILE_FALLBACK_ENDPOINT: "/jogadores/me",
   },
