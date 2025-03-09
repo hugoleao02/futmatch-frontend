@@ -1,8 +1,52 @@
-import { HttpClient, IApiError, isApiError } from "../api/HttpClient";
-import { toJogador } from "../adapters/UserAdapter";
+import { Jogador, LoginDTO, RegisterDTO } from "../../@types";
 import { API_CONFIG } from "../../config/api";
-import { saveToken, removeToken, getUserFromToken } from "./TokenService";
-import { LoginDTO, RegisterDTO, Jogador } from "../../@types";
+import { HttpClient, isApiError } from "../api/HttpClient";
+import { getUserFromToken, removeToken, saveToken } from "./TokenService";
+
+const formatUserResponse = (user: any): Jogador => {
+  const userId = typeof user.id === "number" ? user.id : parseInt(user.id);
+
+  if (isNaN(userId)) {
+    throw new Error("ID do usuário inválido");
+  }
+
+  return {
+    id: userId,
+    nome: user.nome || "Usuário",
+    email: user.email,
+    posicao: user.posicao || "ATACANTE",
+    estatisticas: {
+      totalPartidas: user.estatisticas?.totalPartidas || 0,
+      vitorias: user.estatisticas?.vitorias || 0,
+      derrotas: user.estatisticas?.derrotas || 0,
+      empates: user.estatisticas?.empates || 0,
+      golsMarcados: user.estatisticas?.golsMarcados || 0,
+      golsSofridos: user.estatisticas?.golsSofridos || 0,
+      fairPlayScore: user.estatisticas?.fairPlayScore || 0,
+    },
+  };
+};
+
+export const fetchUserProfile = async (): Promise<Jogador> => {
+  try {
+    // Tenta primeiro o endpoint principal
+    try {
+      const response = await HttpClient.get<any>(
+        API_CONFIG.AUTH.PROFILE_ENDPOINT
+      );
+      return formatUserResponse(response);
+    } catch (error) {
+      console.log("Tentando endpoint alternativo...");
+      const response = await HttpClient.get<any>(
+        API_CONFIG.AUTH.PROFILE_FALLBACK_ENDPOINT
+      );
+      return formatUserResponse(response);
+    }
+  } catch (error) {
+    console.error("Erro ao buscar perfil do usuário:", error);
+    throw new Error("Não foi possível obter os dados do usuário");
+  }
+};
 
 export const login = async (loginDTO: LoginDTO): Promise<Jogador> => {
   try {
@@ -16,13 +60,8 @@ export const login = async (loginDTO: LoginDTO): Promise<Jogador> => {
     }
 
     saveToken(response.token);
-    const user = getUserFromToken();
 
-    if (!user) {
-      throw new Error("Erro ao decodificar token do usuário");
-    }
-
-    return user;
+    return await fetchUserProfile();
   } catch (error) {
     if (isApiError(error)) {
       throw new Error(error.message);
@@ -43,13 +82,9 @@ export const register = async (registerDTO: RegisterDTO): Promise<Jogador> => {
     }
 
     saveToken(response.token);
-    const user = getUserFromToken();
 
-    if (!user) {
-      throw new Error("Erro ao decodificar token do usuário");
-    }
-
-    return user;
+    // Busca o perfil real do usuário após o registro
+    return await fetchUserProfile();
   } catch (error) {
     console.error("Erro no registro:", error);
     if (isApiError(error)) {
@@ -72,4 +107,5 @@ export const AuthService = {
   register,
   logout,
   getCurrentUser,
+  fetchUserProfile,
 };
