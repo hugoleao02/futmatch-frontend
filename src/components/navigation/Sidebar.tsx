@@ -19,7 +19,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import HomeIcon from "@mui/icons-material/Home";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "../../presentation/hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import Logo from "../common/Logo";
 
 const Sidebar: React.FC = () => {

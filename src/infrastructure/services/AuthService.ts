@@ -1,94 +1,60 @@
-import { LoginDTO, RegisterDTO } from "../../core/domain/dto/AuthDTO";
-import { User } from "../../core/domain/entities/User";
-import { HttpClient, ApiError } from "../api/HttpClient";
-import { UserAdapter } from "../adapters/UserAdapter";
+import { HttpClient, IApiError, isApiError } from "../api/HttpClient";
+import { toJogador } from "../adapters/UserAdapter";
 import { API_CONFIG } from "../../config/api";
 import { saveToken, removeToken, getUserFromToken } from "./TokenService";
+import { LoginDTO, RegisterDTO, Jogador } from "../../@types";
 
-// Funções do serviço
-export const login = async (credentials: LoginDTO): Promise<string> => {
+export const login = async (loginDTO: LoginDTO): Promise<Jogador> => {
   try {
-    const response = await HttpClient.post<{ token: string } | string>(
+    const response = await HttpClient.post<{ token: string }>(
       API_CONFIG.AUTH.LOGIN_ENDPOINT,
-      credentials
+      loginDTO
     );
 
-    let token = "";
-
-    if (typeof response === "object" && response.token) {
-      token = response.token;
-    } else if (typeof response === "string") {
-      token = response;
-    } else {
-      throw new Error("Token não encontrado na resposta");
+    if (!response || !response.token) {
+      throw new Error("Token não recebido do servidor");
     }
 
-    saveToken(token);
-    return token;
+    saveToken(response.token);
+    const user = getUserFromToken();
+
+    if (!user) {
+      throw new Error("Erro ao decodificar token do usuário");
+    }
+
+    return user;
   } catch (error) {
-    if (error instanceof ApiError) {
-      if (error.status === 401) {
-        throw new Error("Credenciais inválidas");
-      } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
-      }
+    if (isApiError(error)) {
+      throw new Error(error.message);
     }
-    throw error;
+    throw new Error("Erro ao realizar login");
   }
 };
 
-export const register = async (userData: RegisterDTO): Promise<User> => {
+export const register = async (registerDTO: RegisterDTO): Promise<Jogador> => {
   try {
-    const response = await HttpClient.post<any>(
+    const response = await HttpClient.post<{ token: string }>(
       API_CONFIG.AUTH.REGISTER_ENDPOINT,
-      userData
+      registerDTO
     );
 
-    return UserAdapter.fromApiResponse(response);
-  } catch (error) {
-    if (error instanceof ApiError) {
-      if (error.status === 400) {
-        throw new Error("Dados de registro inválidos");
-      } else if (error.status === 409) {
-        throw new Error("Email já cadastrado");
-      } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
-      }
+    if (!response || !response.token) {
+      throw new Error("Token não recebido do servidor");
     }
-    throw error;
-  }
-};
 
-export const getProfile = async (): Promise<User> => {
-  try {
-    try {
-      const response = await HttpClient.get<any>(
-        API_CONFIG.AUTH.PROFILE_ENDPOINT
-      );
-      return UserAdapter.fromApiResponse(response);
-    } catch (authError) {
-      try {
-        const response = await HttpClient.get<any>(
-          API_CONFIG.AUTH.PROFILE_FALLBACK_ENDPOINT
-        );
-        return UserAdapter.fromApiResponse(response);
-      } catch (jogadoresError) {
-        const userData = getUserFromToken();
-        if (userData) {
-          return userData;
-        }
-        throw jogadoresError;
-      }
+    saveToken(response.token);
+    const user = getUserFromToken();
+
+    if (!user) {
+      throw new Error("Erro ao decodificar token do usuário");
     }
+
+    return user;
   } catch (error) {
-    if (error instanceof ApiError) {
-      if (error.status === 401) {
-        throw new Error("Não autorizado");
-      } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
-      }
+    if (isApiError(error)) {
+      throw new Error(error.message);
     }
-    throw error;
+    throw new Error("Erro ao realizar cadastro");
   }
 };
 
@@ -96,9 +62,13 @@ export const logout = (): void => {
   removeToken();
 };
 
+export const getCurrentUser = (): Jogador | null => {
+  return getUserFromToken();
+};
+
 export const AuthService = {
   login,
   register,
-  getProfile,
   logout,
+  getCurrentUser,
 };

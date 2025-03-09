@@ -1,48 +1,13 @@
-import { HttpClient, ApiError } from "../api/HttpClient";
-import { API_CONFIG } from "../../config/api";
-import { User } from "../../core/domain/entities/User";
-import { UserAdapter } from "../adapters/UserAdapter";
+import { HttpClient, IApiError, isApiError } from "../api/HttpClient";
+import { toJogador } from "../adapters/UserAdapter";
+import { Jogador, Estatisticas } from "../../@types";
 
-export interface AtualizarPerfilDTO {
-  apelido?: string;
-  nome?: string;
-  posicao?: string;
-  avatar?: string;
-}
-
-export interface PartidaResumo {
-  id: number;
-  data: string;
-  local: string;
-  resultado: string;
-  avaliacao: number;
-}
-
-export interface Estatisticas {
-  totalPartidas: number;
-  vitorias: number;
-  derrotas: number;
-  empates: number;
-  golsMarcados: number;
-  golsSofridos: number;
-  saldoGols: number;
-  aproveitamento: number;
-  gols: number;
-  assistencias: number;
-  fairPlayScore: number;
-  mediaAvaliacao: number;
-  partidasOrganizadas: number;
-  cidade: string;
-  ultimasPartidas: PartidaResumo[];
-}
-
-// Funções do serviço
-export const obterPerfil = async (): Promise<User> => {
+export const obterPerfil = async (): Promise<Jogador> => {
   try {
     const response = await HttpClient.get<any>("/jogadores/me");
-    return UserAdapter.fromApiResponse(response);
-  } catch (error) {
-    if (error instanceof ApiError) {
+    return toJogador(response);
+  } catch (error: unknown) {
+    if (isApiError(error)) {
       if (error.status === 401) {
         throw new Error("Não autorizado");
       } else if (error.isNetworkError) {
@@ -53,12 +18,12 @@ export const obterPerfil = async (): Promise<User> => {
   }
 };
 
-export const obterJogadorPorId = async (id: number): Promise<User> => {
+export const obterJogadorPorId = async (id: number): Promise<Jogador> => {
   try {
     const response = await HttpClient.get<any>(`/jogadores/${id}`);
-    return UserAdapter.fromApiResponse(response);
-  } catch (error) {
-    if (error instanceof ApiError) {
+    return toJogador(response);
+  } catch (error: unknown) {
+    if (isApiError(error)) {
       if (error.status === 404) {
         throw new Error("Jogador não encontrado");
       } else if (error.isNetworkError) {
@@ -70,13 +35,13 @@ export const obterJogadorPorId = async (id: number): Promise<User> => {
 };
 
 export const atualizarPerfil = async (
-  perfilData: AtualizarPerfilDTO
-): Promise<User> => {
+  perfilData: Jogador
+): Promise<Jogador> => {
   try {
     const response = await HttpClient.put<any>("/jogadores/me", perfilData);
-    return UserAdapter.fromApiResponse(response);
-  } catch (error) {
-    if (error instanceof ApiError) {
+    return toJogador(response);
+  } catch (error: unknown) {
+    if (isApiError(error)) {
       if (error.status === 400) {
         throw new Error("Dados do perfil inválidos");
       } else if (error.status === 401) {
@@ -98,8 +63,8 @@ export const obterEstatisticas = async (
       : "/jogadores/me/estatisticas";
 
     return await HttpClient.get<Estatisticas>(endpoint);
-  } catch (error) {
-    if (error instanceof ApiError) {
+  } catch (error: unknown) {
+    if (isApiError(error)) {
       if (error.status === 404) {
         throw new Error("Jogador não encontrado");
       } else if (error.status === 401) {

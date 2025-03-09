@@ -1,18 +1,19 @@
-import { User } from "../../core/domain/entities/User";
+import { Jogador, PosicaoType } from "../../@types";
 import { API_CONFIG } from "../../config/api";
 
 const TOKEN_KEY = API_CONFIG.TOKEN.STORAGE_KEY;
 
 export const saveToken = (token: string): void => {
-  sessionStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(TOKEN_KEY, token);
 };
 
 export const getToken = (): string | null => {
-  return sessionStorage.getItem(TOKEN_KEY);
+  const token = localStorage.getItem(TOKEN_KEY);
+  return token;
 };
 
 export const removeToken = (): void => {
-  sessionStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TOKEN_KEY);
 };
 
 export const getTokenPayload = (): any | null => {
@@ -35,24 +36,31 @@ export const getTokenPayload = (): any | null => {
   }
 };
 
-export const getUserFromToken = (): User | null => {
+export const getUserFromToken = (): Jogador | null => {
   try {
-    const payload = getTokenPayload();
-    if (!payload) return null;
+    const token = getToken();
+    if (!token) return null;
 
-    const user: User = {
-      id: payload.id || 0,
-      apelido: payload.sub || "Usuário",
-      email: payload.sub || "",
-      posicao: payload.posicao || "ATACANTE",
-      nivelHabilidade: payload.nivelHabilidade || 1,
-      pontuacaoFairPlay: payload.pontuacaoFairPlay || 0,
-      isPremium: payload.isPremium || false,
-      nome: payload.nome || payload.sub || "Usuário",
-      avatar: payload.avatar || "",
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+
+    const payload = JSON.parse(jsonPayload);
+
+    return {
+      id: payload.sub,
+      nome: "Admin",
+      email: payload.sub,
+      apelido: "Admin",
+      posicao: "ATACANTE" as PosicaoType,
+      nivelHabilidade: 5,
+      pontuacaoFairPlay: 5,
     };
-
-    return user;
   } catch (error) {
     return null;
   }

@@ -7,46 +7,44 @@ import axios, {
 import { getToken } from "../services/TokenService";
 import { API_CONFIG } from "../../config/api";
 
-export class ApiError extends Error {
-  public status: number;
-  public data: any;
-  public isNetworkError: boolean;
-
-  constructor(
-    message: string,
-    status: number = 0,
-    data: any = null,
-    isNetworkError: boolean = false
-  ) {
-    super(message);
-    this.name = "ApiError";
-    this.status = status;
-    this.data = data;
-    this.isNetworkError = isNetworkError;
-  }
-
-  static fromAxiosError(error: AxiosError): ApiError {
-    if (error.response) {
-      return new ApiError(
-        error.message,
-        error.response.status,
-        error.response.data,
-        false
-      );
-    } else if (error.request) {
-      // A requisição foi feita mas não houve resposta
-      return new ApiError(
-        "Não foi possível conectar ao servidor",
-        0,
-        null,
-        true
-      );
-    } else {
-      // Algo aconteceu na configuração da requisição que causou o erro
-      return new ApiError(error.message, 0, null, false);
-    }
-  }
+export interface IApiError {
+  message: string;
+  status: number;
+  data: any;
+  isNetworkError: boolean;
 }
+
+const createApiError = (
+  message: string,
+  status: number = 0,
+  data: any = null,
+  isNetworkError: boolean = false
+): IApiError => ({
+  message,
+  status,
+  data,
+  isNetworkError,
+});
+
+const createApiErrorFromAxiosError = (error: AxiosError): IApiError => {
+  if (error.response) {
+    return createApiError(
+      error.message,
+      error.response.status,
+      error.response.data,
+      false
+    );
+  } else if (error.request) {
+    return createApiError(
+      "Não foi possível conectar ao servidor",
+      0,
+      null,
+      true
+    );
+  } else {
+    return createApiError(error.message, 0, null, false);
+  }
+};
 
 // Criar uma instância do Axios com configurações padrão
 const createAxiosInstance = (
@@ -72,14 +70,14 @@ const createAxiosInstance = (
       return config;
     },
     (error) => {
-      return Promise.reject(ApiError.fromAxiosError(error));
+      return Promise.reject(createApiErrorFromAxiosError(error));
     }
   );
 
   api.interceptors.response.use(
     (response) => response,
     (error) => {
-      return Promise.reject(ApiError.fromAxiosError(error));
+      return Promise.reject(createApiErrorFromAxiosError(error));
     }
   );
 
@@ -88,6 +86,15 @@ const createAxiosInstance = (
 
 // Instância global do Axios
 const api = createAxiosInstance();
+
+export const isApiError = (error: any): error is IApiError => {
+  return (
+    error &&
+    typeof error.message === "string" &&
+    typeof error.status === "number" &&
+    typeof error.isNetworkError === "boolean"
+  );
+};
 
 // Funções HTTP
 export const get = async <T>(
@@ -98,13 +105,13 @@ export const get = async <T>(
     const response: AxiosResponse<T> = await api.get(url, config);
     return response.data;
   } catch (error) {
-    if (error instanceof ApiError) {
+    if (isApiError(error)) {
       throw error;
     }
     if (axios.isAxiosError(error)) {
-      throw ApiError.fromAxiosError(error);
+      throw createApiErrorFromAxiosError(error);
     }
-    throw new ApiError((error as Error).message);
+    throw createApiError((error as Error).message);
   }
 };
 
@@ -117,13 +124,13 @@ export const post = async <T>(
     const response: AxiosResponse<T> = await api.post(url, data, config);
     return response.data;
   } catch (error) {
-    if (error instanceof ApiError) {
+    if (isApiError(error)) {
       throw error;
     }
     if (axios.isAxiosError(error)) {
-      throw ApiError.fromAxiosError(error);
+      throw createApiErrorFromAxiosError(error);
     }
-    throw new ApiError((error as Error).message);
+    throw createApiError((error as Error).message);
   }
 };
 
@@ -136,13 +143,13 @@ export const put = async <T>(
     const response: AxiosResponse<T> = await api.put(url, data, config);
     return response.data;
   } catch (error) {
-    if (error instanceof ApiError) {
+    if (isApiError(error)) {
       throw error;
     }
     if (axios.isAxiosError(error)) {
-      throw ApiError.fromAxiosError(error);
+      throw createApiErrorFromAxiosError(error);
     }
-    throw new ApiError((error as Error).message);
+    throw createApiError((error as Error).message);
   }
 };
 
@@ -154,13 +161,13 @@ export const del = async <T>(
     const response: AxiosResponse<T> = await api.delete(url, config);
     return response.data;
   } catch (error) {
-    if (error instanceof ApiError) {
+    if (isApiError(error)) {
       throw error;
     }
     if (axios.isAxiosError(error)) {
-      throw ApiError.fromAxiosError(error);
+      throw createApiErrorFromAxiosError(error);
     }
-    throw new ApiError((error as Error).message);
+    throw createApiError((error as Error).message);
   }
 };
 

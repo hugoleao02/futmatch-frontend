@@ -1,18 +1,13 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Perfil from "./pages/Perfil";
-import Partidas from "./pages/Partidas";
-import CriarPartida from "./pages/CriarPartida";
-import DetalhesPartida from "./pages/DetalhesPartida";
-import CriarSala from "./pages/CriarSala";
-import ListarSalas from "./pages/ListarSalas";
-import DetalhesSala from "./pages/DetalhesSala";
-import Ranking from "./pages/Ranking";
+import { Home } from "./features/home";
+import { Login, Register } from "./features/auth";
+import { Perfil } from "./features/perfil";
+import { Partidas, CriarPartida, DetalhesPartida } from "./features/partidas";
+import { CriarSala, ListarSalas, DetalhesSala } from "./features/salas";
+import { Ranking } from "./features/ranking";
 import { MainLayout, ProtectedRoute } from "./components";
-import { useAuth } from "./presentation/hooks/useAuth";
+import { useAuth } from "./hooks/useAuth";
 
 /**
  * Componente que define as rotas da aplicação

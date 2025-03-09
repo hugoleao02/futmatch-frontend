@@ -1,72 +1,26 @@
-import { User } from "../../core/domain/entities/User";
+import { Jogador, PosicaoType } from "../../@types";
 
-// Interface que representa o tipo Jogador da API
-export interface JogadorDTO {
-  id: number;
-  apelido: string;
-  email: string;
-  posicao: string;
-  nivelHabilidade: number;
-  pontuacaoFairPlay: number;
-  isPremium: boolean;
-  nome?: string;
-  avatar?: string;
-}
+export const toJogador = (response: any): Jogador => {
+  const token = response.token;
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+      .join("")
+  );
 
-/**
- * Converte um JogadorDTO para uma entidade User do domínio
- */
-export const toUser = (jogador: JogadorDTO): User => {
+  const payload = JSON.parse(jsonPayload);
   return {
-    id: jogador.id,
-    apelido: jogador.apelido,
-    email: jogador.email,
-    posicao: jogador.posicao,
-    nivelHabilidade: jogador.nivelHabilidade,
-    pontuacaoFairPlay: jogador.pontuacaoFairPlay,
-    isPremium: jogador.isPremium,
-    nome: jogador.nome || jogador.apelido,
-    avatar: jogador.avatar || "",
+    id: payload.sub,
+    nome: "Usuário",
+    email: payload.sub,
+    apelido: "Usuário",
+    posicao: "ATACANTE" as PosicaoType,
   };
 };
 
-/**
- * Converte uma entidade User do domínio para um JogadorDTO
- */
-export const toJogadorDTO = (user: User): JogadorDTO => {
-  return {
-    id: user.id,
-    apelido: user.apelido,
-    email: user.email,
-    posicao: user.posicao,
-    nivelHabilidade: user.nivelHabilidade,
-    pontuacaoFairPlay: user.pontuacaoFairPlay,
-    isPremium: user.isPremium,
-    nome: user.nome,
-    avatar: user.avatar,
-  };
-};
-
-/**
- * Converte um objeto de resposta da API para uma entidade User
- */
-export const fromApiResponse = (response: any): User => {
-  // Se a resposta já tiver a estrutura de um jogador
-  if (response && response.id !== undefined) {
-    return toUser(response as JogadorDTO);
-  }
-
-  // Se a resposta tiver um campo jogador
-  if (response && response.jogador) {
-    return toUser(response.jogador as JogadorDTO);
-  }
-
-  throw new Error("Formato de resposta inválido para conversão para User");
-};
-
-// Exportar como objeto para compatibilidade
 export const UserAdapter = {
-  toUser,
-  toJogadorDTO,
-  fromApiResponse,
+  toJogador,
 };
