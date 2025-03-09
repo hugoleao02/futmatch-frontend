@@ -25,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, FormikHelpers } from "formik";
-import { registerSchema, RegisterFormValues } from "../schemas";
+import { schemaCadastro } from "../../../schemas";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
@@ -33,8 +33,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import SportsIcon from "@mui/icons-material/Sports";
-import Logo from "../components/common/Logo";
-import { PosicaoType } from "../../../@types";
+import { Logo } from "../../../components";
+import { FormularioCadastro } from "../../../@types";
+import { PosicaoType } from "../../../@types/enums";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -55,17 +56,17 @@ const Register: React.FC = () => {
     { value: "ATACANTE", label: "Atacante" },
   ];
 
-  const initialValues: RegisterFormValues = {
+  const initialValues: FormularioCadastro = {
     nome: "",
     email: "",
     senha: "",
     confirmSenha: "",
-    posicao: undefined,
+    posicao: "ATACANTE" as PosicaoType,
   };
 
   const handleSubmit = async (
-    values: RegisterFormValues,
-    { setSubmitting }: FormikHelpers<RegisterFormValues>
+    values: FormularioCadastro,
+    { setSubmitting }: FormikHelpers<FormularioCadastro>
   ) => {
     try {
       setError("");
@@ -229,7 +230,7 @@ const Register: React.FC = () => {
 
             <Formik
               initialValues={initialValues}
-              validationSchema={registerSchema(t)}
+              validationSchema={schemaCadastro(t)}
               onSubmit={handleSubmit}
             >
               {({ isSubmitting, touched, errors }) => (

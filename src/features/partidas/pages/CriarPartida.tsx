@@ -40,7 +40,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { criarPartida } from "../services/partidasService";
-import { CriarPartidaDTO } from "../../../@types/api";
+import { CriarPartidaDTO } from "../../../@types";
 const steps = ["Informações Básicas", "Local e Horário", "Configurações"];
 
 interface FormData {
@@ -138,18 +138,12 @@ const CriarPartida: React.FC = () => {
       try {
         setLoading(true);
         const partidaData: CriarPartidaDTO = {
+          titulo: values.title,
           data: values.date?.toISOString() || "",
           local: values.location,
-          timeA: "Time A",
-          timeB: "Time B",
-          salaId: 1,
-          titulo: values.title,
           maxJogadores: values.maxPlayers,
           nivelHabilidade: values.skillLevel,
-          dataHora: values.date?.toISOString() || "",
           observacoes: values.description,
-          jogadoresConfirmados: [],
-          jogadoresEspera: [],
         };
 
         await criarPartida(partidaData);

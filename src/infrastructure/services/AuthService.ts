@@ -51,6 +51,7 @@ export const register = async (registerDTO: RegisterDTO): Promise<Jogador> => {
 
     return user;
   } catch (error) {
+    console.error("Erro no registro:", error);
     if (isApiError(error)) {
       throw new Error(error.message);
     }

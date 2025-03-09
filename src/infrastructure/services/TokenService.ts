@@ -56,10 +56,16 @@ export const getUserFromToken = (): Jogador | null => {
       id: payload.sub,
       nome: "Admin",
       email: payload.sub,
-      apelido: "Admin",
       posicao: "ATACANTE" as PosicaoType,
-      nivelHabilidade: 5,
-      pontuacaoFairPlay: 5,
+      estatisticas: {
+        totalPartidas: 0,
+        vitorias: 0,
+        derrotas: 0,
+        empates: 0,
+        golsMarcados: 0,
+        golsSofridos: 0,
+        fairPlayScore: 0,
+      },
     };
   } catch (error) {
     return null;

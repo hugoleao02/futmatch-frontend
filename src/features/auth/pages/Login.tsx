@@ -8,33 +8,31 @@ import {
   Box,
   Link,
   Alert,
+  CircularProgress,
   useTheme,
   Avatar,
   InputAdornment,
   IconButton,
   Divider,
   useMediaQuery,
+  Grid,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, FormikHelpers } from "formik";
-import { loginSchema, LoginFormValues } from "../schemas";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { schemaLogin } from "../../../schemas";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import Logo from "../../../components/common/Logo";
+import { Logo } from "../../../components";
 import { getToken } from "../../../infrastructure/services/TokenService";
-import { LoginDTO } from "../../../@types/auth";
+import { FormularioLogin, LoginDTO } from "../../../@types";
 
 interface LocationState {
+  from?: { pathname: string };
   message?: string;
   email?: string;
-  from?: {
-    pathname: string;
-  };
 }
 
 const Login: React.FC = () => {
@@ -47,7 +45,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [initialValues, setInitialValues] = useState<LoginFormValues>({
+  const [initialValues, setInitialValues] = useState<FormularioLogin>({
     email: "",
     senha: "",
   });
@@ -57,15 +55,18 @@ const Login: React.FC = () => {
     if (state?.message) {
       setSuccess(state.message);
       if (state.email) {
-        setInitialValues((prev) => ({ ...prev, email: state.email || "" }));
+        setInitialValues((prev: FormularioLogin) => ({
+          ...prev,
+          email: state.email || "",
+        }));
       }
       window.history.replaceState({}, document.title);
     }
   }, [location]);
 
   const handleSubmit = async (
-    values: LoginFormValues,
-    { setSubmitting }: FormikHelpers<LoginFormValues>
+    values: FormularioLogin,
+    { setSubmitting }: FormikHelpers<FormularioLogin>
   ) => {
     try {
       setError("");
@@ -237,7 +238,7 @@ const Login: React.FC = () => {
 
             <Formik
               initialValues={initialValues}
-              validationSchema={loginSchema(t)}
+              validationSchema={schemaLogin(t)}
               onSubmit={handleSubmit}
               enableReinitialize
             >

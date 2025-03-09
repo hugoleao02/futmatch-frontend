@@ -1,11 +1,11 @@
 import React, { createContext, useState, useEffect } from "react";
-import { Jogador, LoginDTO, RegisterDTO } from "../@types";
-import { AuthService } from "../infrastructure/services/AuthService";
+
 import {
   getToken,
   getUserFromToken,
 } from "../infrastructure/services/TokenService";
-
+import { Jogador, LoginDTO, RegisterDTO } from "../@types";
+import { AuthService } from "../infrastructure/services/AuthService";
 interface AuthContextData {
   user: Jogador | null;
   loading: boolean;

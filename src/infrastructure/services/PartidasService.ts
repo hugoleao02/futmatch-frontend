@@ -1,7 +1,7 @@
 import { HttpClient, IApiError, isApiError } from "../api/HttpClient";
 import { FiltroPartidaDTO } from "../../features/partidas/services/partidasService";
-import { Partida } from "../../@types/match";
-import { CriarPartidaDTO, AtualizarPlacarDTO } from "../../@types/api";
+import { Partida } from "../../@types/partida/Partida";
+import { AtualizarPlacarDTO, CriarPartidaDTO } from "../../@types";
 
 export const listarPartidas = async (
   filtros?: FiltroPartidaDTO

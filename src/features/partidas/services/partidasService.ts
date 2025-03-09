@@ -1,4 +1,9 @@
-import { api } from "../../../infrastructure/api";
+import { CriarPartidaDTO } from "../../../@types";
+import { HttpClient } from "../../../infrastructure/api/HttpClient";
+
+interface ApiResponse<T> {
+  data: T;
+}
 
 export interface Partida {
   id: string;
@@ -29,19 +34,26 @@ export interface FiltroPartidaDTO {
 export const listarPartidas = async (
   filtros?: FiltroPartidaDTO
 ): Promise<Partida[]> => {
-  const response = await api.get("/partidas", { params: filtros });
+  const response = await HttpClient.get<ApiResponse<Partida[]>>("/partidas", {
+    params: filtros,
+  });
   return response.data;
 };
 
 export const getPartidaById = async (id: string): Promise<Partida> => {
-  const response = await api.get(`/partidas/${id}`);
+  const response = await HttpClient.get<ApiResponse<Partida>>(
+    `/partidas/${id}`
+  );
   return response.data;
 };
 
 export const criarPartida = async (
-  partida: Omit<Partida, "id">
+  partida: CriarPartidaDTO
 ): Promise<Partida> => {
-  const response = await api.post("/partidas", partida);
+  const response = await HttpClient.post<ApiResponse<Partida>>(
+    "/partidas",
+    partida
+  );
   return response.data;
 };
 
@@ -49,10 +61,13 @@ export const atualizarPartida = async (
   id: string,
   partida: Partial<Partida>
 ): Promise<Partida> => {
-  const response = await api.put(`/partidas/${id}`, partida);
+  const response = await HttpClient.put<ApiResponse<Partida>>(
+    `/partidas/${id}`,
+    partida
+  );
   return response.data;
 };
 
 export const deletarPartida = async (id: string): Promise<void> => {
-  await api.delete(`/partidas/${id}`);
+  await HttpClient.delete(`/partidas/${id}`);
 };

@@ -16,7 +16,6 @@ export const toJogador = (response: any): Jogador => {
     id: payload.sub,
     nome: "Usuário",
     email: payload.sub,
-    apelido: "Usuário",
     posicao: "ATACANTE" as PosicaoType,
   };
 };

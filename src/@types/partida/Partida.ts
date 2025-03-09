@@ -1,4 +1,5 @@
-import { Jogador } from "./player";
+import { Jogador } from "../jogador/Jogador";
+
 export interface Partida {
   id: number;
   titulo?: string;
@@ -18,19 +19,4 @@ export interface Partida {
   jogadoresConfirmados?: Jogador[];
   jogadoresEspera?: Jogador[];
   observacoes?: string;
-}
-
-export interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-export interface PartidaDestaque {
-  id: string;
-  title: string;
-  location: string;
-  time: string;
-  players: string;
-  level: string;
 }
