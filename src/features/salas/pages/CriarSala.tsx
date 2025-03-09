@@ -1,50 +1,46 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { SalasService } from "../services";
-import { CriarSalaDTO } from "../infrastructure/services";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import GroupIcon from "@mui/icons-material/Group";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Box,
   Alert,
+  Box,
+  Button,
   CircularProgress,
-  IconButton,
-  Grid,
-  Stepper,
-  Step,
-  StepLabel,
-  Card,
-  CardContent,
-  Divider,
-  Chip,
-  useTheme,
-  useMediaQuery,
+  Container,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  InputAdornment,
-  Switch,
   FormControlLabel,
   FormHelperText,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
   SelectChangeEvent,
+  Step,
+  StepLabel,
+  Stepper,
+  Switch,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import GroupIcon from "@mui/icons-material/Group";
-import DescriptionIcon from "@mui/icons-material/Description";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import ptBR from "date-fns/locale/pt-BR";
-
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { NivelCompetitividade } from "../../../@types/enums/NivelCompetitividade";
+import { TipoInscricao } from "../../../@types/enums/TipoInscricao";
+import { TipoJogador } from "../../../@types/enums/TipoJogador";
+import { TipoJogo } from "../../../@types/enums/TipoJogo";
+import { CriarSalaCommand } from "../../../@types/sala/CriarSalaCommand";
+import { SalasServiice } from "../../../infrastructure/services/SalasService";
 const steps = ["Informações Básicas", "Configurações", "Confirmação"];
 
 interface FormData {
@@ -79,28 +75,6 @@ const initialFormData: FormData = {
   allowSubstitutes: true,
 };
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const TabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`room-tabpanel-${index}`}
-      aria-labelledby={`room-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
-  );
-};
-
 const CriarSala: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -130,17 +104,58 @@ const CriarSala: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const salaData: CriarSalaDTO = {
+      const salaData: CriarSalaCommand = {
         nome: formData.title,
         descricao: formData.description,
-        localizacao: formData.location,
-        capacidade: formData.maxPlayers,
+        dataHoraPartida:
+          formData.date?.toISOString() || new Date().toISOString(),
+        local: formData.location,
+        endereco: formData.address,
+        duracao: formData.duration,
+        numeroMinimoJogadores: formData.minPlayers,
+        maxJogadores: formData.maxPlayers,
+        valorPorJogador: formData.price ? Number(formData.price) : undefined,
+        tipoInscricao:
+          formData.subscriptionType === "open"
+            ? TipoInscricao.ABERTA
+            : formData.subscriptionType === "invite"
+            ? TipoInscricao.APENAS_CONVIDADOS
+            : TipoInscricao.FECHADA,
+        tipoJogadorPermitido:
+          formData.skillLevel === "casual"
+            ? TipoJogador.INICIANTE
+            : formData.skillLevel === "intermediario"
+            ? TipoJogador.INTERMEDIARIO
+            : TipoJogador.AVANCADO,
+        permitirSubstituicoesAutomaticas: formData.allowSubstitutes,
+        criadorId: 1, // Você precisa obter o ID do usuário logado
+        tipoJogo:
+          formData.gameType === "society"
+            ? TipoJogo.SOCIETY
+            : formData.gameType === "campo"
+            ? TipoJogo.CAMPO
+            : TipoJogo.FUTSAL,
+        nivelCompetitividade:
+          formData.skillLevel === "casual"
+            ? NivelCompetitividade.CASUAL
+            : formData.skillLevel === "intermediario"
+            ? NivelCompetitividade.INTERMEDIARIO
+            : NivelCompetitividade.COMPETITIVO,
       };
 
-      const novaSala = await SalasService.criarSala(salaData);
+      console.log("Dados da sala a serem enviados:", salaData);
+
+      const novaSala = await SalasServiice.criarSala(salaData);
+      console.log("Resposta do servidor:", novaSala);
+
       navigate(`/dashboard/salas/${novaSala.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao criar sala");
+      console.error("Erro ao criar sala:", err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Erro ao criar sala. Por favor, tente novamente.");
+      }
     } finally {
       setLoading(false);
     }

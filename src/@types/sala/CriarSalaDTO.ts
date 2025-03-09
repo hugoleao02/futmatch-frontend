@@ -1,7 +1,6 @@
 export interface CriarSalaDTO {
   nome: string;
-  descricao?: string;
-  maxJogadores: number;
-  nivelHabilidade?: string;
-  dataHora: string;
+  descricao: string;
+  localizacao: string;
+  capacidade: number;
 }

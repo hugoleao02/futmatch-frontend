@@ -1,11 +1,11 @@
 import axios, {
+  AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
-  AxiosError,
 } from "axios";
-import { getToken } from "../services/TokenService";
 import { API_CONFIG } from "../../config/api";
+import { getToken, removeToken } from "../services/TokenService";
 
 export interface IApiError {
   message: string;
@@ -28,6 +28,16 @@ const createApiError = (
 
 const createApiErrorFromAxiosError = (error: AxiosError): IApiError => {
   if (error.response) {
+    if (error.response.status === 401) {
+      removeToken();
+      window.location.href = "/login?expired=true";
+      return createApiError(
+        "Sua sessão expirou. Por favor, faça login novamente.",
+        401,
+        error.response.data,
+        false
+      );
+    }
     return createApiError(
       error.message,
       error.response.status,
@@ -50,6 +60,8 @@ const createApiErrorFromAxiosError = (error: AxiosError): IApiError => {
 const createAxiosInstance = (
   baseURL: string = API_CONFIG.BASE_URL
 ): AxiosInstance => {
+  console.log("Criando instância Axios com baseURL:", baseURL);
+
   const api = axios.create({
     baseURL,
     headers: {
@@ -64,8 +76,11 @@ const createAxiosInstance = (
   api.interceptors.request.use(
     (config) => {
       const token = getToken();
+      console.log("Token atual:", token);
+
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log("Headers da requisição:", config.headers);
       }
       return config;
     },
@@ -77,6 +92,11 @@ const createAxiosInstance = (
   api.interceptors.response.use(
     (response) => response,
     (error) => {
+      console.error("Erro na resposta:", {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        headers: error?.response?.headers,
+      });
       return Promise.reject(createApiErrorFromAxiosError(error));
     }
   );

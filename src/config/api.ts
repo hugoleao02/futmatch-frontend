@@ -11,4 +11,7 @@ export const API_CONFIG = {
   TOKEN: {
     STORAGE_KEY: import.meta.env.VITE_TOKEN_KEY || "auth_token",
   },
+  ENDPOINTS: {
+    SALAS: "/salas",
+  },
 };

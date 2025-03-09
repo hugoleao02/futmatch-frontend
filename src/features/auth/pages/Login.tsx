@@ -1,33 +1,30 @@
-import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Paper,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Link,
-  Alert,
-  CircularProgress,
-  useTheme,
-  Avatar,
-  InputAdornment,
-  IconButton,
-  Divider,
-  useMediaQuery,
-  Grid,
-} from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../../hooks/useAuth";
-import { useTranslation } from "react-i18next";
-import { Formik, Form, Field, FormikHelpers } from "formik";
-import { schemaLogin } from "../../../schemas";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import { Logo } from "../../../components";
-import { getToken } from "../../../infrastructure/services/TokenService";
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  Divider,
+  InputAdornment,
+  Link,
+  Paper,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { Field, Form, Formik, FormikHelpers } from "formik";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { FormularioLogin, LoginDTO } from "../../../@types";
+import { Logo } from "../../../components";
+import { useAuth } from "../../../hooks/useAuth";
+import { getToken } from "../../../infrastructure/services/TokenService";
+import { schemaLogin } from "../../../schemas";
 
 interface LocationState {
   from?: { pathname: string };
@@ -44,11 +41,17 @@ const Login: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword] = useState(false);
   const [initialValues, setInitialValues] = useState<FormularioLogin>({
     email: "",
     senha: "",
   });
+
+  const [searchParams] = useSearchParams();
+  const [message, setMessage] = useState<{
+    type: "error" | "info";
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     const state = location.state as LocationState;
@@ -63,6 +66,15 @@ const Login: React.FC = () => {
       window.history.replaceState({}, document.title);
     }
   }, [location]);
+
+  useEffect(() => {
+    if (searchParams.get("expired") === "true") {
+      setMessage({
+        type: "info",
+        text: "Sua sessão expirou. Por favor, faça login novamente.",
+      });
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (
     values: FormularioLogin,
@@ -96,10 +108,6 @@ const Login: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
   };
 
   return (
@@ -197,6 +205,12 @@ const Login: React.FC = () => {
             >
               {t("auth.login.title")}
             </Typography>
+
+            {message && (
+              <Alert severity={message.type} sx={{ mb: 2 }}>
+                {message.text}
+              </Alert>
+            )}
 
             {error && (
               <Alert

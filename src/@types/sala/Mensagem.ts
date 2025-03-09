@@ -3,9 +3,12 @@ import { Jogador } from "../jogador/Jogador";
 export interface Mensagem {
   id: number;
   conteudo: string;
-  dataHora: string;
-  autor: Jogador;
+  dataEnvio: string;
+  jogadorId: number;
+  jogadorNome: string;
   salaId: number;
+  isAnuncio?: boolean;
+  dataHora?: string;
 }
 
 export interface EnviarMensagemDTO {
