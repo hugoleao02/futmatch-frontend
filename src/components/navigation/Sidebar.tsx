@@ -1,24 +1,23 @@
-import React from "react";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import GroupIcon from "@mui/icons-material/Group";
+import HomeIcon from "@mui/icons-material/Home";
+import PersonIcon from "@mui/icons-material/Person";
+import SportsIcon from "@mui/icons-material/Sports";
 import {
+  Avatar,
   Box,
+  Divider,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Typography,
   useTheme,
-  Avatar,
-  Divider,
-  Badge,
 } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import SportsIcon from "@mui/icons-material/Sports";
-import PersonIcon from "@mui/icons-material/Person";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import HomeIcon from "@mui/icons-material/Home";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import React from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import Logo from "../common/Logo";
 
@@ -31,35 +30,34 @@ const Sidebar: React.FC = () => {
 
   const menuItems = [
     {
-      text: "Home",
       icon: <HomeIcon />,
-      path: "/dashboard",
+      label: t("common.home"),
+      path: "/",
     },
     {
-      text: "Partidas",
       icon: <SportsIcon />,
-      path: "/dashboard/partidas",
-      badge: 3, // Exemplo de badge para novas partidas
+      label: t("common.matches"),
+      path: "/partidas",
     },
     {
-      text: "Salas",
-      icon: <SportsSoccerIcon />,
-      path: "/dashboard/salas",
+      icon: <GroupIcon />,
+      label: t("common.rooms"),
+      path: "/salas",
     },
     {
-      text: "Criar Sala",
       icon: <AddCircleIcon />,
-      path: "/dashboard/criar-sala",
+      label: t("common.createRoom"),
+      path: "/criar-sala",
     },
     {
-      text: "Ranking",
       icon: <EmojiEventsIcon />,
-      path: "/dashboard/ranking",
+      label: t("common.ranking"),
+      path: "/ranking",
     },
     {
-      text: "Meu Perfil",
       icon: <PersonIcon />,
-      path: "/dashboard/perfil",
+      label: t("common.profile"),
+      path: "/perfil",
     },
   ];
 
@@ -193,16 +191,10 @@ const Sidebar: React.FC = () => {
                 transition: "color 0.3s ease",
               }}
             >
-              {item.badge ? (
-                <Badge badgeContent={item.badge} color="error">
-                  {item.icon}
-                </Badge>
-              ) : (
-                item.icon
-              )}
+              {item.icon}
             </ListItemIcon>
             <ListItemText
-              primary={item.text}
+              primary={item.label}
               primaryTypographyProps={{
                 fontWeight: isActive(item.path) ? 600 : 500,
                 fontSize: "1rem",

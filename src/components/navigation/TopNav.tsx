@@ -1,27 +1,28 @@
-import React, { useState } from "react";
-import {
-  Box,
-  IconButton,
-  InputBase,
-  Badge,
-  Avatar,
-  useTheme,
-  Tooltip,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  Typography,
-  Divider,
-  Button,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonIcon from "@mui/icons-material/Person";
+import SearchIcon from "@mui/icons-material/Search";
 import SettingsIcon from "@mui/icons-material/Settings";
-import LogoutIcon from "@mui/icons-material/Logout";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { useAuth } from "../../hooks/useAuth";
+import {
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  InputBase,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const TopNav: React.FC = () => {
   const theme = useTheme();
@@ -29,6 +30,7 @@ const TopNav: React.FC = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchFocused, setSearchFocused] = useState(false);
+  const { t } = useTranslation();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -99,7 +101,7 @@ const TopNav: React.FC = () => {
         variant="contained"
         color="primary"
         startIcon={<AddCircleIcon />}
-        onClick={() => navigate("/dashboard/criar-sala")}
+        onClick={() => navigate("/criar-sala")}
         sx={{
           borderRadius: 2,
           px: 3,
@@ -113,7 +115,7 @@ const TopNav: React.FC = () => {
           },
         }}
       >
-        Criar Partida
+        {t("common.createRoom")}
       </Button>
 
       {/* Notificações */}
@@ -191,17 +193,17 @@ const TopNav: React.FC = () => {
               </Typography>
             </Box>
             <Divider />
-            <MenuItem onClick={() => navigate("/dashboard/perfil")}>
+            <MenuItem onClick={() => navigate("/perfil")}>
               <ListItemIcon>
                 <PersonIcon fontSize="small" />
               </ListItemIcon>
-              Meu Perfil
+              {t("common.profile")}
             </MenuItem>
-            <MenuItem onClick={() => navigate("/dashboard/configuracoes")}>
+            <MenuItem onClick={() => navigate("/configuracoes")}>
               <ListItemIcon>
                 <SettingsIcon fontSize="small" />
               </ListItemIcon>
-              Configurações
+              {t("common.settings")}
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>

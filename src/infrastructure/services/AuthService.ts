@@ -1,13 +1,13 @@
 import { Jogador, LoginDTO, RegisterDTO } from "../../@types";
 import { API_CONFIG } from "../../config/api";
-import { HttpClient, isApiError } from "../api/HttpClient";
+import { HttpClient } from "../api/HttpClient";
 import { getUserFromToken, removeToken, saveToken } from "./TokenService";
 
-const formatUserResponse = (user: any): Jogador => {
+const formatUserResponse = (user: any): Jogador | null => {
   const userId = typeof user.id === "number" ? user.id : parseInt(user.id);
 
   if (isNaN(userId)) {
-    throw new Error("ID do usuário inválido");
+    return null;
   }
 
   return {
@@ -27,28 +27,29 @@ const formatUserResponse = (user: any): Jogador => {
   };
 };
 
-export const fetchUserProfile = async (): Promise<Jogador> => {
+export const fetchUserProfile = async (): Promise<Jogador | null> => {
   try {
-    // Tenta primeiro o endpoint principal
     try {
       const response = await HttpClient.get<any>(
         API_CONFIG.AUTH.PROFILE_ENDPOINT
       );
-      return formatUserResponse(response);
+      const formattedUser = formatUserResponse(response);
+      if (!formattedUser) return null;
+      return formattedUser;
     } catch (error) {
-      console.log("Tentando endpoint alternativo...");
       const response = await HttpClient.get<any>(
         API_CONFIG.AUTH.PROFILE_FALLBACK_ENDPOINT
       );
-      return formatUserResponse(response);
+      const formattedUser = formatUserResponse(response);
+      if (!formattedUser) return null;
+      return formattedUser;
     }
   } catch (error) {
-    console.error("Erro ao buscar perfil do usuário:", error);
-    throw new Error("Não foi possível obter os dados do usuário");
+    return null;
   }
 };
 
-export const login = async (loginDTO: LoginDTO): Promise<Jogador> => {
+export const login = async (loginDTO: LoginDTO): Promise<Jogador | null> => {
   try {
     const response = await HttpClient.post<{ token: string }>(
       API_CONFIG.AUTH.LOGIN_ENDPOINT,
@@ -56,21 +57,20 @@ export const login = async (loginDTO: LoginDTO): Promise<Jogador> => {
     );
 
     if (!response || !response.token) {
-      throw new Error("Token não recebido do servidor");
+      return null;
     }
 
     saveToken(response.token);
 
     return await fetchUserProfile();
   } catch (error) {
-    if (isApiError(error)) {
-      throw new Error(error.message);
-    }
-    throw new Error("Erro ao realizar login");
+    return null;
   }
 };
 
-export const register = async (registerDTO: RegisterDTO): Promise<Jogador> => {
+export const register = async (
+  registerDTO: RegisterDTO
+): Promise<Jogador | null> => {
   try {
     const response = await HttpClient.post<{ token: string }>(
       API_CONFIG.AUTH.REGISTER_ENDPOINT,
@@ -78,19 +78,14 @@ export const register = async (registerDTO: RegisterDTO): Promise<Jogador> => {
     );
 
     if (!response || !response.token) {
-      throw new Error("Token não recebido do servidor");
+      return null;
     }
 
     saveToken(response.token);
 
-    // Busca o perfil real do usuário após o registro
     return await fetchUserProfile();
   } catch (error) {
-    console.error("Erro no registro:", error);
-    if (isApiError(error)) {
-      throw new Error(error.message);
-    }
-    throw new Error("Erro ao realizar cadastro");
+    return null;
   }
 };
 

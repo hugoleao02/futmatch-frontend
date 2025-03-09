@@ -1,40 +1,34 @@
-import React, { useState, useEffect } from "react";
-import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Box,
-  useTheme,
-  useMediaQuery,
-  Container,
-  Paper,
-  Avatar,
-  Chip,
-  Stack,
-  Divider,
-  CircularProgress,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import GroupIcon from "@mui/icons-material/Group";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import StarIcon from "@mui/icons-material/Star";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import SportsIcon from "@mui/icons-material/Sports";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import StarIcon from "@mui/icons-material/Star";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { Logo } from "../../../components";
 import { useAuth } from "../../../hooks/useAuth";
-import SportsIcon from "@mui/icons-material/Sports";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import {
-  Partida,
-  listarPartidas,
-} from "../../partidas/services/partidasService";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 // Interface para as partidas em destaque
 interface PartidaDestaque {
@@ -56,43 +50,14 @@ const Home: React.FC = () => {
   const [partidasDestaque, setPartidasDestaque] = useState<PartidaDestaque[]>(
     []
   );
-
-  useEffect(() => {
-    const carregarPartidasDestaque = async () => {
-      try {
-        setLoading(true);
-        const partidasData = await listarPartidas();
-
-        const partidasFormatadas = partidasData.slice(0, 3).map((partida) => ({
-          id: partida.id,
-          title: partida.titulo,
-          location: partida.local,
-          time: new Date(partida.dataHora).toLocaleString("pt-BR", {
-            weekday: "long",
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          players: `${partida.jogadoresConfirmados.length}/${partida.maxJogadores}`,
-          level: partida.nivelHabilidade,
-        }));
-
-        setPartidasDestaque(partidasFormatadas);
-      } catch (error) {
-        console.error("Erro ao carregar partidas em destaque:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    carregarPartidasDestaque();
-  }, []);
+  const [error, setError] = useState<string | null>(null);
 
   const features = [
     {
       title: t("home.features.findMatches.title"),
       description: t("home.features.findMatches.description"),
       icon: <SportsIcon fontSize="large" />,
-      action: () => navigate("/dashboard/partidas"),
+      action: () => navigate("/partidas"),
       color: theme.palette.primary.main,
       bgColor: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
     },
@@ -100,7 +65,7 @@ const Home: React.FC = () => {
       title: t("home.features.createRoom.title"),
       description: t("home.features.createRoom.description"),
       icon: <AddCircleIcon fontSize="large" />,
-      action: () => navigate("/dashboard/criar-sala"),
+      action: () => navigate("/criar-sala"),
       color: theme.palette.secondary.main,
       bgColor: `linear-gradient(135deg, ${theme.palette.secondary.light} 0%, ${theme.palette.secondary.main} 100%)`,
     },
@@ -108,7 +73,7 @@ const Home: React.FC = () => {
       title: t("home.features.ranking.title"),
       description: t("home.features.ranking.description"),
       icon: <EmojiEventsIcon fontSize="large" />,
-      action: () => navigate("/dashboard/ranking"),
+      action: () => navigate("/ranking"),
       color: theme.palette.success.main,
       bgColor: `linear-gradient(135deg, ${theme.palette.success.light} 0%, ${theme.palette.success.main} 100%)`,
     },
@@ -196,7 +161,7 @@ const Home: React.FC = () => {
                     color="secondary"
                     size="large"
                     startIcon={<SportsSoccerIcon />}
-                    onClick={() => navigate("/dashboard/partidas")}
+                    onClick={() => navigate("/partidas")}
                     sx={{
                       px: { xs: 4, sm: 6 },
                       py: 2,
@@ -219,7 +184,7 @@ const Home: React.FC = () => {
                     variant="outlined"
                     size="large"
                     startIcon={<AddCircleIcon />}
-                    onClick={() => navigate("/dashboard/criar-sala")}
+                    onClick={() => navigate("/criar-sala")}
                     sx={{
                       px: { xs: 4, sm: 6 },
                       py: 2,
@@ -522,9 +487,7 @@ const Home: React.FC = () => {
                         fullWidth
                         variant="contained"
                         color="primary"
-                        onClick={() =>
-                          navigate(`/dashboard/partidas/${partida.id}`)
-                        }
+                        onClick={() => navigate(`/partidas/${partida.id}`)}
                         sx={{
                           mt: 3,
                           borderRadius: 2,

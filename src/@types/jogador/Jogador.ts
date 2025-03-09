@@ -7,4 +7,5 @@ export interface Jogador {
   email: string;
   posicao: PosicaoType;
   estatisticas: Estatisticas;
+  avatar?: string;
 }

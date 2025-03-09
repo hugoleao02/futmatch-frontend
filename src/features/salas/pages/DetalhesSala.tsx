@@ -1,46 +1,44 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PeopleIcon from "@mui/icons-material/People";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import SendIcon from "@mui/icons-material/Send";
+import StarIcon from "@mui/icons-material/Star";
 import {
-  Container,
-  Grid,
-  Paper,
-  Typography,
+  Alert,
+  Avatar,
   Box,
-  Tabs,
-  Tab,
   Button,
   Chip,
-  Divider,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  IconButton,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Avatar,
-  IconButton,
+  Paper,
+  Tab,
+  Tabs,
   TextField,
-  CircularProgress,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
+  Typography,
 } from "@mui/material";
-import { useTranslation } from "react-i18next";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import PeopleIcon from "@mui/icons-material/People";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SendIcon from "@mui/icons-material/Send";
-import AddIcon from "@mui/icons-material/Add";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import StarIcon from "@mui/icons-material/Star";
 import dayjs from "dayjs";
-import { SalasService } from "../services";
-import { Sala, Mensagem, EnviarMensagemDTO } from "../infrastructure/services";
-import { Jogador } from "../types/api";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import { EnviarMensagemDTO, Mensagem, Sala } from "../../../@types";
+import { SalasService } from "../../../infrastructure/services";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -79,7 +77,7 @@ const DetalhesSala: React.FC = () => {
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [novaMensagem, setNovaMensagem] = useState("");
   const [enviandoMensagem, setEnviandoMensagem] = useState(false);
-  const [carregandoMensagens, setCarregandoMensagens] = useState(false);
+  const [, setCarregandoMensagens] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<"sair" | "deletar" | null>(
     null
@@ -89,7 +87,11 @@ const DetalhesSala: React.FC = () => {
     try {
       setLoading(true);
       const salaData = await SalasService.obterSala(Number(id));
-      setSala(salaData);
+      if (salaData.data) {
+        setSala(salaData.data);
+      } else {
+        setError(salaData.error || "Erro ao carregar sala");
+      }
     } catch (err: any) {
       setError(err.message || "Erro ao carregar sala");
     } finally {
@@ -101,9 +103,13 @@ const DetalhesSala: React.FC = () => {
     try {
       setCarregandoMensagens(true);
       const mensagensData = await SalasService.listarMensagens(Number(id));
-      setMensagens(mensagensData);
+      if (mensagensData.data) {
+        setMensagens(mensagensData.data);
+      } else {
+        setError(mensagensData.error || "Erro ao carregar mensagens");
+      }
     } catch (err: any) {
-      console.error("Erro ao carregar mensagens:", err);
+      setError("Erro ao carregar mensagens");
     } finally {
       setCarregandoMensagens(false);
     }
@@ -135,9 +141,9 @@ const DetalhesSala: React.FC = () => {
 
       await SalasService.enviarMensagem(mensagemData);
       setNovaMensagem("");
-      carregarMensagens();
+      await carregarMensagens();
     } catch (err: any) {
-      console.error("Erro ao enviar mensagem:", err);
+      setError("Erro ao enviar mensagem");
     } finally {
       setEnviandoMensagem(false);
     }

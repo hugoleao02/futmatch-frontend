@@ -41,7 +41,7 @@ import { TipoJogador } from "../../../@types/enums/TipoJogador";
 import { TipoJogo } from "../../../@types/enums/TipoJogo";
 import { CriarSalaCommand } from "../../../@types/sala/CriarSalaCommand";
 import { useAuth } from "../../../hooks/useAuth";
-import { SalasServiice } from "../../../infrastructure/services/SalasService";
+import { SalasService } from "../../../infrastructure/services/SalasService";
 const steps = ["Informações Básicas", "Configurações", "Confirmação"];
 
 interface FormData {
@@ -102,7 +102,7 @@ const CriarSala: React.FC = () => {
       return;
     }
 
-    if (!user?.id) {
+    if (!user) {
       setError("Você precisa estar logado para criar uma sala");
       return;
     }
@@ -110,10 +110,6 @@ const CriarSala: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-
-      // Debug do usuário atual
-      console.log("Usuário atual:", user);
-      console.log("ID do usuário:", user.id);
 
       const salaData: CriarSalaCommand = {
         nome: formData.title.trim(),
@@ -154,9 +150,12 @@ const CriarSala: React.FC = () => {
             : NivelCompetitividade.COMPETITIVO,
       };
 
-      const novaSala = await SalasServiice.criarSala(salaData);
-
-      navigate(`/dashboard/salas/${novaSala.id}`);
+      const novaSala = await SalasService.criarSala(salaData);
+      if (novaSala.data) {
+        navigate(`/salas/${novaSala.data.id}`);
+      } else {
+        throw new Error(novaSala.error || "Erro ao criar sala");
+      }
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

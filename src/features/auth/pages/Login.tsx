@@ -21,7 +21,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { FormularioLogin, LoginDTO } from "../../../@types";
-import { Logo } from "../../../components";
+import Logo from "../../../components/Logo";
 import { useAuth } from "../../../hooks/useAuth";
 import { getToken } from "../../../infrastructure/services/TokenService";
 import { schemaLogin } from "../../../schemas";

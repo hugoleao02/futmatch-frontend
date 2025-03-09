@@ -14,9 +14,18 @@ export const toJogador = (response: any): Jogador => {
   const payload = JSON.parse(jsonPayload);
   return {
     id: payload.sub,
-    nome: "Usuário",
+    nome: payload.nome,
     email: payload.sub,
-    posicao: "ATACANTE" as PosicaoType,
+    posicao: payload.posicao as PosicaoType,
+    estatisticas: {
+      totalPartidas: 0,
+      vitorias: 0,
+      derrotas: 0,
+      empates: 0,
+      golsMarcados: 0,
+      golsSofridos: 0,
+      fairPlayScore: 0,
+    },
   };
 };
 

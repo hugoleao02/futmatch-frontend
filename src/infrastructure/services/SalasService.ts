@@ -6,38 +6,49 @@ import { Sala } from "../../@types/sala/Sala";
 import { API_CONFIG } from "../../config/api";
 import { HttpClient, isApiError } from "../api/HttpClient";
 
-export const listarSalas = async (filtros?: FiltroSalaDTO): Promise<Sala[]> => {
+interface ServiceResult<T> {
+  data?: T;
+  error?: string;
+}
+
+export const listarSalas = async (
+  filtros?: FiltroSalaDTO
+): Promise<ServiceResult<Sala[]>> => {
   try {
     const endpoint = filtros ? "/salas/filtrar" : "/salas";
     const config = filtros ? { params: filtros } : undefined;
 
-    return await HttpClient.get<Sala[]>(endpoint, config);
+    const response = await HttpClient.get<Sala[]>(endpoint, config);
+    return { data: response };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao listar salas" };
   }
 };
 
-export const obterSala = async (id: number): Promise<Sala> => {
+export const obterSala = async (id: number): Promise<ServiceResult<Sala>> => {
   try {
-    return await HttpClient.get<Sala>(`/salas/${id}`);
+    const response = await HttpClient.get<Sala>(`/salas/${id}`);
+    return { data: response };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.status === 404) {
-        throw new Error("Sala não encontrada");
+        return { error: "Sala não encontrada" };
       } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao obter sala" };
   }
 };
 
-export const criarSala = async (command: CriarSalaCommand): Promise<Sala> => {
+export const criarSala = async (
+  command: CriarSalaCommand
+): Promise<ServiceResult<Sala>> => {
   try {
     const commandSemUndefined = Object.fromEntries(
       Object.entries(command).filter(([_, value]) => value !== undefined)
@@ -61,174 +72,192 @@ export const criarSala = async (command: CriarSalaCommand): Promise<Sala> => {
     ];
 
     const camposFaltantes = camposObrigatorios.filter(
-      (campo) => !(campo in commandSemUndefined)
+      (campo) => !commandSemUndefined[campo]
     );
     if (camposFaltantes.length > 0) {
-      console.error("Campos obrigatórios faltando:", camposFaltantes);
-      throw new Error(
-        `Campos obrigatórios faltando: ${camposFaltantes.join(", ")}`
-      );
+      return {
+        error: `Campos obrigatórios faltando: ${camposFaltantes.join(", ")}`,
+      };
     }
 
     const response = await HttpClient.post<Sala>(
       API_CONFIG.ENDPOINTS.SALAS,
       commandSemUndefined
     );
-    return response;
+    return { data: response };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.status === 400) {
         const mensagemErro = error.data?.message || error.message;
-        throw new Error("Dados da sala inválidos: " + mensagemErro);
+        return { error: "Dados da sala inválidos: " + mensagemErro };
       } else if (error.status === 401) {
-        throw new Error("Não autorizado. Por favor, faça login novamente.");
+        return { error: "Não autorizado. Por favor, faça login novamente." };
       } else if (error.status === 500) {
-        throw new Error(
-          "Erro interno do servidor. Por favor, tente novamente mais tarde. Detalhes: " +
-            (error.data?.message || error.message)
-        );
+        return {
+          error:
+            "Erro interno do servidor. Por favor, tente novamente mais tarde.",
+        };
       } else if (error.isNetworkError) {
-        throw new Error(
-          "Não foi possível conectar ao servidor. Verifique sua conexão."
-        );
+        return {
+          error:
+            "Não foi possível conectar ao servidor. Verifique sua conexão.",
+        };
       }
-      throw new Error(error.message || "Erro ao criar sala");
     }
-    throw error;
+    return { error: "Erro ao criar sala" };
   }
 };
 
-export const entrarNaSala = async (salaId: number): Promise<Sala> => {
+export const entrarNaSala = async (
+  salaId: number
+): Promise<ServiceResult<Sala>> => {
   try {
-    return await HttpClient.post<Sala>(`/salas/${salaId}/entrar`);
+    const response = await HttpClient.post<Sala>(`/salas/${salaId}/entrar`);
+    return { data: response };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.status === 404) {
-        throw new Error("Sala não encontrada");
+        return { error: "Sala não encontrada" };
       } else if (error.status === 400) {
-        throw new Error("Não é possível entrar nesta sala");
+        return { error: "Não é possível entrar nesta sala" };
       } else if (error.status === 401) {
-        throw new Error("Não autorizado");
+        return { error: "Não autorizado" };
       } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao entrar na sala" };
   }
 };
 
-export const sairDaSala = async (salaId: number): Promise<void> => {
+export const sairDaSala = async (
+  salaId: number
+): Promise<ServiceResult<void>> => {
   try {
     await HttpClient.post<void>(`/salas/${salaId}/sair`);
+    return { data: undefined };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.status === 404) {
-        throw new Error("Sala não encontrada");
+        return { error: "Sala não encontrada" };
       } else if (error.status === 400) {
-        throw new Error("Não é possível sair desta sala");
+        return { error: "Não é possível sair desta sala" };
       } else if (error.status === 401) {
-        throw new Error("Não autorizado");
+        return { error: "Não autorizado" };
       } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao sair da sala" };
   }
 };
 
-export const deletarSala = async (salaId: number): Promise<void> => {
+export const deletarSala = async (
+  salaId: number
+): Promise<ServiceResult<void>> => {
   try {
     await HttpClient.delete<void>(`/salas/${salaId}`);
+    return { data: undefined };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.status === 404) {
-        throw new Error("Sala não encontrada");
+        return { error: "Sala não encontrada" };
       } else if (error.status === 403) {
-        throw new Error("Você não tem permissão para deletar esta sala");
+        return { error: "Você não tem permissão para deletar esta sala" };
       } else if (error.status === 401) {
-        throw new Error("Não autorizado");
+        return { error: "Não autorizado" };
       } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao deletar sala" };
   }
 };
 
 export const buscarPorLocalizacao = async (
   localizacao: string
-): Promise<Sala[]> => {
+): Promise<ServiceResult<Sala[]>> => {
   try {
-    return await HttpClient.get<Sala[]>(
+    const response = await HttpClient.get<Sala[]>(
       `/salas/buscar?localizacao=${encodeURIComponent(localizacao)}`
     );
+    return { data: response };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao buscar salas por localização" };
   }
 };
 
-export const filtrarSalas = async (filtros: FiltroSalaDTO): Promise<Sala[]> => {
+export const filtrarSalas = async (
+  filtros: FiltroSalaDTO
+): Promise<ServiceResult<Sala[]>> => {
   try {
-    return await HttpClient.get<Sala[]>("/salas/filtrar", {
+    const response = await HttpClient.get<Sala[]>("/salas/filtrar", {
       params: filtros,
     });
+    return { data: response };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao filtrar salas" };
   }
 };
 
-export const listarMensagens = async (salaId: number): Promise<Mensagem[]> => {
+export const listarMensagens = async (
+  salaId: number
+): Promise<ServiceResult<Mensagem[]>> => {
   try {
-    return await HttpClient.get<Mensagem[]>(`/salas/${salaId}/mensagens`);
+    const response = await HttpClient.get<Mensagem[]>(
+      `/salas/${salaId}/mensagens`
+    );
+    return { data: response };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.status === 404) {
-        throw new Error("Sala não encontrada");
+        return { error: "Sala não encontrada" };
       } else if (error.status === 401) {
-        throw new Error("Não autorizado");
+        return { error: "Não autorizado" };
       } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao listar mensagens" };
   }
 };
 
 export const enviarMensagem = async (
   mensagemData: EnviarMensagemDTO
-): Promise<Mensagem> => {
+): Promise<ServiceResult<Mensagem>> => {
   try {
-    return await HttpClient.post<Mensagem>(
+    const response = await HttpClient.post<Mensagem>(
       `/salas/${mensagemData.salaId}/mensagens`,
       mensagemData
     );
+    return { data: response };
   } catch (error: unknown) {
     if (isApiError(error)) {
       if (error.status === 404) {
-        throw new Error("Sala não encontrada");
+        return { error: "Sala não encontrada" };
       } else if (error.status === 400) {
-        throw new Error("Mensagem inválida");
+        return { error: "Mensagem inválida" };
       } else if (error.status === 401) {
-        throw new Error("Não autorizado");
+        return { error: "Não autorizado" };
       } else if (error.isNetworkError) {
-        throw new Error("Não foi possível conectar ao servidor");
+        return { error: "Não foi possível conectar ao servidor" };
       }
     }
-    throw error;
+    return { error: "Erro ao enviar mensagem" };
   }
 };
 
-export const SalasServiice = {
+export const SalasService = {
   listarSalas,
   obterSala,
   criarSala,

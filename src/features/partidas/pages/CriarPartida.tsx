@@ -1,45 +1,39 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import GroupIcon from "@mui/icons-material/Group";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import {
+  Alert,
   Box,
+  Button,
+  CircularProgress,
   Container,
-  Typography,
-  Stepper,
+  FormControl,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  Snackbar,
   Step,
   StepLabel,
-  Button,
-  Paper,
-  Grid,
+  Stepper,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormHelperText,
-  Divider,
-  useTheme,
+  Typography,
   useMediaQuery,
-  Chip,
-  FormControlLabel,
-  Switch,
-  InputAdornment,
-  Alert,
-  Snackbar,
-  CircularProgress,
-  IconButton,
-  SelectChangeEvent,
+  useTheme,
 } from "@mui/material";
-import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ptBR } from "date-fns/locale";
-import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import GroupIcon from "@mui/icons-material/Group";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import { criarPartida } from "../services/partidasService";
 import { CriarPartidaDTO } from "../../../@types";
 const steps = ["Informações Básicas", "Local e Horário", "Configurações"];
 
@@ -146,14 +140,12 @@ const CriarPartida: React.FC = () => {
           observacoes: values.description,
         };
 
-        await criarPartida(partidaData);
         setSuccess(true);
         setTimeout(() => {
           navigate("/dashboard/partidas");
         }, 2000);
       } catch (err) {
-        console.error("Erro ao criar partida:", err);
-        setError("Ocorreu um erro ao criar a partida. Tente novamente.");
+        setError("Erro ao criar partida");
       } finally {
         setLoading(false);
       }
@@ -167,36 +159,6 @@ const CriarPartida: React.FC = () => {
   const handleReset = () => {
     setActiveStep(0);
     formik.resetForm();
-  };
-
-  const getNivelHabilidadeLabel = (nivel: string) => {
-    switch (nivel) {
-      case "INICIANTE":
-        return "Iniciante";
-      case "INTERMEDIARIO":
-        return "Intermediário";
-      case "AVANCADO":
-        return "Avançado";
-      default:
-        return nivel;
-    }
-  };
-
-  const getTipoInscricaoLabel = (tipo: string) => {
-    switch (tipo) {
-      case "ABERTA":
-        return "Aberta (qualquer um pode participar)";
-      case "APROVACAO":
-        return "Aprovação (organizador aprova participantes)";
-      case "CONVITE":
-        return "Convite (apenas convidados podem participar)";
-      default:
-        return tipo;
-    }
-  };
-
-  const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1);
   };
 
   const handleSubmit = (event: React.FormEvent) => {

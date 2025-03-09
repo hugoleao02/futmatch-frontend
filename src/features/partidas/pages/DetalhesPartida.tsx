@@ -1,40 +1,38 @@
-import React, { useState, useEffect } from "react";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import GroupIcon from "@mui/icons-material/Group";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import ShareIcon from "@mui/icons-material/Share";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import {
-  Container,
-  Typography,
-  Box,
-  Paper,
-  Grid,
+  Alert,
   Avatar,
-  Chip,
+  Box,
   Button,
+  Chip,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
+  Grid,
+  IconButton,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  IconButton,
-  useTheme,
+  Paper,
   Tab,
   Tabs,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
-  Alert,
+  Typography,
 } from "@mui/material";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import GroupIcon from "@mui/icons-material/Group";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import ShareIcon from "@mui/icons-material/Share";
+import { useTheme } from "@mui/material/styles";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Partida, getPartidaById } from "../services/partidasService";
 
 interface Player {
   id: number;
@@ -57,10 +55,37 @@ interface Match {
   gameType: string;
   duration: number;
   skillLevel: string;
-  organizer: Player;
+  organizer: {
+    id: number;
+    name: string;
+    avatar: string;
+    position: string;
+  };
   players: Player[];
   waitingList: Player[];
 }
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel = (props: TabPanelProps) => {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`match-tabpanel-${index}`}
+      aria-labelledby={`match-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+};
 
 // Mock da partida
 const mockMatch: Match = {
@@ -122,31 +147,9 @@ const mockMatch: Match = {
   ],
 };
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const TabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`match-tabpanel-${index}`}
-      aria-labelledby={`match-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
-  );
-};
-
 const DetalhesPartida: React.FC = () => {
   const theme = useTheme();
-  const { id } = useParams();
+  useParams();
   const [tabValue, setTabValue] = useState(0);
   const [openJoinDialog, setOpenJoinDialog] = useState(false);
   const [position, setPosition] = useState("");
@@ -491,7 +494,7 @@ const DetalhesPartida: React.FC = () => {
 
             <TabPanel value={tabValue} index={0}>
               <List>
-                {mockMatch.players.map((player, index) => (
+                {mockMatch.players.map((player: Player, index: number) => (
                   <React.Fragment key={player.id}>
                     {index > 0 && <Divider variant="inset" component="li" />}
                     <ListItem
@@ -530,7 +533,7 @@ const DetalhesPartida: React.FC = () => {
 
             <TabPanel value={tabValue} index={1}>
               <List>
-                {mockMatch.waitingList.map((player, index) => (
+                {mockMatch.waitingList.map((player: Player, index: number) => (
                   <React.Fragment key={player.id}>
                     {index > 0 && <Divider variant="inset" component="li" />}
                     <ListItem

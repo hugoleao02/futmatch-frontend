@@ -1,41 +1,38 @@
-import React, { useState } from "react";
-import {
-  Container,
-  Paper,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Link,
-  Alert,
-  MenuItem,
-  CircularProgress,
-  useTheme,
-  Avatar,
-  InputAdornment,
-  IconButton,
-  Divider,
-  useMediaQuery,
-  Stepper,
-  Step,
-  StepLabel,
-  Grid,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../hooks/useAuth";
-import { useTranslation } from "react-i18next";
-import { Formik, Form, Field, FormikHelpers } from "formik";
-import { schemaCadastro } from "../../../schemas";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import SportsIcon from "@mui/icons-material/Sports";
-import { Logo } from "../../../components";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import {
+  Avatar,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Link,
+  MenuItem,
+  Paper,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { Field, Form, Formik, FormikHelpers } from "formik";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { FormularioCadastro } from "../../../@types";
 import { PosicaoType } from "../../../@types/enums";
+import { Logo } from "../../../components";
+import { Toast } from "../../../components/Toast/Toast";
+import { useAuth } from "../../../hooks/useAuth";
+import { useToast } from "../../../hooks/useToast";
+import { schemaCadastro } from "../../../schemas";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -43,7 +40,7 @@ const Register: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [error, setError] = useState("");
+  const { toast, showToast, hideToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -69,9 +66,9 @@ const Register: React.FC = () => {
     { setSubmitting }: FormikHelpers<FormularioCadastro>
   ) => {
     try {
-      setError("");
       if (!values.posicao) {
-        throw new Error(t("auth.register.errors.positionRequired"));
+        showToast(t("auth.register.errors.positionRequired"), "error");
+        return;
       }
 
       const jogadorDTO = {
@@ -88,13 +85,8 @@ const Register: React.FC = () => {
           email: values.email,
         },
       });
-    } catch (error: unknown) {
-      console.error("Erro no registro:", error);
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError(t("auth.register.error"));
-      }
+    } catch (error) {
+      showToast(t("auth.register.error"), "error");
     } finally {
       setSubmitting(false);
     }
@@ -203,30 +195,6 @@ const Register: React.FC = () => {
             >
               {t("auth.register.title")}
             </Typography>
-
-            {error && (
-              <Alert
-                severity="error"
-                sx={{
-                  width: "100%",
-                  mb: 3,
-                  borderRadius: 2,
-                  animation: "slideIn 0.3s ease-out",
-                  "@keyframes slideIn": {
-                    from: {
-                      opacity: 0,
-                      transform: "translateY(-10px)",
-                    },
-                    to: {
-                      opacity: 1,
-                      transform: "translateY(0)",
-                    },
-                  },
-                }}
-              >
-                {error}
-              </Alert>
-            )}
 
             <Formik
               initialValues={initialValues}
@@ -492,6 +460,12 @@ const Register: React.FC = () => {
           </Paper>
         </Box>
       </Container>
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        severity={toast.severity}
+        onClose={hideToast}
+      />
     </Box>
   );
 };

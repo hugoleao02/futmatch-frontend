@@ -1,35 +1,29 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Home } from "./features/home";
-import { Login, Register } from "./features/auth";
-import { Perfil } from "./features/perfil";
-import { Partidas, CriarPartida, DetalhesPartida } from "./features/partidas";
-import { CriarSala, ListarSalas, DetalhesSala } from "./features/salas";
-import { Ranking } from "./features/ranking";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { MainLayout, ProtectedRoute } from "./components";
+import { Login, Register } from "./features/auth";
+import { Home } from "./features/home";
+import { CriarPartida, DetalhesPartida, Partidas } from "./features/partidas";
+import { Perfil } from "./features/perfil";
+import { Ranking } from "./features/ranking";
+import { CriarSala, DetalhesSala, ListarSalas } from "./features/salas";
 import { useAuth } from "./hooks/useAuth";
 
-/**
- * Componente que define as rotas da aplicação
- */
 const AppRoutes: React.FC = () => {
   const { user } = useAuth();
 
   return (
     <Routes>
-      {/* Rota raiz que redireciona para dashboard se autenticado ou mostra a Home pública */}
       <Route
         path="/"
-        element={user ? <Navigate to="/dashboard" replace /> : <Home />}
+        element={user ? <Navigate to="/partidas" replace /> : <Home />}
       />
 
-      {/* Rotas públicas */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Rotas protegidas dentro do MainLayout */}
       <Route
-        path="/dashboard"
+        path="/"
         element={
           <ProtectedRoute>
             <MainLayout />

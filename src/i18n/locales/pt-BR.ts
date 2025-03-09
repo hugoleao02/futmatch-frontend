@@ -10,7 +10,14 @@ export default {
     learnMore: "Saiba mais",
     viewAll: "Ver todos",
     join: "Participar",
-    searchPlaceholder: "Buscar partidas, jogadores...",
+    searchPlaceholder: "Buscar partidas, jogadores ou salas...",
+    profile: "Perfil",
+    settings: "Configurações",
+    createRoom: "Criar Sala",
+    matches: "Partidas",
+    ranking: "Ranking",
+    rooms: "Salas",
+    home: "Início",
   },
   navigation: {
     home: "Início",
@@ -26,13 +33,8 @@ export default {
     title: "FutMatch",
     subtitle: "Organize suas peladas de forma fácil e rápida",
     createMatch: "Criar Sala",
-    featuresTitle: "Como funciona",
-    featuredMatches: "Partidas em Destaque",
-    joinCommunity: "Entre para a Comunidade",
-    joinCommunityText:
-      "Milhares de jogadores já estão usando o FutMatch para encontrar e organizar peladas. Crie sua conta e comece a jogar!",
-    getStarted: "Começar Agora",
     features: {
+      title: "Como funciona",
       findMatches: {
         title: "Encontre Peladas",
         description:
@@ -47,9 +49,34 @@ export default {
         description: "Acompanhe seu desempenho e evolua seu nível.",
       },
     },
+    featuredMatches: {
+      title: "Partidas em Destaque",
+      empty: "Nenhuma partida em destaque no momento",
+    },
+    joinCommunity: "Entre para a Comunidade",
+    joinCommunityText:
+      "Milhares de jogadores já estão usando o FutMatch para encontrar e organizar peladas. Crie sua conta e comece a jogar!",
+    getStarted: "Começar Agora",
   },
   matches: {
-    title: "Partidas Disponíveis",
+    title: "Partidas",
+    buscar: "Buscar partidas",
+    nivel: "Nível",
+    noTitle: "Sem título",
+    playersConfirmed: "jogadores confirmados",
+    viewDetails: "Ver detalhes",
+    next: "Próximas",
+    mine: "Minhas",
+    noMatch: "Nenhuma partida encontrada",
+    soon: "Em breve",
+    niveis: {
+      iniciante: "Iniciante",
+      intermediario: "Intermediário",
+      avancado: "Avançado",
+    },
+    levels: {
+      all: "Todos os níveis",
+    },
     subtitle: "Encontre jogos próximos a você ou crie sua própria pelada",
     search: "Buscar partidas por nome ou local",
     nearbyMatches: "Partidas Próximas",
@@ -57,12 +84,6 @@ export default {
     noMatchesFoundText:
       "Não encontramos partidas com os filtros selecionados. Tente outros filtros ou crie sua própria pelada.",
     level: "Nível",
-    levels: {
-      all: "Todos os níveis",
-      beginner: "Iniciante (1-3)",
-      intermediate: "Intermediário (4-7)",
-      advanced: "Avançado (8-10)",
-    },
     matchInfo: {
       location: "Local",
       dateTime: "Data e Hora",
@@ -224,5 +245,9 @@ export default {
     maxLength: "Deve ter no máximo {{max}} caracteres",
     passwordFormat: "A senha deve conter pelo menos uma letra e um número",
     passwordMatch: "As senhas não conferem",
+  },
+  data: {
+    hoje: "Hoje",
+    amanha: "Amanhã",
   },
 };
