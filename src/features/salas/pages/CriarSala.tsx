@@ -40,6 +40,7 @@ import { TipoInscricao } from "../../../@types/enums/TipoInscricao";
 import { TipoJogador } from "../../../@types/enums/TipoJogador";
 import { TipoJogo } from "../../../@types/enums/TipoJogo";
 import { CriarSalaCommand } from "../../../@types/sala/CriarSalaCommand";
+import { useAuth } from "../../../hooks/useAuth";
 import { SalasServiice } from "../../../infrastructure/services/SalasService";
 const steps = ["Informações Básicas", "Configurações", "Confirmação"];
 
@@ -77,6 +78,7 @@ const initialFormData: FormData = {
 
 const CriarSala: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [activeStep, setActiveStep] = useState(0);
@@ -100,17 +102,26 @@ const CriarSala: React.FC = () => {
       return;
     }
 
+    if (!user?.id) {
+      setError("Você precisa estar logado para criar uma sala");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
+      // Debug do usuário atual
+      console.log("Usuário atual:", user);
+      console.log("ID do usuário:", user.id);
+
       const salaData: CriarSalaCommand = {
-        nome: formData.title,
-        descricao: formData.description,
+        nome: formData.title.trim(),
+        descricao: formData.description.trim(),
         dataHoraPartida:
           formData.date?.toISOString() || new Date().toISOString(),
-        local: formData.location,
-        endereco: formData.address,
+        local: formData.location.trim(),
+        endereco: formData.address.trim(),
         duracao: formData.duration,
         numeroMinimoJogadores: formData.minPlayers,
         maxJogadores: formData.maxPlayers,
@@ -128,7 +139,7 @@ const CriarSala: React.FC = () => {
             ? TipoJogador.INTERMEDIARIO
             : TipoJogador.AVANCADO,
         permitirSubstituicoesAutomaticas: formData.allowSubstitutes,
-        criadorId: 1, // Você precisa obter o ID do usuário logado
+        criadorId: Number(user.id),
         tipoJogo:
           formData.gameType === "society"
             ? TipoJogo.SOCIETY
@@ -143,14 +154,10 @@ const CriarSala: React.FC = () => {
             : NivelCompetitividade.COMPETITIVO,
       };
 
-      console.log("Dados da sala a serem enviados:", salaData);
-
       const novaSala = await SalasServiice.criarSala(salaData);
-      console.log("Resposta do servidor:", novaSala);
 
       navigate(`/dashboard/salas/${novaSala.id}`);
     } catch (err) {
-      console.error("Erro ao criar sala:", err);
       if (err instanceof Error) {
         setError(err.message);
       } else {

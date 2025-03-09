@@ -39,33 +39,47 @@ export const obterSala = async (id: number): Promise<Sala> => {
 
 export const criarSala = async (command: CriarSalaCommand): Promise<Sala> => {
   try {
-    console.log("Iniciando criação da sala com dados:", command);
-    console.log("URL da requisição:", API_CONFIG.ENDPOINTS.SALAS);
-
-    // Remover campos undefined antes de enviar
     const commandSemUndefined = Object.fromEntries(
       Object.entries(command).filter(([_, value]) => value !== undefined)
     );
+
+    const camposObrigatorios = [
+      "nome",
+      "descricao",
+      "dataHoraPartida",
+      "local",
+      "endereco",
+      "duracao",
+      "numeroMinimoJogadores",
+      "maxJogadores",
+      "tipoInscricao",
+      "tipoJogadorPermitido",
+      "permitirSubstituicoesAutomaticas",
+      "criadorId",
+      "tipoJogo",
+      "nivelCompetitividade",
+    ];
+
+    const camposFaltantes = camposObrigatorios.filter(
+      (campo) => !(campo in commandSemUndefined)
+    );
+    if (camposFaltantes.length > 0) {
+      console.error("Campos obrigatórios faltando:", camposFaltantes);
+      throw new Error(
+        `Campos obrigatórios faltando: ${camposFaltantes.join(", ")}`
+      );
+    }
 
     const response = await HttpClient.post<Sala>(
       API_CONFIG.ENDPOINTS.SALAS,
       commandSemUndefined
     );
-    console.log("Resposta do servidor após criar sala:", response);
     return response;
   } catch (error: unknown) {
-    console.error("Erro ao criar sala no serviço:", error);
     if (isApiError(error)) {
-      console.error("Detalhes do erro:", {
-        status: error.status,
-        message: error.message,
-        data: error.data,
-      });
-
       if (error.status === 400) {
-        throw new Error(
-          "Dados da sala inválidos: " + (error.data?.message || error.message)
-        );
+        const mensagemErro = error.data?.message || error.message;
+        throw new Error("Dados da sala inválidos: " + mensagemErro);
       } else if (error.status === 401) {
         throw new Error("Não autorizado. Por favor, faça login novamente.");
       } else if (error.status === 500) {

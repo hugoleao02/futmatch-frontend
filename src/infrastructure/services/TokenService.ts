@@ -52,19 +52,25 @@ export const getUserFromToken = (): Jogador | null => {
 
     const payload = JSON.parse(jsonPayload);
 
+    const userId =
+      Number(payload.id) || Number(payload.userId) || Number(payload.sub);
+    if (isNaN(userId)) {
+      return null;
+    }
+
     return {
-      id: payload.sub,
-      nome: "Admin",
-      email: payload.sub,
-      posicao: "ATACANTE" as PosicaoType,
+      id: userId,
+      nome: payload.nome || payload.name || "Usuário",
+      email: payload.email || payload.sub,
+      posicao: payload.posicao || ("ATACANTE" as PosicaoType),
       estatisticas: {
-        totalPartidas: 0,
-        vitorias: 0,
-        derrotas: 0,
-        empates: 0,
-        golsMarcados: 0,
-        golsSofridos: 0,
-        fairPlayScore: 0,
+        totalPartidas: payload.estatisticas?.totalPartidas || 0,
+        vitorias: payload.estatisticas?.vitorias || 0,
+        derrotas: payload.estatisticas?.derrotas || 0,
+        empates: payload.estatisticas?.empates || 0,
+        golsMarcados: payload.estatisticas?.golsMarcados || 0,
+        golsSofridos: payload.estatisticas?.golsSofridos || 0,
+        fairPlayScore: payload.estatisticas?.fairPlayScore || 0,
       },
     };
   } catch (error) {

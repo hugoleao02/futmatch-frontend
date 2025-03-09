@@ -60,8 +60,6 @@ const createApiErrorFromAxiosError = (error: AxiosError): IApiError => {
 const createAxiosInstance = (
   baseURL: string = API_CONFIG.BASE_URL
 ): AxiosInstance => {
-  console.log("Criando instância Axios com baseURL:", baseURL);
-
   const api = axios.create({
     baseURL,
     headers: {
@@ -76,11 +74,8 @@ const createAxiosInstance = (
   api.interceptors.request.use(
     (config) => {
       const token = getToken();
-      console.log("Token atual:", token);
-
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log("Headers da requisição:", config.headers);
       }
       return config;
     },
@@ -92,11 +87,6 @@ const createAxiosInstance = (
   api.interceptors.response.use(
     (response) => response,
     (error) => {
-      console.error("Erro na resposta:", {
-        status: error?.response?.status,
-        data: error?.response?.data,
-        headers: error?.response?.headers,
-      });
       return Promise.reject(createApiErrorFromAxiosError(error));
     }
   );
