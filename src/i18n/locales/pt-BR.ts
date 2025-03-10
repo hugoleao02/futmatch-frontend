@@ -199,7 +199,7 @@ export default {
   auth: {
     login: {
       title: "Entrar",
-      email: "Email",
+      email: "E-mail",
       password: "Senha",
       submit: "Entrar",
       forgotPassword: "Esqueceu sua senha?",
@@ -209,16 +209,17 @@ export default {
     register: {
       title: "Criar Conta",
       nickname: "Nome",
-      email: "Email",
+      email: "E-mail",
       password: "Senha",
       confirmPassword: "Confirmar Senha",
       position: "Posição",
-      submit: "Registrar",
+      submit: "Criar conta",
       hasAccount: "Já tem uma conta? Entre",
       successMessage: "Conta criada com sucesso! Faça login para continuar.",
       error: "Erro ao criar conta. Tente novamente.",
       errors: {
         positionRequired: "Selecione uma posição",
+        playerTypeRequired: "Selecione um nível",
       },
     },
     logout: {
@@ -228,8 +229,18 @@ export default {
       confirmButton: "Sair",
       success: "Você saiu com sucesso",
     },
+    validation: {
+      required: "Campo obrigatório",
+      invalidEmail: "E-mail inválido",
+      minNickname: "O nome deve ter no mínimo 3 caracteres",
+      minPassword: "A senha deve ter no mínimo 6 caracteres",
+      passwordMatch: "As senhas não conferem",
+      passwordFormat: "A senha deve conter letras e números",
+    },
     errors: {
-      invalidCredentials: "Email ou senha inválidos",
+      invalidCredentials: "E-mail ou senha inválidos",
+      serverError: "Erro no servidor. Tente novamente mais tarde.",
+      networkError: "Erro de conexão. Verifique sua internet.",
     },
   },
   footer: {
@@ -240,11 +251,12 @@ export default {
   },
   validation: {
     required: "Campo obrigatório",
-    email: "Formato de email inválido",
+    email: "E-mail inválido",
     minLength: "Deve ter no mínimo {{min}} caracteres",
     maxLength: "Deve ter no máximo {{max}} caracteres",
-    passwordFormat: "A senha deve conter pelo menos uma letra e um número",
+    passwordFormat: "A senha deve conter letras e números",
     passwordMatch: "As senhas não conferem",
+    minPassword: "A senha deve ter no mínimo 6 caracteres",
   },
   data: {
     hoje: "Hoje",

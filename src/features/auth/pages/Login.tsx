@@ -1,13 +1,15 @@
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import {
-  Alert,
   Avatar,
   Box,
   Button,
   Container,
   Divider,
+  IconButton,
   InputAdornment,
   Link,
   Paper,
@@ -22,9 +24,12 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { FormularioLogin, LoginDTO } from "../../../@types";
 import Logo from "../../../components/Logo";
+import { Toast } from "../../../components/Toast/Toast";
 import { useAuth } from "../../../hooks/useAuth";
+import { useToast } from "../../../hooks/useToast";
 import { getToken } from "../../../infrastructure/services/TokenService";
 import { schemaLogin } from "../../../schemas";
+import { loginStyles } from "./Login.styles";
 
 interface LocationState {
   from?: { pathname: string };
@@ -39,24 +44,21 @@ const Login: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showPassword] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
   const [initialValues, setInitialValues] = useState<FormularioLogin>({
     email: "",
     senha: "",
   });
 
+  const styles = loginStyles(theme, isMobile);
+
   const [searchParams] = useSearchParams();
-  const [message, setMessage] = useState<{
-    type: "error" | "info";
-    text: string;
-  } | null>(null);
 
   useEffect(() => {
     const state = location.state as LocationState;
     if (state?.message) {
-      setSuccess(state.message);
+      showToast(state.message, "success");
       if (state.email) {
         setInitialValues((prev: FormularioLogin) => ({
           ...prev,
@@ -69,10 +71,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (searchParams.get("expired") === "true") {
-      setMessage({
-        type: "info",
-        text: "Sua sessão expirou. Por favor, faça login novamente.",
-      });
+      showToast("Sua sessão expirou. Por favor, faça login novamente.", "info");
     }
   }, [searchParams]);
 
@@ -81,8 +80,6 @@ const Login: React.FC = () => {
     { setSubmitting }: FormikHelpers<FormularioLogin>
   ) => {
     try {
-      setError("");
-
       const loginDTO: LoginDTO = {
         email: values.email,
         senha: values.senha,
@@ -101,154 +98,45 @@ const Login: React.FC = () => {
       navigate(from, { replace: true });
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message || t("auth.errors.invalidCredentials"));
+        showToast(
+          error.message || t("auth.errors.invalidCredentials"),
+          "error"
+        );
       } else {
-        setError(t("auth.errors.invalidCredentials"));
+        showToast(t("auth.errors.invalidCredentials"), "error");
       }
     } finally {
       setSubmitting(false);
     }
   };
 
-  return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background: `url('/soccer-field-bg.jpg')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        position: "relative",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `linear-gradient(135deg, rgba(40, 167, 69, 0.95), rgba(27, 126, 49, 0.9))`,
-          backdropFilter: "blur(8px)",
-        },
-      }}
-    >
-      <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
-        <Box
-          sx={{
-            marginTop: isMobile ? 4 : 8,
-            marginBottom: 4,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Paper
-            elevation={24}
-            sx={{
-              padding: { xs: 3, sm: 5 },
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "100%",
-              borderRadius: 3,
-              position: "relative",
-              overflow: "hidden",
-              background: "rgba(255, 255, 255, 0.98)",
-              backdropFilter: "blur(10px)",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-              transition: "transform 0.2s ease-in-out",
-              "&:hover": {
-                transform: "translateY(-4px)",
-              },
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "6px",
-                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              }}
-            />
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
-            <Box sx={{ mb: 4, mt: 2, textAlign: "center" }}>
+  return (
+    <Box sx={styles.root}>
+      <Container maxWidth="sm" sx={styles.container}>
+        <Box sx={styles.boxContent}>
+          <Paper elevation={24} sx={styles.paper}>
+            <Box sx={styles.gradientBar} />
+
+            <Box sx={styles.logoBox}>
               <Logo variant="h3" iconSize={48} />
             </Box>
 
-            <Avatar
-              sx={{
-                mb: 2,
-                bgcolor: theme.palette.primary.main,
-                width: 64,
-                height: 64,
-                boxShadow: "0 4px 12px rgba(40, 167, 69, 0.2)",
-              }}
-            >
-              <SportsSoccerIcon sx={{ fontSize: 36 }} />
+            <Avatar sx={styles.avatar}>
+              <SportsSoccerIcon sx={styles.avatarIcon} />
             </Avatar>
 
             <Typography
               component="h1"
               variant="h4"
               gutterBottom
-              sx={{
-                fontWeight: 700,
-                mb: 3,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                color: "transparent",
-                textAlign: "center",
-              }}
+              sx={styles.title}
             >
               {t("auth.login.title")}
             </Typography>
-
-            {message && (
-              <Alert severity={message.type} sx={{ mb: 2 }}>
-                {message.text}
-              </Alert>
-            )}
-
-            {error && (
-              <Alert
-                severity="error"
-                sx={{
-                  width: "100%",
-                  mb: 3,
-                  borderRadius: 2,
-                  animation: "slideIn 0.3s ease-out",
-                  "@keyframes slideIn": {
-                    from: {
-                      opacity: 0,
-                      transform: "translateY(-10px)",
-                    },
-                    to: {
-                      opacity: 1,
-                      transform: "translateY(0)",
-                    },
-                  },
-                }}
-              >
-                {error}
-              </Alert>
-            )}
-
-            {success && (
-              <Alert
-                severity="success"
-                sx={{
-                  width: "100%",
-                  mb: 3,
-                  borderRadius: 2,
-                  animation: "slideIn 0.3s ease-out",
-                }}
-              >
-                {success}
-              </Alert>
-            )}
 
             <Formik
               initialValues={initialValues}
@@ -277,18 +165,7 @@ const Login: React.FC = () => {
                         </InputAdornment>
                       ),
                     }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2,
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                        },
-                        "&.Mui-focused": {
-                          boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
-                        },
-                      },
-                    }}
+                    sx={styles.textField}
                   />
 
                   <Field
@@ -297,7 +174,7 @@ const Login: React.FC = () => {
                     required
                     fullWidth
                     name="senha"
-                    label={t("auth.login.password")}
+                    label={`${t("auth.login.password")} *`}
                     type={showPassword ? "text" : "password"}
                     id="senha"
                     autoComplete="current-password"
@@ -309,19 +186,23 @@ const Login: React.FC = () => {
                           <LockOutlinedIcon color="primary" />
                         </InputAdornment>
                       ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleTogglePasswordVisibility}
+                            edge="end"
+                          >
+                            {showPassword ? (
+                              <VisibilityOffOutlinedIcon />
+                            ) : (
+                              <VisibilityOutlinedIcon />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2,
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                        },
-                        "&.Mui-focused": {
-                          boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
-                        },
-                      },
-                    }}
+                    sx={styles.textField}
                   />
 
                   <Button
@@ -329,47 +210,18 @@ const Login: React.FC = () => {
                     fullWidth
                     variant="contained"
                     disabled={isSubmitting}
-                    sx={{
-                      mt: 3,
-                      mb: 2,
-                      py: 1.5,
-                      fontSize: "1.1rem",
-                      fontWeight: 600,
-                      borderRadius: 2,
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-2px)",
-                        boxShadow: "0 6px 16px rgba(40, 167, 69, 0.25)",
-                      },
-                    }}
+                    sx={styles.submitButton}
                   >
                     {isSubmitting
                       ? t("common.loading")
                       : t("auth.login.submit")}
                   </Button>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: { xs: "column", sm: "row" },
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 1,
-                      mt: 2,
-                    }}
-                  >
+                  <Box sx={styles.linksContainer}>
                     <Link
                       href="#"
                       variant="body2"
-                      sx={{
-                        color: theme.palette.primary.main,
-                        textDecoration: "none",
-                        transition: "color 0.2s ease",
-                        "&:hover": {
-                          color: theme.palette.primary.dark,
-                        },
-                      }}
+                      sx={styles.forgotPasswordLink}
                     >
                       {t("auth.login.forgotPassword")}
                     </Link>
@@ -377,15 +229,7 @@ const Login: React.FC = () => {
                     <Link
                       href="/register"
                       variant="body2"
-                      sx={{
-                        color: theme.palette.secondary.main,
-                        textDecoration: "none",
-                        fontWeight: 500,
-                        transition: "color 0.2s ease",
-                        "&:hover": {
-                          color: theme.palette.secondary.dark,
-                        },
-                      }}
+                      sx={styles.registerLink}
                     >
                       {t("auth.login.noAccount")}
                     </Link>
@@ -401,32 +245,17 @@ const Login: React.FC = () => {
                     </Typography>
                   </Divider>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      gap: 2,
-                    }}
-                  >
+                  <Box sx={styles.socialButtonsContainer}>
                     <Button
                       variant="outlined"
                       startIcon={
                         <img
                           src="/google-icon.png"
                           alt="Google"
-                          style={{ width: 20, height: 20 }}
+                          style={styles.socialIcon}
                         />
                       }
-                      sx={{
-                        borderRadius: 2,
-                        px: 3,
-                        py: 1,
-                        borderColor: "rgba(0, 0, 0, 0.12)",
-                        color: "text.primary",
-                        "&:hover": {
-                          backgroundColor: "rgba(0, 0, 0, 0.04)",
-                        },
-                      }}
+                      sx={styles.socialButton}
                     >
                       Google
                     </Button>
@@ -437,19 +266,10 @@ const Login: React.FC = () => {
                         <img
                           src="/facebook-icon.png"
                           alt="Facebook"
-                          style={{ width: 20, height: 20 }}
+                          style={styles.socialIcon}
                         />
                       }
-                      sx={{
-                        borderRadius: 2,
-                        px: 3,
-                        py: 1,
-                        borderColor: "rgba(0, 0, 0, 0.12)",
-                        color: "text.primary",
-                        "&:hover": {
-                          backgroundColor: "rgba(0, 0, 0, 0.04)",
-                        },
-                      }}
+                      sx={styles.socialButton}
                     >
                       Facebook
                     </Button>
@@ -460,6 +280,12 @@ const Login: React.FC = () => {
           </Paper>
         </Box>
       </Container>
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        severity={toast.severity}
+        onClose={hideToast}
+      />
     </Box>
   );
 };

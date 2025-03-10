@@ -1,16 +1,18 @@
 import React, { createContext, useEffect, useState } from "react";
-
-import { Jogador, LoginDTO, RegisterDTO } from "../@types";
+import { useTranslation } from "react-i18next";
+import { RegisterResponse } from "../@types";
+import { LoginDTO } from "../@types/auth/LoginDTO";
+import { RegisterDTO } from "../@types/auth/RegisterDTO";
+import { Jogador } from "../@types/jogador/Jogador";
 import { Toast } from "../components/Toast/Toast";
 import { useToast } from "../hooks/useToast";
 import { AuthService } from "../infrastructure/services/AuthService";
 import { getToken } from "../infrastructure/services/TokenService";
-
 interface AuthContextData {
   user: Jogador | null;
   loading: boolean;
   login: (loginDTO: LoginDTO) => Promise<void>;
-  register: (registerDTO: RegisterDTO) => Promise<void>;
+  register: (registerDTO: RegisterDTO) => Promise<RegisterResponse>;
   logout: () => void;
   refreshUserProfile: () => Promise<void>;
 }
@@ -23,26 +25,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<Jogador | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { toast, showToast, hideToast } = useToast();
+  const { t } = useTranslation();
 
   const loadUser = async () => {
-    try {
-      const token = getToken();
-
-      if (token) {
-        const currentUser = await AuthService.fetchUserProfile();
-        if (!currentUser) {
-          showToast("Não foi possível carregar os dados do usuário", "error");
-          return;
-        }
-        setUser(currentUser);
+    const token = getToken();
+    if (token) {
+      try {
+        const userProfile = await AuthService.fetchUserProfile();
+        setUser(userProfile);
+      } catch (error) {
+        console.error("Erro ao carregar perfil:", error);
       }
-    } catch (error) {
-      setUser(null);
-      showToast("Erro ao carregar usuário", "error");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -66,32 +61,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (loginDTO: LoginDTO) => {
     try {
       setLoading(true);
-      const loggedUser = await AuthService.login(loginDTO);
-      if (!loggedUser) {
-        showToast("Erro ao realizar login", "error");
+      const response = await AuthService.login(loginDTO);
+      if (!response) {
+        showToast(t("auth.errors.invalidCredentials"), "error");
         return;
       }
-      setUser(loggedUser);
-      showToast("Login realizado com sucesso", "success");
+      setUser(response);
     } catch (error) {
-      showToast("Erro ao realizar login", "error");
+      showToast(t("auth.errors.invalidCredentials"), "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (registerDTO: RegisterDTO) => {
+  const register = async (
+    registerDTO: RegisterDTO
+  ): Promise<RegisterResponse> => {
     try {
       setLoading(true);
-      const newUser = await AuthService.register(registerDTO);
-      if (!newUser) {
-        showToast("Erro ao realizar cadastro", "error");
-        return;
+      const response = await AuthService.register(registerDTO);
+
+      if (!response.success) {
+        showToast(response.message || t("auth.register.error"), "error");
+        return response;
       }
-      setUser(newUser);
-      showToast("Cadastro realizado com sucesso", "success");
-    } catch (error) {
-      showToast("Erro ao realizar cadastro", "error");
+
+      if (response.data) {
+        setUser(response.data);
+      }
+
+      return response;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || t("auth.register.error");
+      showToast(errorMessage, "error");
+      return {
+        success: false,
+        message: errorMessage,
+      };
     } finally {
       setLoading(false);
     }

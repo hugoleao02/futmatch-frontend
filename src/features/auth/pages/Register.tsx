@@ -33,6 +33,7 @@ import { Toast } from "../../../components/Toast/Toast";
 import { useAuth } from "../../../hooks/useAuth";
 import { useToast } from "../../../hooks/useToast";
 import { schemaCadastro } from "../../../schemas";
+import { registerStyles } from "./Register.styles";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -43,6 +44,8 @@ const Register: React.FC = () => {
   const { toast, showToast, hideToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const styles = registerStyles(theme, isMobile);
 
   const posicoes = [
     { value: "GOLEIRO", label: "Goleiro" },
@@ -66,6 +69,7 @@ const Register: React.FC = () => {
     { setSubmitting }: FormikHelpers<FormularioCadastro>
   ) => {
     try {
+      console.log("Iniciando processo de registro...", values);
       if (!values.posicao) {
         showToast(t("auth.register.errors.positionRequired"), "error");
         return;
@@ -78,15 +82,27 @@ const Register: React.FC = () => {
         posicao: values.posicao as PosicaoType,
       };
 
-      await register(jogadorDTO);
-      navigate("/login", {
-        state: {
-          message: t("auth.register.successMessage"),
-          email: values.email,
-        },
-      });
-    } catch (error) {
-      showToast(t("auth.register.error"), "error");
+      console.log("Enviando dados para registro:", jogadorDTO);
+      const response = await register(jogadorDTO);
+      console.log("Resposta do registro:", response);
+
+      if (response.success) {
+        navigate("/login", {
+          state: {
+            message: t("auth.register.successMessage"),
+            email: values.email,
+          },
+        });
+      } else {
+        showToast(response.message || t("auth.register.error"), "error");
+      }
+    } catch (error: any) {
+      console.error("Erro detalhado no registro:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        t("auth.register.error");
+      showToast(errorMessage, "error");
     } finally {
       setSubmitting(false);
     }
@@ -101,97 +117,25 @@ const Register: React.FC = () => {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background: `url('/soccer-field-bg.jpg')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        position: "relative",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `linear-gradient(135deg, rgba(40, 167, 69, 0.95), rgba(27, 126, 49, 0.9))`,
-          backdropFilter: "blur(8px)",
-        },
-      }}
-    >
-      <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
-        <Box
-          sx={{
-            marginTop: isMobile ? 4 : 8,
-            marginBottom: 4,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Paper
-            elevation={24}
-            sx={{
-              padding: { xs: 3, sm: 5 },
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "100%",
-              borderRadius: 3,
-              position: "relative",
-              overflow: "hidden",
-              background: "rgba(255, 255, 255, 0.98)",
-              backdropFilter: "blur(10px)",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-              transition: "transform 0.2s ease-in-out",
-              "&:hover": {
-                transform: "translateY(-4px)",
-              },
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "6px",
-                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              }}
-            />
+    <Box sx={styles.root}>
+      <Container maxWidth="sm" sx={styles.container}>
+        <Box sx={styles.boxContent}>
+          <Paper elevation={24} sx={styles.paper}>
+            <Box sx={styles.gradientBar} />
 
-            <Box sx={{ mb: 4, mt: 2, textAlign: "center" }}>
+            <Box sx={styles.logoBox}>
               <Logo variant="h3" iconSize={48} />
             </Box>
 
-            <Avatar
-              sx={{
-                mb: 2,
-                bgcolor: theme.palette.secondary.main,
-                width: 64,
-                height: 64,
-                boxShadow: "0 4px 12px rgba(255, 193, 7, 0.2)",
-              }}
-            >
-              <SportsSoccerIcon sx={{ fontSize: 36 }} />
+            <Avatar sx={styles.avatar}>
+              <SportsSoccerIcon sx={styles.avatarIcon} />
             </Avatar>
 
             <Typography
               component="h1"
               variant="h4"
               gutterBottom
-              sx={{
-                fontWeight: 700,
-                mb: 3,
-                background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                color: "transparent",
-                textAlign: "center",
-              }}
+              sx={styles.title}
             >
               {t("auth.register.title")}
             </Typography>
@@ -223,18 +167,7 @@ const Register: React.FC = () => {
                             </InputAdornment>
                           ),
                         }}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                            },
-                            "&.Mui-focused": {
-                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
-                            },
-                          },
-                        }}
+                        sx={styles.textField}
                       />
                     </Grid>
 
@@ -256,18 +189,7 @@ const Register: React.FC = () => {
                             </InputAdornment>
                           ),
                         }}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                            },
-                            "&.Mui-focused": {
-                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
-                            },
-                          },
-                        }}
+                        sx={styles.textField}
                       />
                     </Grid>
 
@@ -277,7 +199,7 @@ const Register: React.FC = () => {
                         required
                         fullWidth
                         name="senha"
-                        label={t("auth.register.password")}
+                        label={`${t("auth.register.password")} *`}
                         type={showPassword ? "text" : "password"}
                         id="senha"
                         autoComplete="new-password"
@@ -295,22 +217,17 @@ const Register: React.FC = () => {
                                 aria-label="toggle password visibility"
                                 onClick={handleTogglePasswordVisibility}
                                 edge="end"
-                              ></IconButton>
+                              >
+                                {showPassword ? (
+                                  <VisibilityOffOutlinedIcon />
+                                ) : (
+                                  <VisibilityOutlinedIcon />
+                                )}
+                              </IconButton>
                             </InputAdornment>
                           ),
                         }}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                            },
-                            "&.Mui-focused": {
-                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
-                            },
-                          },
-                        }}
+                        sx={styles.textField}
                       />
                     </Grid>
 
@@ -320,7 +237,7 @@ const Register: React.FC = () => {
                         required
                         fullWidth
                         name="confirmSenha"
-                        label={t("auth.register.confirmPassword")}
+                        label={`${t("auth.register.confirmPassword")} *`}
                         type={showConfirmPassword ? "text" : "password"}
                         id="confirmSenha"
                         autoComplete="new-password"
@@ -350,18 +267,7 @@ const Register: React.FC = () => {
                             </InputAdornment>
                           ),
                         }}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                            },
-                            "&.Mui-focused": {
-                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
-                            },
-                          },
-                        }}
+                        sx={styles.textField}
                       />
                     </Grid>
 
@@ -382,18 +288,7 @@ const Register: React.FC = () => {
                             </InputAdornment>
                           ),
                         }}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 2,
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                            },
-                            "&.Mui-focused": {
-                              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
-                            },
-                          },
-                        }}
+                        sx={styles.textField}
                       >
                         {posicoes.map((posicao) => (
                           <MenuItem key={posicao.value} value={posicao.value}>
@@ -408,21 +303,7 @@ const Register: React.FC = () => {
                     type="submit"
                     fullWidth
                     variant="contained"
-                    disabled={isSubmitting}
-                    sx={{
-                      mt: 3,
-                      mb: 2,
-                      py: 1.5,
-                      fontSize: "1.1rem",
-                      fontWeight: 600,
-                      borderRadius: 2,
-                      background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-2px)",
-                        boxShadow: "0 6px 16px rgba(255, 193, 7, 0.25)",
-                      },
-                    }}
+                    sx={styles.submitButton}
                   >
                     {isSubmitting ? (
                       <CircularProgress size={24} color="inherit" />
@@ -431,26 +312,8 @@ const Register: React.FC = () => {
                     )}
                   </Button>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      mt: 2,
-                    }}
-                  >
-                    <Link
-                      href="/login"
-                      variant="body2"
-                      sx={{
-                        color: theme.palette.primary.main,
-                        textDecoration: "none",
-                        fontWeight: 500,
-                        transition: "color 0.2s ease",
-                        "&:hover": {
-                          color: theme.palette.primary.dark,
-                        },
-                      }}
-                    >
+                  <Box sx={styles.linkContainer}>
+                    <Link href="/login" variant="body2" sx={styles.loginLink}>
                       {t("auth.register.hasAccount")}
                     </Link>
                   </Box>
