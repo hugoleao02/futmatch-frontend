@@ -6,4 +6,5 @@ export interface FormularioCadastro {
   senha: string;
   confirmSenha: string;
   posicao?: PosicaoType;
+  nivelHabilidade: number;
 }

@@ -62,6 +62,7 @@ const Register: React.FC = () => {
     senha: "",
     confirmSenha: "",
     posicao: "ATACANTE" as PosicaoType,
+    nivelHabilidade: 5,
   };
 
   const handleSubmit = async (
@@ -79,6 +80,7 @@ const Register: React.FC = () => {
         email: values.email,
         senha: values.senha,
         posicao: values.posicao as PosicaoType,
+        nivelHabilidade: values.nivelHabilidade,
       };
 
       const response = await register(jogadorDTO);
@@ -293,6 +295,33 @@ const Register: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Field>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Field
+                        as={TextField}
+                        required
+                        fullWidth
+                        type="number"
+                        name="nivelHabilidade"
+                        label={t("auth.register.skillLevel")}
+                        error={
+                          touched.nivelHabilidade &&
+                          Boolean(errors.nivelHabilidade)
+                        }
+                        helperText={
+                          touched.nivelHabilidade && errors.nivelHabilidade
+                        }
+                        InputProps={{
+                          inputProps: { min: 1, max: 10 },
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SportsSoccerIcon color="primary" />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={styles.textField}
+                      />
                     </Grid>
                   </Grid>
 

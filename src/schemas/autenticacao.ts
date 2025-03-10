@@ -28,4 +28,8 @@ export const schemaCadastro = (t: TFunction) =>
       .oneOf([Yup.ref("senha")], t("auth.validation.passwordMatch"))
       .required(t("auth.validation.required")),
     posicao: Yup.string().required(t("auth.validation.required")),
+    nivelHabilidade: Yup.number()
+      .min(1, t("auth.validation.minSkillLevel"))
+      .max(10, t("auth.validation.maxSkillLevel"))
+      .required(t("auth.validation.required")),
   });

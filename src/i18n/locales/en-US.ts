@@ -93,6 +93,7 @@ export default {
       password: "Password",
       confirmPassword: "Confirm Password",
       position: "Position",
+      skillLevel: "Skill Level (1-10)",
       submit: "Create Account",
       loginLink: "Already have an account? Login",
       positions: {
@@ -118,6 +119,17 @@ export default {
       confirmWithName: "{{name}}, are you sure you want to sign out?",
       confirmButton: "Sign Out",
       success: "You have successfully signed out",
+    },
+    validation: {
+      required: "Required field",
+      invalidEmail: "Invalid email",
+      minPassword: "Password must be at least 6 characters",
+      passwordFormat:
+        "Password must contain at least one letter and one number",
+      passwordMatch: "Passwords don't match",
+      minNickname: "Nickname must be at least 3 characters",
+      minSkillLevel: "Skill level must be between 1 and 10",
+      maxSkillLevel: "Skill level must be between 1 and 10",
     },
     errors: {
       invalidCredentials: "Invalid email or password",
