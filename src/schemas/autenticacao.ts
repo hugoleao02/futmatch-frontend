@@ -28,5 +28,4 @@ export const schemaCadastro = (t: TFunction) =>
       .oneOf([Yup.ref("senha")], t("auth.validation.passwordMatch"))
       .required(t("auth.validation.required")),
     posicao: Yup.string().required(t("auth.validation.required")),
-    tipoJogador: Yup.string().required(t("auth.validation.required")),
   });

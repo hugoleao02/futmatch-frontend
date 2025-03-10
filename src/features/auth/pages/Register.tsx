@@ -69,7 +69,6 @@ const Register: React.FC = () => {
     { setSubmitting }: FormikHelpers<FormularioCadastro>
   ) => {
     try {
-      console.log("Iniciando processo de registro...", values);
       if (!values.posicao) {
         showToast(t("auth.register.errors.positionRequired"), "error");
         return;
@@ -82,11 +81,10 @@ const Register: React.FC = () => {
         posicao: values.posicao as PosicaoType,
       };
 
-      console.log("Enviando dados para registro:", jogadorDTO);
       const response = await register(jogadorDTO);
-      console.log("Resposta do registro:", response);
 
       if (response.success) {
+        showToast(t("auth.register.successMessage"), "success");
         navigate("/login", {
           state: {
             message: t("auth.register.successMessage"),
@@ -97,7 +95,6 @@ const Register: React.FC = () => {
         showToast(response.message || t("auth.register.error"), "error");
       }
     } catch (error: any) {
-      console.error("Erro detalhado no registro:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
