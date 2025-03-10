@@ -79,36 +79,24 @@ export const register = async (
 ): Promise<RegisterResponse> => {
   try {
     console.log("AuthService: Iniciando chamada de registro...");
-    const response = await HttpClient.post<{ token: string }>(
+    const response = await HttpClient.post<Jogador>(
       API_CONFIG.AUTH.REGISTER_ENDPOINT,
       registerDTO
     );
     console.log("AuthService: Resposta da API:", response);
 
-    if (!response || !response.token) {
-      console.log("AuthService: Token não encontrado na resposta");
+    if (!response || !response.id) {
+      console.log("AuthService: Dados do jogador não encontrados na resposta");
       return {
         success: false,
         message: "Erro ao processar o registro",
       };
     }
 
-    saveToken(response.token);
-    console.log("AuthService: Token salvo, buscando perfil do usuário...");
-    const userProfile = await fetchUserProfile();
-
-    if (!userProfile) {
-      console.log("AuthService: Perfil do usuário não encontrado");
-      return {
-        success: false,
-        message: "Erro ao obter perfil do usuário",
-      };
-    }
-
     console.log("AuthService: Registro concluído com sucesso");
     return {
       success: true,
-      data: userProfile,
+      data: response,
     };
   } catch (error: any) {
     console.error("AuthService: Erro detalhado no registro:", error);
