@@ -213,6 +213,7 @@ export default {
       password: "Senha",
       confirmPassword: "Confirmar Senha",
       position: "Posição",
+      skillLevel: "Nível de Habilidade (1-10)",
       submit: "Criar conta",
       hasAccount: "Já tem uma conta? Entre",
       successMessage: "Conta criada com sucesso! Faça login para continuar.",
@@ -232,10 +233,12 @@ export default {
     validation: {
       required: "Campo obrigatório",
       invalidEmail: "E-mail inválido",
-      minNickname: "O nome deve ter no mínimo 3 caracteres",
       minPassword: "A senha deve ter no mínimo 6 caracteres",
+      passwordFormat: "A senha deve conter pelo menos uma letra e um número",
       passwordMatch: "As senhas não conferem",
-      passwordFormat: "A senha deve conter letras e números",
+      minNickname: "O nome deve ter no mínimo 3 caracteres",
+      minSkillLevel: "O nível de habilidade deve ser entre 1 e 10",
+      maxSkillLevel: "O nível de habilidade deve ser entre 1 e 10",
     },
     errors: {
       invalidCredentials: "E-mail ou senha inválidos",
