@@ -28,9 +28,9 @@ import { useTranslation } from "react-i18next";
 import { Logo } from "../../../components";
 import { Toast } from "../../../components/Toast/Toast";
 import { useToast } from "../../../hooks/useToast";
-import { schemaCadastro } from "../../../schemas";
 import { useRegisterForm } from "../hooks/useRegisterForm";
-import { registerStyles } from "./Register.styles";
+import { schemaCadastro } from "../schemas/autenticacao";
+import { registerStyles } from "../styles/Register.styles";
 
 const Register: React.FC = () => {
   const { t } = useTranslation();

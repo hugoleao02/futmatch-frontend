@@ -15,7 +15,6 @@ import {
   Paper,
   TextField,
   Typography,
-  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { Field, Form, Formik } from "formik";
@@ -25,12 +24,11 @@ import Logo from "../../../components/Logo";
 import { Toast } from "../../../components/Toast/Toast";
 import { schemaLogin } from "../../../schemas";
 import { useLoginLogic } from "../hooks/useLoginLogic";
-import { loginStyles } from "./Login.styles";
+import { loginStyles } from "../styles/Login.styles";
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const {
     initialValues,
     showPassword,
@@ -40,7 +38,7 @@ const Login: React.FC = () => {
     hideToast,
   } = useLoginLogic();
 
-  const styles = loginStyles(theme, isMobile);
+  const styles = loginStyles(theme);
 
   return (
     <Box sx={styles.root}>
