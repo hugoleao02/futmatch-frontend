@@ -22,98 +22,32 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Field, Form, Formik, FormikHelpers } from "formik";
-import React, { useState } from "react";
+import { Field, Form, Formik } from "formik";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { FormularioCadastro } from "../../../@types";
-import { PosicaoType } from "../../../@types/enums";
 import { Logo } from "../../../components";
 import { Toast } from "../../../components/Toast/Toast";
-import { useAuth } from "../../../hooks/useAuth";
 import { useToast } from "../../../hooks/useToast";
 import { schemaCadastro } from "../../../schemas";
+import { useRegisterForm } from "../hooks/useRegisterForm";
 import { registerStyles } from "./Register.styles";
 
 const Register: React.FC = () => {
-  const navigate = useNavigate();
-  const { register } = useAuth();
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { toast, showToast, hideToast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { toast, hideToast } = useToast();
+  const {
+    initialValues,
+    posicoes,
+    showPassword,
+    showConfirmPassword,
+    handleSubmit,
+    handleTogglePasswordVisibility,
+    handleToggleConfirmPasswordVisibility,
+  } = useRegisterForm();
 
   const styles = registerStyles(theme, isMobile);
-
-  const posicoes = [
-    { value: "GOLEIRO", label: "Goleiro" },
-    { value: "ZAGUEIRO", label: "Zagueiro" },
-    { value: "LATERAL", label: "Lateral" },
-    { value: "VOLANTE", label: "Volante" },
-    { value: "MEIA", label: "Meia" },
-    { value: "ATACANTE", label: "Atacante" },
-  ];
-
-  const initialValues: FormularioCadastro = {
-    nome: "",
-    email: "",
-    senha: "",
-    confirmSenha: "",
-    posicao: "ATACANTE" as PosicaoType,
-    nivelHabilidade: 5,
-  };
-
-  const handleSubmit = async (
-    values: FormularioCadastro,
-    { setSubmitting }: FormikHelpers<FormularioCadastro>
-  ) => {
-    try {
-      if (!values.posicao) {
-        showToast(t("auth.register.errors.positionRequired"), "error");
-        return;
-      }
-
-      const jogadorDTO = {
-        nome: values.nome,
-        email: values.email,
-        senha: values.senha,
-        posicao: values.posicao as PosicaoType,
-        nivelHabilidade: values.nivelHabilidade,
-      };
-
-      const response = await register(jogadorDTO);
-
-      if (response.success) {
-        showToast(t("auth.register.successMessage"), "success");
-        navigate("/login", {
-          state: {
-            message: t("auth.register.successMessage"),
-            email: values.email,
-          },
-        });
-      } else {
-        showToast(response.message || t("auth.register.error"), "error");
-      }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        t("auth.register.error");
-      showToast(errorMessage, "error");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleToggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
 
   return (
     <Box sx={styles.root}>

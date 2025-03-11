@@ -78,25 +78,32 @@ export const register = async (
   registerDTO: RegisterDTO
 ): Promise<RegisterResponse> => {
   try {
-    console.log("AuthService: Iniciando chamada de registro...");
-    const response = await HttpClient.post<Jogador>(
+    console.log(
+      "AuthService: Iniciando chamada de registro com payload:",
+      JSON.stringify(registerDTO, null, 2)
+    );
+    const response = await HttpClient.post<any>(
       API_CONFIG.AUTH.REGISTER_ENDPOINT,
       registerDTO
     );
-    console.log("AuthService: Resposta da API:", response);
+    console.log(
+      "AuthService: Resposta da API:",
+      JSON.stringify(response, null, 2)
+    );
 
-    if (!response || !response.id) {
-      console.log("AuthService: Dados do jogador não encontrados na resposta");
+    if (response) {
+      console.log("AuthService: Registro concluído com sucesso");
       return {
-        success: false,
-        message: "Erro ao processar o registro",
+        success: true,
+        data: response.jogador || response,
+        message: response.message || "Registro realizado com sucesso",
       };
     }
 
-    console.log("AuthService: Registro concluído com sucesso");
+    console.log("AuthService: Dados do jogador não encontrados na resposta");
     return {
-      success: true,
-      data: response,
+      success: false,
+      message: "Erro ao processar o registro",
     };
   } catch (error: any) {
     console.error("AuthService: Erro detalhado no registro:", error);
