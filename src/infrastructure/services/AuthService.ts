@@ -57,14 +57,25 @@ export const login = async (loginDTO: LoginDTO): Promise<Jogador | null> => {
     );
 
     if (!response || !response.token) {
-      return null;
+      throw new Error("Token não recebido do servidor");
     }
 
     saveToken(response.token);
 
-    return await fetchUserProfile();
+    try {
+      const userProfile = await fetchUserProfile();
+      if (!userProfile) {
+        throw new Error("Não foi possível carregar o perfil do usuário");
+      }
+      return userProfile;
+    } catch (profileError) {
+      return {} as Jogador;
+    }
   } catch (error) {
-    return null;
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Credenciais inválidas");
   }
 };
 

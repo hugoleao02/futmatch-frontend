@@ -62,13 +62,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setLoading(true);
       const response = await AuthService.login(loginDTO);
-      if (!response) {
-        showToast(t("auth.errors.invalidCredentials"), "error");
-        return;
-      }
       setUser(response);
+
+      // Se chegou aqui, o login foi bem sucedido
+      if (Object.keys(response).length === 0) {
+        // Login ok mas perfil não foi carregado
+        showToast("Login realizado com sucesso, carregando perfil...", "info");
+        // Tenta carregar o perfil novamente
+        refreshUserProfile();
+      }
     } catch (error) {
-      showToast(t("auth.errors.invalidCredentials"), "error");
+      if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast(t("auth.errors.invalidCredentials"), "error");
+      }
+      throw error; // Propaga o erro para o componente de login
     } finally {
       setLoading(false);
     }
