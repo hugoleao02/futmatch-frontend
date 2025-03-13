@@ -1,5 +1,6 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { RegisterResponse } from "../@types";
 import { LoginDTO } from "../@types/auth/LoginDTO";
 import { RegisterDTO } from "../@types/auth/RegisterDTO";
@@ -7,79 +8,74 @@ import { Jogador } from "../@types/jogador/Jogador";
 import { Toast } from "../components/Toast/Toast";
 import { useToast } from "../hooks/useToast";
 import { AuthService } from "../infrastructure/services/AuthService";
-import { getToken } from "../infrastructure/services/TokenService";
+import {
+  getToken,
+  getUserFromToken,
+} from "../infrastructure/services/TokenService";
+
 interface AuthContextData {
   user: Jogador | null;
   loading: boolean;
-  login: (loginDTO: LoginDTO) => Promise<void>;
+  login: (loginDTO: LoginDTO) => Promise<Jogador>;
   register: (registerDTO: RegisterDTO) => Promise<RegisterResponse>;
   logout: () => void;
-  refreshUserProfile: () => Promise<void>;
+  loadUserProfile: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextData>(
   {} as AuthContextData
 );
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<Jogador | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast, showToast, hideToast } = useToast();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  const loadUser = async () => {
-    const token = getToken();
-    if (token) {
-      try {
-        const userProfile = await AuthService.fetchUserProfile();
-        setUser(userProfile);
-      } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
-      }
-    }
-  };
-
-  const refreshUserProfile = async () => {
+  const loadUserProfile = useCallback(async () => {
     try {
-      const updatedUser = await AuthService.fetchUserProfile();
-      if (!updatedUser) {
-        showToast("Não foi possível atualizar o perfil", "error");
+      const token = getToken();
+      if (!token) {
+        setUser(null);
         return;
       }
-      setUser(updatedUser);
-    } catch (error) {
-      showToast("Erro ao atualizar perfil", "error");
-    }
-  };
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const login = async (loginDTO: LoginDTO) => {
-    try {
-      setLoading(true);
-      const response = await AuthService.login(loginDTO);
-      setUser(response);
-
-      // Se chegou aqui, o login foi bem sucedido
-      if (Object.keys(response).length === 0) {
-        // Login ok mas perfil não foi carregado
-        showToast("Login realizado com sucesso, carregando perfil...", "info");
-        // Tenta carregar o perfil novamente
-        refreshUserProfile();
+      const tokenData = getUserFromToken();
+      if (tokenData) {
+        setUser(tokenData);
       }
+
+      try {
+        const userProfile = await AuthService.fetchUserProfile();
+        if (userProfile) {
+          setUser(userProfile);
+        }
+      } catch (profileError) {}
     } catch (error) {
-      if (error instanceof Error) {
-        showToast(error.message, "error");
-      } else {
-        showToast(t("auth.errors.invalidCredentials"), "error");
+      const tokenData = getUserFromToken();
+      if (tokenData) {
+        setUser(tokenData);
       }
-      throw error; // Propaga o erro para o componente de login
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, [loadUserProfile]);
+
+  const login = async (loginDTO: LoginDTO): Promise<Jogador> => {
+    try {
+      const user = await AuthService.login(loginDTO);
+      if (!user) {
+        throw new Error("Falha no login");
+      }
+      setUser(user);
+      return user;
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -87,7 +83,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     registerDTO: RegisterDTO
   ): Promise<RegisterResponse> => {
     try {
-      setLoading(true);
       const response = await AuthService.register(registerDTO);
 
       if (!response.success) {
@@ -108,28 +103,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         success: false,
         message: errorMessage,
       };
-    } finally {
-      setLoading(false);
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     AuthService.logout();
     setUser(null);
-    showToast("Logout realizado com sucesso", "info");
+    navigate("/login");
+  }, [navigate]);
+
+  const value = {
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    loadUserProfile,
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        refreshUserProfile,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
       <Toast
         open={toast.open}
