@@ -25,10 +25,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Jogador } from "../../../@types";
 import { useToast } from "../../../hooks/useToast";
-import { PerfilService } from "../../../infrastructure/services/PerfilService";
+import {
+  PerfilService,
+  ProfilePhotoService,
+} from "../../../infrastructure/services";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -36,9 +39,12 @@ interface TabPanelProps {
   value: number;
 }
 
-const TabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props;
-
+const TabPanel: React.FC<TabPanelProps> = ({
+  children,
+  value,
+  index,
+  ...other
+}) => {
   return (
     <div
       role="tabpanel"
@@ -63,12 +69,25 @@ const Perfil: React.FC = () => {
     posicao: "",
     citacao: "",
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const carregarPerfil = async () => {
       try {
         const data = await PerfilService.obterPerfil();
-        setPerfil(data);
+        const photoUrl = await ProfilePhotoService.getProfilePhotoUrl();
+        console.log("URL da foto ao carregar:", photoUrl);
+
+        setPerfil((prev) =>
+          prev
+            ? {
+                ...prev,
+                ...data,
+                fotoPerfilUrl: photoUrl,
+              }
+            : data
+        );
+
         setEditData({
           nome: data.nome || "",
           posicao: data.posicao || "",
@@ -111,7 +130,40 @@ const Perfil: React.FC = () => {
     }
   };
 
-  const getBadgeColor = (badge: string) => {
+  const handlePhotoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await ProfilePhotoService.uploadProfilePhoto(file);
+      const photoUrl = await ProfilePhotoService.getProfilePhotoUrl();
+      console.log("Nova URL da foto:", photoUrl);
+      if (photoUrl) {
+        setPerfil((prev) =>
+          prev
+            ? {
+                ...prev,
+                fotoPerfilUrl: photoUrl,
+              }
+            : null
+        );
+      }
+      showToast("Foto de perfil atualizada com sucesso", "success");
+    } catch (error) {
+      console.error("Erro ao atualizar foto:", error);
+      showToast("Erro ao atualizar foto de perfil", "error");
+    }
+  };
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const getBadgeColor = (
+    badge: string
+  ): "error" | "success" | "info" | "default" => {
     switch (badge) {
       case "Artilheiro":
         return "error";
@@ -169,10 +221,26 @@ const Perfil: React.FC = () => {
                   mb: 2,
                   border: "4px solid",
                   borderColor: "primary.main",
+                  objectFit: "cover",
+                  bgcolor: "background.paper",
+                }}
+                imgProps={{
+                  crossOrigin: "anonymous",
+                  referrerPolicy: "no-referrer",
+                  onError: () => {
+                    showToast("Erro ao carregar imagem", "error");
+                  },
                 }}
               >
-                {perfil.nome?.charAt(0)}
+                {!perfil.fotoPerfilUrl && perfil.nome?.charAt(0)}
               </Avatar>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                accept="image/*"
+                onChange={handlePhotoUpload}
+              />
               <IconButton
                 sx={{
                   position: "absolute",
@@ -184,6 +252,7 @@ const Perfil: React.FC = () => {
                   },
                 }}
                 size="small"
+                onClick={handlePhotoClick}
               >
                 <PhotoCameraIcon fontSize="small" />
               </IconButton>
