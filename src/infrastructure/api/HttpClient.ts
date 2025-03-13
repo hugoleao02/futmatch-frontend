@@ -28,18 +28,42 @@ const createApiError = (
 
 const createApiErrorFromAxiosError = (error: AxiosError): IApiError => {
   if (error.response) {
+    const getBackendErrorMessage = (data: any): string => {
+      if (!data) return "Erro no servidor";
+
+      if (typeof data === "string") return data;
+
+      if (typeof data === "object" && "message" in data) {
+        return data.message as string;
+      }
+
+      if (typeof data === "object" && Object.keys(data).length > 0) {
+        const firstError = Object.values(data)[0];
+        if (typeof firstError === "string") return firstError;
+      }
+
+      return "Erro no servidor";
+    };
+
     if (error.response.status === 401) {
-      removeToken();
-      window.location.href = "/login?expired=true";
-      return createApiError(
-        "Sua sessão expirou. Por favor, faça login novamente.",
-        401,
-        error.response.data,
-        false
-      );
+      const errorMessage = getBackendErrorMessage(error.response.data);
+
+      const responseData = error.response.data as Record<string, any>;
+      const isTokenExpired =
+        responseData?.expired === true ||
+        errorMessage.toLowerCase().includes("expirou") ||
+        errorMessage.toLowerCase().includes("sessão");
+
+      if (isTokenExpired) {
+        removeToken();
+        window.location.href = "/login?expired=true";
+      }
+
+      return createApiError(errorMessage, 401, error.response.data, false);
     }
+
     return createApiError(
-      error.message,
+      getBackendErrorMessage(error.response.data),
       error.response.status,
       error.response.data,
       false
@@ -52,11 +76,10 @@ const createApiErrorFromAxiosError = (error: AxiosError): IApiError => {
       true
     );
   } else {
-    return createApiError(error.message, 0, null, false);
+    return createApiError(error.message || "Erro desconhecido", 0, null, false);
   }
 };
 
-// Criar uma instância do Axios com configurações padrão
 const createAxiosInstance = (
   baseURL: string = API_CONFIG.BASE_URL
 ): AxiosInstance => {
@@ -70,7 +93,6 @@ const createAxiosInstance = (
     timeout: API_CONFIG.TIMEOUT,
   });
 
-  // Configurar interceptors
   api.interceptors.request.use(
     (config) => {
       const token = getToken();
@@ -94,7 +116,6 @@ const createAxiosInstance = (
   return api;
 };
 
-// Instância global do Axios
 const api = createAxiosInstance();
 
 export const isApiError = (error: any): error is IApiError => {
@@ -106,7 +127,6 @@ export const isApiError = (error: any): error is IApiError => {
   );
 };
 
-// Funções HTTP
 export const get = async <T>(
   url: string,
   config?: AxiosRequestConfig
@@ -181,7 +201,6 @@ export const del = async <T>(
   }
 };
 
-// Exportar como objeto para compatibilidade
 export const HttpClient = {
   get,
   post,

@@ -58,17 +58,23 @@ export const useLoginLogic = () => {
       };
 
       await login(loginDTO);
+      console.log("Login: Login realizado com sucesso");
 
       const tokenAtual = getToken();
+      console.log("Login: Token atual:", tokenAtual ? "Presente" : "Ausente");
 
       if (!tokenAtual) {
-        window.sessionStorage.setItem("tokenBackup", "token_teste_login");
+        console.error("Login: Token não encontrado após login");
+        showToast("Erro ao realizar login: token não encontrado", "error");
+        return;
       }
 
+      console.log("Login: Redirecionando usuário...");
       const state = location.state as LocationState;
       const from = state?.from?.pathname || "/";
       navigate(from, { replace: true });
     } catch (error) {
+      console.error("Login: Erro durante o login:", error);
       if (error instanceof Error) {
         showToast(
           error.message || t("auth.errors.invalidCredentials"),
