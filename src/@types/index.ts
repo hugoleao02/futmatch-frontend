@@ -24,6 +24,9 @@ export * from "./sala/CriarSalaDTO";
 export * from "./sala/Mensagem";
 export * from "./sala/Sala";
 
+// Profile
+export * from "./profile/FotoPerfilResponse";
+
 // Components
 export * from "./components/LogoProps";
 
