@@ -1,6 +1,6 @@
-import { HttpClient, IApiError, isApiError } from "../api/HttpClient";
-import { toJogador } from "../adapters/UserAdapter";
 import { Estatisticas, Jogador } from "../../@types";
+import { toJogador } from "../adapters/UserAdapter";
+import { HttpClient, isApiError } from "../api/HttpClient";
 
 export const obterPerfil = async (): Promise<Jogador> => {
   try {

@@ -8,10 +8,7 @@ import { Jogador } from "../@types/jogador/Jogador";
 import { Toast } from "../components/Toast/Toast";
 import { useToast } from "../hooks/useToast";
 import { AuthService } from "../infrastructure/services/AuthService";
-import {
-  getToken,
-  getUserFromToken,
-} from "../infrastructure/services/TokenService";
+import { getToken } from "../infrastructure/services/TokenService";
 
 interface AuthContextData {
   user: Jogador | null;
@@ -41,22 +38,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      const tokenData = getUserFromToken();
-      if (tokenData) {
-        setUser(tokenData);
+      const userProfile = await AuthService.fetchUserProfile();
+      if (userProfile) {
+        setUser(userProfile);
+      } else {
+        setUser(null);
       }
-
-      try {
-        const userProfile = await AuthService.fetchUserProfile();
-        if (userProfile) {
-          setUser(userProfile);
-        }
-      } catch (profileError) {}
     } catch (error) {
-      const tokenData = getUserFromToken();
-      if (tokenData) {
-        setUser(tokenData);
-      }
+      setUser(null);
     } finally {
       setLoading(false);
     }

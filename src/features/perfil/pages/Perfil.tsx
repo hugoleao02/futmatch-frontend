@@ -1,125 +1,34 @@
-import React, { useState } from "react";
+import EditIcon from "@mui/icons-material/Edit";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import GroupsIcon from "@mui/icons-material/Groups";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import StarIcon from "@mui/icons-material/Star";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
 import {
-  Container,
-  Typography,
-  Box,
-  Paper,
-  Grid,
   Avatar,
-  Chip,
+  Box,
   Button,
+  Chip,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
+  Grid,
   IconButton,
-  useTheme,
+  LinearProgress,
+  Paper,
   Tab,
   Tabs,
   TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Rating,
-  LinearProgress,
+  Typography,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import StarIcon from "@mui/icons-material/Star";
-import WhatshotIcon from "@mui/icons-material/Whatshot";
-import GroupsIcon from "@mui/icons-material/Groups";
-import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-  position: string;
-  level: number;
-  xp: number;
-  nextLevelXp: number;
-  matches: number;
-  wins: number;
-  goals: number;
-  assists: number;
-  fairPlay: number;
-  streak: number;
-  badges: string[];
-  bio: string;
-}
-
-// Mock do usuário
-const mockUser: User = {
-  id: 1,
-  name: "João Silva",
-  email: "joao.silva@email.com",
-  avatar: "",
-  position: "Atacante",
-  level: 8,
-  xp: 7500,
-  nextLevelXp: 10000,
-  matches: 45,
-  wins: 32,
-  goals: 67,
-  assists: 25,
-  fairPlay: 95,
-  streak: 5,
-  badges: ["Artilheiro", "MVP", "Fair Play"],
-  bio: "Apaixonado por futebol desde criança. Jogo como atacante e adoro fazer gols!",
-};
-
-interface Match {
-  id: number;
-  title: string;
-  date: string;
-  location: string;
-  result: string;
-  score: string;
-  goals: number;
-  assists: number;
-  rating: number;
-}
-
-// Mock do histórico de partidas
-const mockMatchHistory: Match[] = [
-  {
-    id: 1,
-    title: "Pelada dos Amigos",
-    date: "2024-03-15T19:00:00",
-    location: "Arena Soccer Club",
-    result: "Vitória",
-    score: "5 - 3",
-    goals: 2,
-    assists: 1,
-    rating: 4.5,
-  },
-  {
-    id: 2,
-    title: "Futebol Society",
-    date: "2024-03-10T20:00:00",
-    location: "Soccer House",
-    result: "Derrota",
-    score: "2 - 3",
-    goals: 1,
-    assists: 0,
-    rating: 4.0,
-  },
-  {
-    id: 3,
-    title: "Rachão de Quinta",
-    date: "2024-03-05T18:30:00",
-    location: "Clube Atlético",
-    result: "Vitória",
-    score: "4 - 2",
-    goals: 3,
-    assists: 1,
-    rating: 5.0,
-  },
-];
+import React, { useEffect, useState } from "react";
+import { Jogador } from "../../../@types";
+import { useToast } from "../../../hooks/useToast";
+import { PerfilService } from "../../../infrastructure/services/PerfilService";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -144,14 +53,36 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 const Perfil: React.FC = () => {
-  const theme = useTheme();
+  const { showToast } = useToast();
   const [tabValue, setTabValue] = useState(0);
   const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [perfil, setPerfil] = useState<Jogador | null>(null);
   const [editData, setEditData] = useState({
-    name: mockUser.name,
-    position: mockUser.position,
-    bio: mockUser.bio,
+    nome: "",
+    posicao: "",
+    citacao: "",
   });
+
+  useEffect(() => {
+    const carregarPerfil = async () => {
+      try {
+        const data = await PerfilService.obterPerfil();
+        setPerfil(data);
+        setEditData({
+          nome: data.nome || "",
+          posicao: data.posicao || "",
+          citacao: data.citacao || "",
+        });
+      } catch (error) {
+        showToast("Erro ao carregar perfil", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarPerfil();
+  }, []);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -161,9 +92,23 @@ const Perfil: React.FC = () => {
     setOpenEditDialog(true);
   };
 
-  const handleEditSave = () => {
-    // Implementar lógica para salvar as alterações
-    setOpenEditDialog(false);
+  const handleEditSave = async () => {
+    try {
+      if (!perfil) return;
+
+      const updatedPerfil = await PerfilService.atualizarPerfil({
+        ...perfil,
+        nome: editData.nome,
+        posicao: editData.posicao,
+        citacao: editData.citacao,
+      });
+
+      setPerfil(updatedPerfil);
+      showToast("Perfil atualizado com sucesso", "success");
+      setOpenEditDialog(false);
+    } catch (error) {
+      showToast("Erro ao atualizar perfil", "error");
+    }
   };
 
   const getBadgeColor = (badge: string) => {
@@ -179,25 +124,15 @@ const Perfil: React.FC = () => {
     }
   };
 
-  const getResultColor = (result: string) => {
-    switch (result) {
-      case "Vitória":
-        return "success";
-      case "Derrota":
-        return "error";
-      default:
-        return "warning";
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }).format(date);
-  };
+  if (loading || !perfil) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4 }}>
+          <LinearProgress />
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg">
@@ -226,7 +161,7 @@ const Perfil: React.FC = () => {
 
             <Box sx={{ position: "relative", display: "inline-block" }}>
               <Avatar
-                src={mockUser.avatar}
+                src={perfil.fotoPerfilUrl}
                 sx={{
                   width: 120,
                   height: 120,
@@ -236,7 +171,7 @@ const Perfil: React.FC = () => {
                   borderColor: "primary.main",
                 }}
               >
-                {mockUser.name.charAt(0)}
+                {perfil.nome?.charAt(0)}
               </Avatar>
               <IconButton
                 sx={{
@@ -255,57 +190,35 @@ const Perfil: React.FC = () => {
             </Box>
 
             <Typography variant="h5" gutterBottom>
-              {mockUser.name}
+              {perfil.nome}
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              {mockUser.email}
+              {perfil.email}
             </Typography>
             <Chip
-              label={mockUser.position}
+              label={perfil.posicao}
               color="primary"
               variant="outlined"
               sx={{ mb: 2 }}
             />
 
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Nível {mockUser.level}
-              </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={(mockUser.xp / mockUser.nextLevelXp) * 100}
-                sx={{
-                  height: 8,
-                  borderRadius: 4,
-                  bgcolor: "background.default",
-                  "& .MuiLinearProgress-bar": {
-                    borderRadius: 4,
-                  },
-                }}
-              />
-              <Typography variant="caption" color="text.secondary">
-                {mockUser.xp}/{mockUser.nextLevelXp} XP
-              </Typography>
-            </Box>
-
             <Divider sx={{ my: 2 }} />
 
             <Typography variant="body1" color="text.secondary">
-              {mockUser.bio}
+              {perfil.citacao}
             </Typography>
 
             <Divider sx={{ my: 2 }} />
 
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {mockUser.badges.map((badge) => (
+            {perfil.badgePersonalizado && (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                 <Chip
-                  key={badge}
-                  label={badge}
-                  color={getBadgeColor(badge) as any}
+                  label={perfil.badgePersonalizado}
+                  color={getBadgeColor(perfil.badgePersonalizado)}
                   size="small"
                 />
-              ))}
-            </Box>
+              </Box>
+            )}
           </Paper>
         </Grid>
 
@@ -354,7 +267,7 @@ const Perfil: React.FC = () => {
                       sx={{ fontSize: 40, color: "primary.main", mb: 1 }}
                     />
                     <Typography variant="h4" gutterBottom>
-                      {mockUser.matches}
+                      {perfil.estatisticas?.totalPartidas || 0}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Partidas Jogadas
@@ -376,7 +289,7 @@ const Perfil: React.FC = () => {
                       sx={{ fontSize: 40, color: "warning.main", mb: 1 }}
                     />
                     <Typography variant="h4" gutterBottom>
-                      {mockUser.wins}
+                      {perfil.estatisticas?.totalVitorias || 0}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Vitórias
@@ -398,7 +311,7 @@ const Perfil: React.FC = () => {
                       sx={{ fontSize: 40, color: "error.main", mb: 1 }}
                     />
                     <Typography variant="h4" gutterBottom>
-                      {mockUser.goals}
+                      {perfil.estatisticas?.totalGols || 0}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Gols Marcados
@@ -420,10 +333,10 @@ const Perfil: React.FC = () => {
                       sx={{ fontSize: 40, color: "secondary.main", mb: 1 }}
                     />
                     <Typography variant="h4" gutterBottom>
-                      {mockUser.assists}
+                      {perfil.estatisticas?.precisaoPasses || 0}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Assistências
+                      Precisão de Passes
                     </Typography>
                   </Paper>
                 </Grid>
@@ -442,10 +355,10 @@ const Perfil: React.FC = () => {
                       sx={{ fontSize: 40, color: "info.main", mb: 1 }}
                     />
                     <Typography variant="h4" gutterBottom>
-                      {mockUser.fairPlay}%
+                      {perfil.rankingLocal || 0}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Fair Play
+                      Ranking Local
                     </Typography>
                   </Paper>
                 </Grid>
@@ -464,7 +377,7 @@ const Perfil: React.FC = () => {
                       sx={{ fontSize: 40, color: "success.main", mb: 1 }}
                     />
                     <Typography variant="h4" gutterBottom>
-                      {mockUser.streak}
+                      {perfil.sequenciaVitorias || 0}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Sequência de Vitórias
@@ -475,64 +388,11 @@ const Perfil: React.FC = () => {
             </TabPanel>
 
             <TabPanel value={tabValue} index={1}>
-              <List>
-                {mockMatchHistory.map((match, index) => (
-                  <React.Fragment key={match.id}>
-                    {index > 0 && <Divider component="li" />}
-                    <ListItem
-                      alignItems="flex-start"
-                      secondaryAction={
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "flex-end",
-                          }}
-                        >
-                          <Chip
-                            label={match.result}
-                            color={getResultColor(match.result) as any}
-                            size="small"
-                            sx={{ mb: 1 }}
-                          />
-                          <Rating value={match.rating} readOnly size="small" />
-                        </Box>
-                      }
-                    >
-                      <ListItemAvatar>
-                        <Avatar>
-                          <SportsSoccerIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={match.title}
-                        secondary={
-                          <React.Fragment>
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="text.primary"
-                            >
-                              {formatDate(match.date)}
-                            </Typography>
-                            {" — "}
-                            {match.location}
-                            <br />
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="text.secondary"
-                            >
-                              {match.score} • {match.goals} gols •{" "}
-                              {match.assists} assistências
-                            </Typography>
-                          </React.Fragment>
-                        }
-                      />
-                    </ListItem>
-                  </React.Fragment>
-                ))}
-              </List>
+              <Box sx={{ p: 2, textAlign: "center" }}>
+                <Typography variant="body1" color="text.secondary">
+                  Histórico de partidas em breve...
+                </Typography>
+              </Box>
             </TabPanel>
           </Paper>
         </Grid>
@@ -551,9 +411,9 @@ const Perfil: React.FC = () => {
             <TextField
               fullWidth
               label="Nome"
-              value={editData.name}
-              onChange={(e) =>
-                setEditData({ ...editData, name: e.target.value })
+              value={editData.nome}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setEditData({ ...editData, nome: e.target.value })
               }
               sx={{ mb: 2 }}
             />
@@ -561,29 +421,29 @@ const Perfil: React.FC = () => {
               fullWidth
               label="Posição"
               select
-              value={editData.position}
-              onChange={(e) =>
-                setEditData({ ...editData, position: e.target.value })
+              value={editData.posicao}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setEditData({ ...editData, posicao: e.target.value })
               }
               SelectProps={{
                 native: true,
               }}
               sx={{ mb: 2 }}
             >
-              <option value="goleiro">Goleiro</option>
-              <option value="zagueiro">Zagueiro</option>
-              <option value="lateral">Lateral</option>
-              <option value="meio-campo">Meio-Campo</option>
-              <option value="atacante">Atacante</option>
+              <option value="GOLEIRO">Goleiro</option>
+              <option value="ZAGUEIRO">Zagueiro</option>
+              <option value="LATERAL">Lateral</option>
+              <option value="MEIO_CAMPO">Meio-Campo</option>
+              <option value="ATACANTE">Atacante</option>
             </TextField>
             <TextField
               fullWidth
-              label="Bio"
+              label="Citação"
               multiline
               rows={4}
-              value={editData.bio}
-              onChange={(e) =>
-                setEditData({ ...editData, bio: e.target.value })
+              value={editData.citacao}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setEditData({ ...editData, citacao: e.target.value })
               }
             />
           </Box>

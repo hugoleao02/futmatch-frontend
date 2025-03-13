@@ -5,8 +5,7 @@ export const API_CONFIG = {
   AUTH: {
     LOGIN_ENDPOINT: "/auth/login",
     REGISTER_ENDPOINT: "/auth/registrar",
-    PROFILE_ENDPOINT: "/auth/me",
-    PROFILE_FALLBACK_ENDPOINT: "/jogadores/me",
+    PROFILE_ENDPOINT: "/jogadores/me",
   },
   TOKEN: {
     STORAGE_KEY: import.meta.env.VITE_TOKEN_KEY || "auth_token",

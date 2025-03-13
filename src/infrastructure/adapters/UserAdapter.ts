@@ -1,32 +1,50 @@
-import { Jogador, PosicaoType } from "../../@types";
+import { Jogador } from "../../@types";
 
-export const toJogador = (response: any): Jogador => {
-  const token = response.token;
-  const base64Url = token.split(".")[1];
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  const jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split("")
-      .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-      .join("")
-  );
-
-  const payload = JSON.parse(jsonPayload);
-  return {
-    id: payload.sub,
-    nome: payload.nome,
-    email: payload.sub,
-    posicao: payload.posicao as PosicaoType,
+export const toJogador = (data: any): Jogador => {
+  const jogador: Jogador = {
+    id: data.id,
+    nome: data.nome,
+    email: data.email,
+    posicao: data.posicao,
+    fotoPerfilUrl: data.fotoPerfilUrl,
+    citacao: data.citacao,
+    estiloJogo: data.estiloJogo,
+    ranking: data.ranking || 0,
+    rankingLocal: data.rankingLocal || 0,
+    melhorNota: data.melhorNota || 0,
+    sequenciaVitorias: data.sequenciaVitorias || 0,
+    maiorSequenciaVitorias: data.maiorSequenciaVitorias || 0,
+    avatarPersonalizadoUrl: data.avatarPersonalizadoUrl,
+    temaPerfilUrl: data.temaPerfilUrl,
+    badgePersonalizado: data.badgePersonalizado,
+    tituloDestaque: data.tituloDestaque,
+    rankingAmigos: data.rankingAmigos || 0,
+    identificador: data.identificador,
+    nomeCompleto: data.nomeCompleto,
+    telefone: data.telefone,
+    nivelCompetitividade: data.nivelCompetitividade,
+    tipoJogador: data.tipoJogador,
+    notaMedia: data.notaMedia,
+    totalPartidas: data.totalPartidas || 0,
+    partidasGanhas: data.partidasGanhas,
+    partidasPerdidas: data.partidasPerdidas,
+    partidasEmpatadas: data.partidasEmpatadas,
     estatisticas: {
-      totalPartidas: 0,
-      vitorias: 0,
-      derrotas: 0,
-      empates: 0,
-      golsMarcados: 0,
-      golsSofridos: 0,
-      fairPlayScore: 0,
+      totalPartidas: data.estatisticas?.totalPartidas || 0,
+      totalVitorias: data.estatisticas?.totalVitorias || 0,
+      totalDerrotas: data.estatisticas?.totalDerrotas || 0,
+      totalEmpates: data.estatisticas?.totalEmpates || 0,
+      totalGols: data.estatisticas?.totalGols || 0,
+      totalAssistencias: data.estatisticas?.totalAssistencias || 0,
+      tempoTotalJogo: data.estatisticas?.tempoTotalJogo || 0,
+      mediaNotas: data.estatisticas?.mediaNotas || 0,
+      taxaConversaoChutes: data.estatisticas?.taxaConversaoChutes || 0,
+      precisaoPasses: data.estatisticas?.precisaoPasses || 0,
+      totalDesarmes: data.estatisticas?.totalDesarmes || 0,
+      totalInterceptacoes: data.estatisticas?.totalInterceptacoes || 0,
     },
   };
+  return jogador;
 };
 
 export const UserAdapter = {
