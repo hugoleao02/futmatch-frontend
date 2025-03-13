@@ -107,8 +107,10 @@ const createAxiosInstance = (
   );
 
   api.interceptors.response.use(
-    (response) => response,
-    (error) => {
+    (response) => {
+      return response;
+    },
+    (error: AxiosError) => {
       return Promise.reject(createApiErrorFromAxiosError(error));
     }
   );
@@ -118,12 +120,13 @@ const createAxiosInstance = (
 
 const api = createAxiosInstance();
 
-export const isApiError = (error: any): error is IApiError => {
+export const isApiError = (error: unknown): error is IApiError => {
   return (
-    error &&
-    typeof error.message === "string" &&
-    typeof error.status === "number" &&
-    typeof error.isNetworkError === "boolean"
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    "message" in error &&
+    "isNetworkError" in error
   );
 };
 

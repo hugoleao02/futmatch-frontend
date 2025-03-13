@@ -4,57 +4,63 @@ import { HttpClient } from "../api/HttpClient";
 import { getUserFromToken, removeToken, saveToken } from "./TokenService";
 
 const formatUserResponse = (user: any): Jogador | null => {
-  const userId = typeof user.id === "number" ? user.id : parseInt(user.id);
-
-  if (isNaN(userId)) {
+  if (!user || !user.email) {
     return null;
   }
 
   return {
-    id: userId,
-    nome: user.nome || "Usuário",
+    id: user.id,
+    nome: user.nome,
     email: user.email,
-    posicao: user.posicao || "ATACANTE",
+    posicao: user.posicao,
+    fotoPerfilUrl: user.fotoPerfilUrl,
+    citacao: user.citacao,
+    estiloJogo: user.estiloJogo,
+    ranking: user.ranking || 0,
+    rankingLocal: user.rankingLocal || 0,
+    melhorNota: user.melhorNota || 0,
+    sequenciaVitorias: user.sequenciaVitorias || 0,
+    maiorSequenciaVitorias: user.maiorSequenciaVitorias || 0,
+    avatarPersonalizadoUrl: user.avatarPersonalizadoUrl,
+    temaPerfilUrl: user.temaPerfilUrl,
+    badgePersonalizado: user.badgePersonalizado,
+    tituloDestaque: user.tituloDestaque,
+    rankingAmigos: user.rankingAmigos || 0,
+    identificador: user.identificador,
+    nomeCompleto: user.nomeCompleto,
+    telefone: user.telefone,
+    nivelCompetitividade: user.nivelCompetitividade,
+    tipoJogador: user.tipoJogador,
+    notaMedia: user.notaMedia,
+    totalPartidas: user.totalPartidas || 0,
+    partidasGanhas: user.partidasGanhas,
+    partidasPerdidas: user.partidasPerdidas,
+    partidasEmpatadas: user.partidasEmpatadas,
     estatisticas: {
       totalPartidas: user.estatisticas?.totalPartidas || 0,
-      vitorias: user.estatisticas?.vitorias || 0,
-      derrotas: user.estatisticas?.derrotas || 0,
-      empates: user.estatisticas?.empates || 0,
-      golsMarcados: user.estatisticas?.golsMarcados || 0,
-      golsSofridos: user.estatisticas?.golsSofridos || 0,
-      fairPlayScore: user.estatisticas?.fairPlayScore || 0,
+      totalVitorias: user.estatisticas?.totalVitorias || 0,
+      totalDerrotas: user.estatisticas?.totalDerrotas || 0,
+      totalEmpates: user.estatisticas?.totalEmpates || 0,
+      totalGols: user.estatisticas?.totalGols || 0,
+      totalAssistencias: user.estatisticas?.totalAssistencias || 0,
+      tempoTotalJogo: user.estatisticas?.tempoTotalJogo || 0,
+      mediaNotas: user.estatisticas?.mediaNotas || 0,
+      taxaConversaoChutes: user.estatisticas?.taxaConversaoChutes || 0,
+      precisaoPasses: user.estatisticas?.precisaoPasses || 0,
+      totalDesarmes: user.estatisticas?.totalDesarmes || 0,
+      totalInterceptacoes: user.estatisticas?.totalInterceptacoes || 0,
     },
   };
 };
 
 const fetchUserProfile = async (): Promise<Jogador | null> => {
   try {
-    const tokenData = getUserFromToken();
-    if (!tokenData) {
-      return null;
-    }
-
-    try {
-      const response = await HttpClient.get<any>(
-        API_CONFIG.AUTH.PROFILE_ENDPOINT
-      );
-      const formattedUser = formatUserResponse(response);
-      if (!formattedUser) return tokenData;
-      return formattedUser;
-    } catch (error) {
-      try {
-        const response = await HttpClient.get<any>(
-          API_CONFIG.AUTH.PROFILE_FALLBACK_ENDPOINT
-        );
-        const formattedUser = formatUserResponse(response);
-        if (!formattedUser) return tokenData;
-        return formattedUser;
-      } catch (fallbackError) {
-        return tokenData;
-      }
-    }
+    const response = await HttpClient.get<any>(
+      API_CONFIG.AUTH.PROFILE_ENDPOINT
+    );
+    return formatUserResponse(response);
   } catch (error) {
-    return getUserFromToken();
+    return null;
   }
 };
 
