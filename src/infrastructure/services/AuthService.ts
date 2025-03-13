@@ -27,44 +27,72 @@ const formatUserResponse = (user: any): Jogador | null => {
   };
 };
 
-export const fetchUserProfile = async (): Promise<Jogador | null> => {
+const fetchUserProfile = async (): Promise<Jogador | null> => {
   try {
+    const tokenData = getUserFromToken();
+    if (!tokenData) {
+      return null;
+    }
+
     try {
       const response = await HttpClient.get<any>(
         API_CONFIG.AUTH.PROFILE_ENDPOINT
       );
       const formattedUser = formatUserResponse(response);
-      if (!formattedUser) return null;
+      if (!formattedUser) return tokenData;
       return formattedUser;
     } catch (error) {
-      const response = await HttpClient.get<any>(
-        API_CONFIG.AUTH.PROFILE_FALLBACK_ENDPOINT
-      );
-      const formattedUser = formatUserResponse(response);
-      if (!formattedUser) return null;
-      return formattedUser;
+      try {
+        const response = await HttpClient.get<any>(
+          API_CONFIG.AUTH.PROFILE_FALLBACK_ENDPOINT
+        );
+        const formattedUser = formatUserResponse(response);
+        if (!formattedUser) return tokenData;
+        return formattedUser;
+      } catch (fallbackError) {
+        return tokenData;
+      }
     }
   } catch (error) {
-    return null;
+    return getUserFromToken();
   }
 };
 
-export const login = async (loginDTO: LoginDTO): Promise<Jogador | null> => {
+const login = async (loginDTO: LoginDTO): Promise<Jogador | null> => {
   try {
-    const response = await HttpClient.post<{ token: string }>(
+    const response = await HttpClient.post<any>(
       API_CONFIG.AUTH.LOGIN_ENDPOINT,
       loginDTO
     );
 
-    if (!response || !response.token) {
-      return null;
+    if (!response || (!response.token && !response.access_token)) {
+      throw new Error("Token não recebido do servidor");
     }
 
-    saveToken(response.token);
+    const token = response.token || response.access_token;
+    saveToken(token);
 
-    return await fetchUserProfile();
+    const tokenData = getUserFromToken();
+    if (!tokenData) {
+      throw new Error("Token inválido recebido do servidor");
+    }
+
+    try {
+      const userProfile = await fetchUserProfile();
+      if (userProfile) {
+        return userProfile;
+      }
+    } catch (profileError) {}
+
+    return tokenData;
   } catch (error) {
-    return null;
+    if (
+      error instanceof Error &&
+      error.message.toLowerCase().includes("token")
+    ) {
+      removeToken();
+    }
+    throw error;
   }
 };
 
@@ -74,25 +102,16 @@ interface RegisterResponse {
   data?: Jogador;
 }
 
-export const register = async (
+const register = async (
   registerDTO: RegisterDTO
 ): Promise<RegisterResponse> => {
   try {
-    console.log(
-      "AuthService: Iniciando chamada de registro com payload:",
-      JSON.stringify(registerDTO, null, 2)
-    );
     const response = await HttpClient.post<any>(
       API_CONFIG.AUTH.REGISTER_ENDPOINT,
       registerDTO
     );
-    console.log(
-      "AuthService: Resposta da API:",
-      JSON.stringify(response, null, 2)
-    );
 
     if (response) {
-      console.log("AuthService: Registro concluído com sucesso");
       return {
         success: true,
         data: response.jogador || response,
@@ -100,13 +119,11 @@ export const register = async (
       };
     }
 
-    console.log("AuthService: Dados do jogador não encontrados na resposta");
     return {
       success: false,
       message: "Erro ao processar o registro",
     };
   } catch (error: any) {
-    console.error("AuthService: Erro detalhado no registro:", error);
     return {
       success: false,
       message: error.response?.data?.message || "Erro ao realizar o registro",
@@ -114,11 +131,11 @@ export const register = async (
   }
 };
 
-export const logout = (): void => {
+const logout = (): void => {
   removeToken();
 };
 
-export const getCurrentUser = (): Jogador | null => {
+const getCurrentUser = (): Jogador | null => {
   return getUserFromToken();
 };
 
@@ -128,4 +145,4 @@ export const AuthService = {
   logout,
   getCurrentUser,
   fetchUserProfile,
-};
+} as const;

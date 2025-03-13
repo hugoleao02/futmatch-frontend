@@ -1,4 +1,4 @@
-import { Jogador, PosicaoType } from "../../@types";
+import { Jogador } from "../../@types";
 import { API_CONFIG } from "../../config/api";
 
 const TOKEN_KEY = API_CONFIG.TOKEN.STORAGE_KEY;
@@ -39,9 +39,15 @@ export const getTokenPayload = (): any | null => {
 export const getUserFromToken = (): Jogador | null => {
   try {
     const token = getToken();
-    if (!token) return null;
+    if (!token) {
+      return null;
+    }
 
     const base64Url = token.split(".")[1];
+    if (!base64Url) {
+      return null;
+    }
+
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
       atob(base64)
@@ -52,25 +58,24 @@ export const getUserFromToken = (): Jogador | null => {
 
     const payload = JSON.parse(jsonPayload);
 
-    const userId =
-      Number(payload.id) || Number(payload.userId) || Number(payload.sub);
-    if (isNaN(userId)) {
+    const userId = payload.id || payload.userId || payload.sub || payload.uuid;
+    if (!userId) {
       return null;
     }
 
     return {
-      id: userId,
+      id: Number(userId) || userId,
       nome: payload.nome || payload.name || "Usuário",
-      email: payload.email || payload.sub,
-      posicao: payload.posicao || ("ATACANTE" as PosicaoType),
+      email: payload.email || payload.sub || "",
+      posicao: payload.posicao || "ATACANTE",
       estatisticas: {
-        totalPartidas: payload.estatisticas?.totalPartidas || 0,
-        vitorias: payload.estatisticas?.vitorias || 0,
-        derrotas: payload.estatisticas?.derrotas || 0,
-        empates: payload.estatisticas?.empates || 0,
-        golsMarcados: payload.estatisticas?.golsMarcados || 0,
-        golsSofridos: payload.estatisticas?.golsSofridos || 0,
-        fairPlayScore: payload.estatisticas?.fairPlayScore || 0,
+        totalPartidas: 0,
+        vitorias: 0,
+        derrotas: 0,
+        empates: 0,
+        golsMarcados: 0,
+        golsSofridos: 0,
+        fairPlayScore: 0,
       },
     };
   } catch (error) {

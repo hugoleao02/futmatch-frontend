@@ -5,10 +5,14 @@ export const registerStyles = (theme: Theme, isMobile: boolean) => ({
     minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
-    background: `url('/soccer-field-bg.jpg')`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
     position: "relative",
+    background: `
+      radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.8), transparent 50%),
+      radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.8), transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.8), transparent 50%),
+      radial-gradient(circle at 0% 100%, rgba(59, 130, 246, 0.8), transparent 50%)
+    `,
+    backgroundColor: "#0f172a",
     "&::before": {
       content: '""',
       position: "absolute",
@@ -16,8 +20,8 @@ export const registerStyles = (theme: Theme, isMobile: boolean) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: `linear-gradient(135deg, rgba(40, 167, 69, 0.95), rgba(27, 126, 49, 0.9))`,
-      backdropFilter: "blur(8px)",
+      background: "rgba(15, 23, 42, 0.3)",
+      backdropFilter: "blur(100px)",
     },
   },
   container: {
