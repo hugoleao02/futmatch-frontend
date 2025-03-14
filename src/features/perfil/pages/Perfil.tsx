@@ -26,14 +26,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
-import { Jogador } from "../../../@types";
-import { useProfilePhoto } from "../../../hooks/useProfilePhoto";
-import { useToast } from "../../../hooks/useToast";
-import {
-  PerfilService,
-  ProfilePhotoService,
-} from "../../../infrastructure/services";
+import React from "react";
+import { usePerfil } from "../hooks/usePerfil";
+import { usePerfilPhoto } from "../hooks/usePerfilPhoto";
+import { usePerfilTabs } from "../hooks/usePerfilTabs";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -61,127 +57,28 @@ const TabPanel: React.FC<TabPanelProps> = ({
 };
 
 const Perfil: React.FC = () => {
-  const { showToast } = useToast();
-  const [tabValue, setTabValue] = useState(0);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [perfil, setPerfil] = useState<Jogador | null>(null);
+  const {
+    loading,
+    perfil,
+    openEditDialog,
+    editData,
+    setEditData,
+    setOpenEditDialog,
+    handleEditSave,
+    getBadgeColor,
+  } = usePerfil();
+
   const {
     photoUrl,
     tempPhotoUrl,
-    isLoading: isLoadingPhoto,
-    forceUpdate,
-    error: photoError,
-    setTempPhotoUrl,
-  } = useProfilePhoto();
-  const [editData, setEditData] = useState({
-    nome: "",
-    posicao: "",
-    citacao: "",
-  });
-  const fileInputRef = useRef<HTMLInputElement>(null);
+    isLoadingPhoto,
+    photoError,
+    fileInputRef,
+    handlePhotoUpload,
+    handlePhotoClick,
+  } = usePerfilPhoto();
 
-  useEffect(() => {
-    const carregarPerfil = async () => {
-      try {
-        const data = await PerfilService.obterPerfil();
-        setPerfil((prev) =>
-          prev
-            ? {
-                ...prev,
-                ...data,
-              }
-            : data
-        );
-
-        setEditData({
-          nome: data.nome || "",
-          posicao: data.posicao || "",
-          citacao: data.citacao || "",
-        });
-      } catch (error) {
-        showToast("Erro ao carregar perfil", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    carregarPerfil();
-  }, []);
-
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
-  const handleEditClick = () => {
-    setOpenEditDialog(true);
-  };
-
-  const handleEditSave = async () => {
-    try {
-      if (!perfil) return;
-
-      const updatedPerfil = await PerfilService.atualizarPerfil({
-        ...perfil,
-        nome: editData.nome,
-        posicao: editData.posicao,
-        citacao: editData.citacao,
-      });
-
-      setPerfil(updatedPerfil);
-      showToast("Perfil atualizado com sucesso", "success");
-      setOpenEditDialog(false);
-    } catch (error) {
-      showToast("Erro ao atualizar perfil", "error");
-    }
-  };
-
-  const handlePhotoUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      // Cria um preview imediato da foto
-      const previewUrl = URL.createObjectURL(file);
-      setTempPhotoUrl(previewUrl);
-
-      // Faz o upload em segundo plano
-      await ProfilePhotoService.uploadProfilePhoto(file);
-
-      // Força atualização e notifica outros componentes
-      await forceUpdate();
-      useProfilePhoto.getState().notifyPhotoUpdate();
-
-      showToast("Foto de perfil atualizada com sucesso", "success");
-    } catch (error) {
-      console.error("Erro ao atualizar foto:", error);
-      showToast("Erro ao atualizar foto de perfil", "error");
-      setTempPhotoUrl(null);
-      // Em caso de erro, força atualização para mostrar a foto anterior
-      await forceUpdate();
-    }
-  };
-
-  const handlePhotoClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const getBadgeColor = (
-    badge: string
-  ): "error" | "success" | "info" | "default" => {
-    switch (badge) {
-      case "Artilheiro":
-        return "error";
-      case "MVP":
-        return "success";
-      case "Fair Play":
-        return "info";
-      default:
-        return "default";
-    }
-  };
+  const { tabValue, handleTabChange } = usePerfilTabs();
 
   if (loading || !perfil) {
     return (
@@ -213,7 +110,7 @@ const Perfil: React.FC = () => {
                 top: 8,
                 right: 8,
               }}
-              onClick={handleEditClick}
+              onClick={() => setOpenEditDialog(true)}
             >
               <EditIcon />
             </IconButton>
@@ -239,7 +136,6 @@ const Perfil: React.FC = () => {
                     const imgElement = e.target as HTMLImageElement;
                     imgElement.onerror = null;
                     imgElement.src = "";
-                    showToast(photoError || "Erro ao carregar imagem", "error");
                   },
                 }}
               >
