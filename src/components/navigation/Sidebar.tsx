@@ -15,10 +15,14 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import {
+  subscribeToPhotoUpdates,
+  useProfilePhoto,
+} from "../../hooks/useProfilePhoto";
 import Logo from "../common/Logo";
 
 const Sidebar: React.FC = () => {
@@ -27,6 +31,31 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const {
+    photoUrl,
+    tempPhotoUrl,
+    isLoading: isLoadingPhoto,
+    updatePhoto,
+    forceUpdate,
+  } = useProfilePhoto();
+
+  useEffect(() => {
+    if (user) {
+      updatePhoto();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    // Inscreve-se para atualizações de foto
+    const unsubscribe = subscribeToPhotoUpdates(() => {
+      forceUpdate();
+    });
+
+    // Limpa a inscrição quando o componente é desmontado
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const menuItems = [
     {
@@ -127,16 +156,38 @@ const Sidebar: React.FC = () => {
             }}
           >
             <Avatar
-              src={user.avatar}
+              src={tempPhotoUrl || photoUrl}
               sx={{
                 width: 48,
                 height: 48,
                 border: "3px solid",
                 borderColor: "primary.main",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                bgcolor: theme.palette.primary.light,
+                opacity: isLoadingPhoto ? 0.7 : 1,
+                transition: "opacity 0.2s ease",
+              }}
+              imgProps={{
+                loading: "lazy",
+                onError: (e) => {
+                  console.error("Erro ao carregar imagem do perfil:", e);
+                  const imgElement = e.target as HTMLImageElement;
+                  imgElement.onerror = null;
+                  imgElement.src = "";
+                },
               }}
             >
-              {user.nome?.charAt(0)}
+              {!tempPhotoUrl && !photoUrl && (
+                <Typography
+                  sx={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    color: "white",
+                  }}
+                >
+                  {user.nome?.charAt(0).toUpperCase()}
+                </Typography>
+              )}
             </Avatar>
             <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>

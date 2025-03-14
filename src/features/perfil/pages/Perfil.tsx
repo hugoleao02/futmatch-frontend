@@ -10,6 +10,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -27,6 +28,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { Jogador } from "../../../@types";
+import { useProfilePhoto } from "../../../hooks/useProfilePhoto";
 import { useToast } from "../../../hooks/useToast";
 import {
   PerfilService,
@@ -64,6 +66,14 @@ const Perfil: React.FC = () => {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [perfil, setPerfil] = useState<Jogador | null>(null);
+  const {
+    photoUrl,
+    tempPhotoUrl,
+    isLoading: isLoadingPhoto,
+    forceUpdate,
+    error: photoError,
+    setTempPhotoUrl,
+  } = useProfilePhoto();
   const [editData, setEditData] = useState({
     nome: "",
     posicao: "",
@@ -75,15 +85,11 @@ const Perfil: React.FC = () => {
     const carregarPerfil = async () => {
       try {
         const data = await PerfilService.obterPerfil();
-        const photoUrl = await ProfilePhotoService.getProfilePhotoUrl();
-        console.log("URL da foto ao carregar:", photoUrl);
-
         setPerfil((prev) =>
           prev
             ? {
                 ...prev,
                 ...data,
-                fotoPerfilUrl: photoUrl,
               }
             : data
         );
@@ -137,23 +143,24 @@ const Perfil: React.FC = () => {
     if (!file) return;
 
     try {
+      // Cria um preview imediato da foto
+      const previewUrl = URL.createObjectURL(file);
+      setTempPhotoUrl(previewUrl);
+
+      // Faz o upload em segundo plano
       await ProfilePhotoService.uploadProfilePhoto(file);
-      const photoUrl = await ProfilePhotoService.getProfilePhotoUrl();
-      console.log("Nova URL da foto:", photoUrl);
-      if (photoUrl) {
-        setPerfil((prev) =>
-          prev
-            ? {
-                ...prev,
-                fotoPerfilUrl: photoUrl,
-              }
-            : null
-        );
-      }
+
+      // Força atualização e notifica outros componentes
+      await forceUpdate();
+      useProfilePhoto.getState().notifyPhotoUpdate();
+
       showToast("Foto de perfil atualizada com sucesso", "success");
     } catch (error) {
       console.error("Erro ao atualizar foto:", error);
       showToast("Erro ao atualizar foto de perfil", "error");
+      setTempPhotoUrl(null);
+      // Em caso de erro, força atualização para mostrar a foto anterior
+      await forceUpdate();
     }
   };
 
@@ -213,27 +220,49 @@ const Perfil: React.FC = () => {
 
             <Box sx={{ position: "relative", display: "inline-block" }}>
               <Avatar
-                src={perfil.fotoPerfilUrl}
+                src={tempPhotoUrl || photoUrl}
                 sx={{
                   width: 120,
                   height: 120,
                   mx: "auto",
                   mb: 2,
                   border: "4px solid",
-                  borderColor: "primary.main",
+                  borderColor: photoError ? "error.main" : "primary.main",
                   objectFit: "cover",
                   bgcolor: "background.paper",
+                  opacity: isLoadingPhoto ? 0.7 : 1,
+                  transition: "opacity 0.2s ease",
                 }}
                 imgProps={{
-                  crossOrigin: "anonymous",
-                  referrerPolicy: "no-referrer",
-                  onError: () => {
-                    showToast("Erro ao carregar imagem", "error");
+                  loading: "lazy",
+                  onError: (e) => {
+                    const imgElement = e.target as HTMLImageElement;
+                    imgElement.onerror = null;
+                    imgElement.src = "";
+                    showToast(photoError || "Erro ao carregar imagem", "error");
                   },
                 }}
               >
-                {!perfil.fotoPerfilUrl && perfil.nome?.charAt(0)}
+                {!tempPhotoUrl && !photoUrl && perfil?.nome?.charAt(0)}
               </Avatar>
+              {isLoadingPhoto && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bgcolor: "rgba(0, 0, 0, 0.3)",
+                    borderRadius: "50%",
+                  }}
+                >
+                  <CircularProgress size={40} />
+                </Box>
+              )}
               <input
                 type="file"
                 ref={fileInputRef}
