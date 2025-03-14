@@ -10,6 +10,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -25,10 +26,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { Jogador } from "../../../@types";
-import { useToast } from "../../../hooks/useToast";
-import { PerfilService } from "../../../infrastructure/services/PerfilService";
+import React from "react";
+import { usePerfil } from "../hooks/usePerfil";
+import { usePerfilPhoto } from "../hooks/usePerfilPhoto";
+import { usePerfilTabs } from "../hooks/usePerfilTabs";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -36,9 +37,12 @@ interface TabPanelProps {
   value: number;
 }
 
-const TabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props;
-
+const TabPanel: React.FC<TabPanelProps> = ({
+  children,
+  value,
+  index,
+  ...other
+}) => {
   return (
     <div
       role="tabpanel"
@@ -53,76 +57,28 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 const Perfil: React.FC = () => {
-  const { showToast } = useToast();
-  const [tabValue, setTabValue] = useState(0);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [perfil, setPerfil] = useState<Jogador | null>(null);
-  const [editData, setEditData] = useState({
-    nome: "",
-    posicao: "",
-    citacao: "",
-  });
+  const {
+    loading,
+    perfil,
+    openEditDialog,
+    editData,
+    setEditData,
+    setOpenEditDialog,
+    handleEditSave,
+    getBadgeColor,
+  } = usePerfil();
 
-  useEffect(() => {
-    const carregarPerfil = async () => {
-      try {
-        const data = await PerfilService.obterPerfil();
-        setPerfil(data);
-        setEditData({
-          nome: data.nome || "",
-          posicao: data.posicao || "",
-          citacao: data.citacao || "",
-        });
-      } catch (error) {
-        showToast("Erro ao carregar perfil", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    photoUrl,
+    tempPhotoUrl,
+    isLoadingPhoto,
+    photoError,
+    fileInputRef,
+    handlePhotoUpload,
+    handlePhotoClick,
+  } = usePerfilPhoto();
 
-    carregarPerfil();
-  }, []);
-
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
-  const handleEditClick = () => {
-    setOpenEditDialog(true);
-  };
-
-  const handleEditSave = async () => {
-    try {
-      if (!perfil) return;
-
-      const updatedPerfil = await PerfilService.atualizarPerfil({
-        ...perfil,
-        nome: editData.nome,
-        posicao: editData.posicao,
-        citacao: editData.citacao,
-      });
-
-      setPerfil(updatedPerfil);
-      showToast("Perfil atualizado com sucesso", "success");
-      setOpenEditDialog(false);
-    } catch (error) {
-      showToast("Erro ao atualizar perfil", "error");
-    }
-  };
-
-  const getBadgeColor = (badge: string) => {
-    switch (badge) {
-      case "Artilheiro":
-        return "error";
-      case "MVP":
-        return "success";
-      case "Fair Play":
-        return "info";
-      default:
-        return "default";
-    }
-  };
+  const { tabValue, handleTabChange } = usePerfilTabs();
 
   if (loading || !perfil) {
     return (
@@ -154,25 +110,62 @@ const Perfil: React.FC = () => {
                 top: 8,
                 right: 8,
               }}
-              onClick={handleEditClick}
+              onClick={() => setOpenEditDialog(true)}
             >
               <EditIcon />
             </IconButton>
 
             <Box sx={{ position: "relative", display: "inline-block" }}>
               <Avatar
-                src={perfil.fotoPerfilUrl}
+                src={tempPhotoUrl || photoUrl}
                 sx={{
                   width: 120,
                   height: 120,
                   mx: "auto",
                   mb: 2,
                   border: "4px solid",
-                  borderColor: "primary.main",
+                  borderColor: photoError ? "error.main" : "primary.main",
+                  objectFit: "cover",
+                  bgcolor: "background.paper",
+                  opacity: isLoadingPhoto ? 0.7 : 1,
+                  transition: "opacity 0.2s ease",
+                }}
+                imgProps={{
+                  loading: "lazy",
+                  onError: (e) => {
+                    const imgElement = e.target as HTMLImageElement;
+                    imgElement.onerror = null;
+                    imgElement.src = "";
+                  },
                 }}
               >
-                {perfil.nome?.charAt(0)}
+                {!tempPhotoUrl && !photoUrl && perfil?.nome?.charAt(0)}
               </Avatar>
+              {isLoadingPhoto && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bgcolor: "rgba(0, 0, 0, 0.3)",
+                    borderRadius: "50%",
+                  }}
+                >
+                  <CircularProgress size={40} />
+                </Box>
+              )}
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                accept="image/*"
+                onChange={handlePhotoUpload}
+              />
               <IconButton
                 sx={{
                   position: "absolute",
@@ -184,6 +177,7 @@ const Perfil: React.FC = () => {
                   },
                 }}
                 size="small"
+                onClick={handlePhotoClick}
               >
                 <PhotoCameraIcon fontSize="small" />
               </IconButton>

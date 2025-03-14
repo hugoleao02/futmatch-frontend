@@ -1,7 +1,5 @@
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import LogoutIcon from "@mui/icons-material/Logout";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
 import SettingsIcon from "@mui/icons-material/Settings";
 import {
@@ -9,7 +7,6 @@ import {
   Badge,
   Box,
   Button,
-  Divider,
   IconButton,
   InputBase,
   ListItemIcon,
@@ -19,18 +16,47 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import {
+  subscribeToPhotoUpdates,
+  useProfilePhoto,
+} from "../../hooks/useProfilePhoto";
 
 const TopNav: React.FC = () => {
   const theme = useTheme();
   const { user, logout } = useAuth();
+  const {
+    photoUrl,
+    tempPhotoUrl,
+    isLoading: isLoadingPhoto,
+    updatePhoto,
+    forceUpdate,
+  } = useProfilePhoto();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchFocused, setSearchFocused] = useState(false);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (user) {
+      updatePhoto();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    // Inscreve-se para atualizações de foto
+    const unsubscribe = subscribeToPhotoUpdates(() => {
+      forceUpdate();
+    });
+
+    // Limpa a inscrição quando o componente é desmontado
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -41,9 +67,14 @@ const TopNav: React.FC = () => {
   };
 
   const handleLogout = () => {
-    handleClose();
     logout();
+    handleClose();
     navigate("/login");
+  };
+
+  const handleProfile = () => {
+    handleClose();
+    navigate("/perfil");
   };
 
   return (
@@ -145,59 +176,49 @@ const TopNav: React.FC = () => {
             <IconButton
               onClick={handleMenu}
               sx={{
-                p: 0.5,
-                border: "2px solid",
-                borderColor: Boolean(anchorEl) ? "primary.main" : "divider",
-                transition: "all 0.3s ease",
+                p: 0,
                 "&:hover": {
-                  borderColor: "primary.main",
                   transform: "scale(1.05)",
+                  transition: "transform 0.2s",
                 },
               }}
             >
               <Avatar
-                src={user.avatar}
+                src={tempPhotoUrl || photoUrl}
                 sx={{
-                  width: 36,
-                  height: 36,
-                  bgcolor: theme.palette.primary.main,
+                  width: 40,
+                  height: 40,
+                  border: "2px solid",
+                  borderColor: "primary.main",
+                  bgcolor: theme.palette.primary.light,
+                  opacity: isLoadingPhoto ? 0.7 : 1,
+                  transition: "opacity 0.2s ease",
                 }}
               >
-                {user.nome?.charAt(0)}
+                {!tempPhotoUrl &&
+                  !photoUrl &&
+                  user.nome?.charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
           </Tooltip>
 
           <Menu
+            id="menu-appbar"
             anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
             open={Boolean(anchorEl)}
             onClose={handleClose}
-            onClick={handleClose}
-            PaperProps={{
-              sx: {
-                mt: 1.5,
-                minWidth: 220,
-                borderRadius: 2,
-                boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-              },
-            }}
-            transformOrigin={{ horizontal: "right", vertical: "top" }}
-            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            <Box sx={{ px: 2, py: 1.5 }}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                {user.nome}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {user.email}
-              </Typography>
-            </Box>
-            <Divider />
-            <MenuItem onClick={() => navigate("/perfil")}>
-              <ListItemIcon>
-                <PersonIcon fontSize="small" />
-              </ListItemIcon>
-              {t("common.profile")}
+            <MenuItem onClick={handleProfile}>
+              <Typography>Meu Perfil</Typography>
             </MenuItem>
             <MenuItem onClick={() => navigate("/configuracoes")}>
               <ListItemIcon>
@@ -205,12 +226,8 @@ const TopNav: React.FC = () => {
               </ListItemIcon>
               {t("common.settings")}
             </MenuItem>
-            <Divider />
-            <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
-              <ListItemIcon>
-                <LogoutIcon fontSize="small" color="error" />
-              </ListItemIcon>
-              Sair
+            <MenuItem onClick={handleLogout}>
+              <Typography>Sair</Typography>
             </MenuItem>
           </Menu>
         </>
