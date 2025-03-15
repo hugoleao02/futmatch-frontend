@@ -20,14 +20,15 @@ export interface Jogador {
 
 export interface Estatisticas {
   golsMarcados: number;
-  assistencias: number;
-  jogos: number;
+  assistencias?: number;
+  jogos?: number;
   vitorias: number;
   derrotas: number;
   empates: number;
-  golsSofridos?: number; // para goleiros
-  defesasDificeis?: number; // para goleiros
-  cleanSheets?: number; // para goleiros
-  totalPartidas?: number;
-  fairPlayScore?: number;
+  golsSofridos?: number;
+  defesasDificeis?: number;
+  cleanSheets?: number;
+  totalPartidas: number;
+  fairPlayScore: number;
+  totalJogos?: number;
 }
