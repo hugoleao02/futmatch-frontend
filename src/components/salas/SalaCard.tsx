@@ -1,19 +1,19 @@
-import React from "react";
-import {
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  Box,
-  Chip,
-  Button,
-} from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PeopleIcon from "@mui/icons-material/People";
-import { useTranslation } from "react-i18next";
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  Typography,
+} from "@mui/material";
 import dayjs from "dayjs";
-import { Sala } from "../../infrastructure/services";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { Sala } from "../../@types/sala";
 
 interface SalaCardProps {
   sala: Sala;

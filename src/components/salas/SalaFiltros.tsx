@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Grid,
-  TextField,
-  Button,
-  InputAdornment,
-  Divider,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip,
+} from "@mui/material";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FiltroSalaDTO } from "../../infrastructure/services";
+import { FiltroSalaDTO } from "../../@types/sala";
 
 interface SalaFiltrosProps {
   filtros: FiltroSalaDTO;

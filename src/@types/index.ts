@@ -43,3 +43,8 @@ export * from "./auth/RegisterDTO";
 
 // Configuracoes
 export * from "./configuracoes/ConfiguracoesForm";
+
+export * from "./auth";
+export * from "./jogador";
+export * from "./profile";
+export * from "./sala";
