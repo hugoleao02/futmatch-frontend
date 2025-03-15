@@ -11,4 +11,10 @@ export interface Estatisticas {
   precisaoPasses: number;
   totalDesarmes: number;
   totalInterceptacoes: number;
+  golsMarcados: number;
+  golsSofridos: number;
+  vitorias: number;
+  derrotas: number;
+  empates: number;
+  fairPlayScore: number;
 }

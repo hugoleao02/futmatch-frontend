@@ -2,6 +2,7 @@ import { PosicaoType } from "../enums";
 import { Estatisticas } from "./Estatisticas";
 
 export interface Jogador {
+  id?: string | number;
   uuid: string;
   nome: string;
   fotoPerfilUrl: string;

@@ -105,7 +105,11 @@ const SalaCard: React.FC<SalaCardProps> = ({ sala, onVerDetalhes }) => {
           size="small"
           variant="contained"
           fullWidth
-          onClick={() => onVerDetalhes(sala.id)}
+          onClick={() =>
+            onVerDetalhes(
+              typeof sala.id === "string" ? parseInt(sala.id, 10) : sala.id
+            )
+          }
         >
           {t("Ver Detalhes")}
         </Button>
