@@ -25,7 +25,7 @@ export interface Estatisticas {
   vitorias: number;
   derrotas: number;
   empates: number;
-  golsSofridos?: number;
+  golsSofridos: number;
   defesasDificeis?: number;
   cleanSheets?: number;
   totalPartidas: number;
