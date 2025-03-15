@@ -17,7 +17,7 @@ import { Sala } from "../../@types/sala";
 
 interface SalaCardProps {
   sala: Sala;
-  onVerDetalhes: (salaId: number) => void;
+  onVerDetalhes: (salaId: string | number) => void;
 }
 
 const SalaCard: React.FC<SalaCardProps> = ({ sala, onVerDetalhes }) => {

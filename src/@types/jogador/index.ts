@@ -6,6 +6,16 @@ export interface Jogador {
   citacao?: string;
   badgePersonalizado?: string;
   estatisticas?: Estatisticas;
+  fotoPerfilUrl?: string;
+  estiloJogo?: string;
+  ranking?: number;
+  rankingLocal?: number;
+  melhorNota?: number;
+  sequenciaVitorias?: number;
+  maiorSequenciaVitorias?: number;
+  avatarPersonalizadoUrl?: string;
+  temaPerfilUrl?: string;
+  tituloDestaque?: string;
 }
 
 export interface Estatisticas {
