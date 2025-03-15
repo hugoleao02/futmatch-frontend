@@ -27,6 +27,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import ImageEditor from "../../../components/ImageEditor";
 import { usePerfil } from "../hooks/usePerfil";
 import { usePerfilPhoto } from "../hooks/usePerfilPhoto";
 import { usePerfilTabs } from "../hooks/usePerfilTabs";
@@ -74,8 +75,12 @@ const Perfil: React.FC = () => {
     isLoadingPhoto,
     photoError,
     fileInputRef,
+    isEditorOpen,
+    selectedImageUrl,
+    handlePhotoSelect,
     handlePhotoUpload,
     handlePhotoClick,
+    handleEditorClose,
   } = usePerfilPhoto();
 
   const { tabValue, handleTabChange } = usePerfilTabs();
@@ -114,14 +119,20 @@ const Perfil: React.FC = () => {
               <EditIcon />
             </IconButton>
 
-            <Box sx={{ position: "relative", display: "inline-block" }}>
+            <Box
+              sx={{
+                position: "relative",
+                width: 120,
+                height: 120,
+                mx: "auto",
+                mb: 2,
+              }}
+            >
               <Avatar
                 src={tempPhotoUrl || photoUrl}
                 sx={{
-                  width: 120,
-                  height: 120,
-                  mx: "auto",
-                  mb: 2,
+                  width: "100%",
+                  height: "100%",
                   border: "4px solid",
                   borderColor: photoError ? "error.main" : "primary.main",
                   objectFit: "cover",
@@ -163,12 +174,12 @@ const Perfil: React.FC = () => {
                 ref={fileInputRef}
                 style={{ display: "none" }}
                 accept="image/*"
-                onChange={handlePhotoUpload}
+                onChange={handlePhotoSelect}
               />
               <IconButton
                 sx={{
                   position: "absolute",
-                  bottom: 16,
+                  bottom: -8,
                   right: -8,
                   bgcolor: "background.paper",
                   "&:hover": {
@@ -214,6 +225,16 @@ const Perfil: React.FC = () => {
             )}
           </Paper>
         </Grid>
+
+        {/* Editor de Imagem */}
+        {isEditorOpen && selectedImageUrl && (
+          <ImageEditor
+            open={isEditorOpen}
+            onClose={handleEditorClose}
+            imageUrl={selectedImageUrl}
+            onSave={handlePhotoUpload}
+          />
+        )}
 
         {/* Conteúdo Principal */}
         <Grid item xs={12} md={8}>
