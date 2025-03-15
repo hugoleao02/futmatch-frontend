@@ -33,18 +33,5 @@ export * from "./components/LogoProps";
 // API
 export * from "./api/ApiError";
 
-// Enums
-export * from "./enums/index";
-
-// Auth
-export * from "./auth/AuthResponse";
-export * from "./auth/LoginDTO";
-export * from "./auth/RegisterDTO";
-
 // Configuracoes
 export * from "./configuracoes/ConfiguracoesForm";
-
-export * from "./auth";
-export * from "./jogador";
-export * from "./profile";
-export * from "./sala";

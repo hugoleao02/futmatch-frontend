@@ -8,6 +8,11 @@ export interface Sala {
   numeroMaximoParticipantes: number;
   criador: string;
   status: string;
+  nivelMinimo?: number;
+  nivelMaximo?: number;
+  localizacao: string;
+  participantes?: any[];
+  capacidade: number;
 }
 
 export interface FiltroSalaDTO {
@@ -16,4 +21,7 @@ export interface FiltroSalaDTO {
   dataInicio?: string;
   dataFim?: string;
   status?: string;
+  nivelMinimo?: number;
+  nivelMaximo?: number;
+  minimoFairPlay?: number;
 }

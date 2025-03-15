@@ -1,5 +1,5 @@
 export interface Jogador {
-  id: string;
+  id: string | number;
   nome: string;
   email: string;
   posicao: string;
@@ -18,4 +18,6 @@ export interface Estatisticas {
   golsSofridos?: number; // para goleiros
   defesasDificeis?: number; // para goleiros
   cleanSheets?: number; // para goleiros
+  totalPartidas?: number;
+  fairPlayScore?: number;
 }
