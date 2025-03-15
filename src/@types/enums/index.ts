@@ -1,13 +1,6 @@
-export type PosicaoType =
-  | "GOLEIRO"
-  | "ZAGUEIRO"
-  | "LATERAL"
-  | "VOLANTE"
-  | "MEIA"
-  | "ATACANTE";
-
-export type NivelHabilidadeType =
-  | "INICIANTE"
-  | "INTERMEDIARIO"
-  | "AVANCADO"
-  | "PROFISSIONAL";
+export * from "./NivelCompetitividade";
+export * from "./NivelHabilidadeType";
+export * from "./PosicaoType";
+export * from "./TipoInscricao";
+export * from "./TipoJogador";
+export * from "./TipoJogo";

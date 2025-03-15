@@ -1,9 +1,9 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { RegisterResponse } from "../@types";
 import { LoginDTO } from "../@types/auth/LoginDTO";
 import { RegisterDTO } from "../@types/auth/RegisterDTO";
+import { RegisterResponse } from "../@types/auth/RegisterResponse";
 import { Jogador } from "../@types/jogador/Jogador";
 import { Toast } from "../components/Toast/Toast";
 import { useToast } from "../hooks/useToast";
@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (loginDTO: LoginDTO): Promise<Jogador> => {
     try {
+      navigate("/");
       const user = await AuthService.login(loginDTO);
       if (!user) {
         throw new Error("Falha no login");
