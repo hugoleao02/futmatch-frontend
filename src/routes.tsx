@@ -5,6 +5,7 @@ import { Login, Register } from "./features/auth";
 import { Home } from "./features/home";
 import { CriarPartida, DetalhesPartida, Partidas } from "./features/partidas";
 import { Perfil } from "./features/perfil";
+import Configuracoes from "./features/perfil/pages/Configuracoes";
 import { Ranking } from "./features/ranking";
 import { CriarSala, DetalhesSala, ListarSalas } from "./features/salas";
 import { useAuth } from "./hooks/useAuth";
@@ -32,6 +33,7 @@ const AppRoutes: React.FC = () => {
       >
         <Route index element={<Home />} />
         <Route path="perfil" element={<Perfil />} />
+        <Route path="configuracoes" element={<Configuracoes />} />
         <Route path="partidas" element={<Partidas />} />
         <Route path="criar-partida" element={<CriarPartida />} />
         <Route path="partidas/:id" element={<DetalhesPartida />} />

@@ -3,6 +3,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import GroupIcon from "@mui/icons-material/Group";
 import HomeIcon from "@mui/icons-material/Home";
 import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from "@mui/icons-material/Settings";
 import SportsIcon from "@mui/icons-material/Sports";
 import {
   Avatar,
@@ -87,6 +88,11 @@ const Sidebar: React.FC = () => {
       icon: <PersonIcon />,
       label: t("common.profile"),
       path: "/perfil",
+    },
+    {
+      icon: <SettingsIcon />,
+      label: t("common.settings"),
+      path: "/configuracoes",
     },
   ];
 

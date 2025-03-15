@@ -222,6 +222,14 @@ export default {
         positionRequired: "Selecione uma posição",
         playerTypeRequired: "Selecione um nível",
       },
+      positions: {
+        goleiro: "Goleiro",
+        zagueiro: "Zagueiro",
+        lateral: "Lateral",
+        volante: "Volante",
+        meia: "Meia",
+        atacante: "Atacante",
+      },
     },
     logout: {
       title: "Sair da conta",
@@ -264,5 +272,48 @@ export default {
   data: {
     hoje: "Hoje",
     amanha: "Amanhã",
+  },
+  settings: {
+    title: "Configurações",
+    notifications: {
+      title: "Notificações",
+      receiveNotifications: "Receber notificações",
+      receiveNotificationsDescription:
+        "Ative para receber notificações sobre partidas, convites e atualizações importantes",
+      emailNotifications: "Notificações por e-mail",
+      emailNotificationsDescription:
+        "Receba atualizações importantes por e-mail sobre suas partidas e convites",
+      pushNotifications: "Notificações push",
+      pushNotificationsDescription:
+        "Receba notificações push no seu navegador sobre atualizações em tempo real",
+    },
+    appearance: {
+      title: "Aparência",
+      theme: "Tema",
+      themeDescription:
+        "Escolha entre tema claro (cores mais suaves, ideal para uso diurno), escuro (reduz o cansaço visual em ambientes com pouca luz) ou siga as configurações do seu sistema",
+      light: "Claro",
+      dark: "Escuro",
+      system: "Sistema",
+    },
+    preferences: {
+      title: "Preferências",
+      preferredPosition: "Posição Preferida",
+      preferredPositionDescription:
+        "Escolha sua posição preferida em campo. Esta informação será usada para sugerir partidas e formar times equilibrados",
+    },
+    privacy: {
+      title: "Privacidade",
+      publicProfile: "Perfil público",
+      publicProfileDescription:
+        "Permite que outros jogadores vejam seu perfil e informações básicas",
+      showStatistics: "Mostrar estatísticas",
+      showStatisticsDescription:
+        "Compartilha suas estatísticas de jogo com outros jogadores (gols, assistências, etc.)",
+      showMatchHistory: "Mostrar histórico de partidas",
+      showMatchHistoryDescription:
+        "Permite que outros jogadores vejam seu histórico de partidas jogadas",
+    },
+    saveButton: "Salvar Configurações",
   },
 };

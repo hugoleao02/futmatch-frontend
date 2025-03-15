@@ -7,6 +7,17 @@ export default {
     delete: "Delete",
     select: "Select",
     loading: "Loading...",
+    learnMore: "Learn More",
+    viewAll: "View All",
+    join: "Join",
+    searchPlaceholder: "Search matches, players or rooms...",
+    profile: "Profile",
+    settings: "Settings",
+    createRoom: "Create Room",
+    matches: "Matches",
+    ranking: "Ranking",
+    rooms: "Rooms",
+    home: "Home",
   },
   navigation: {
     home: "Home",
@@ -140,5 +151,48 @@ export default {
       passwordTooShort: "Password must be at least 6 characters",
       passwordsDontMatch: "Passwords don't match",
     },
+  },
+  settings: {
+    title: "Settings",
+    notifications: {
+      title: "Notifications",
+      receiveNotifications: "Receive notifications",
+      receiveNotificationsDescription:
+        "Enable to receive notifications about matches, invites and important updates",
+      emailNotifications: "Email notifications",
+      emailNotificationsDescription:
+        "Receive important updates via email about your matches and invites",
+      pushNotifications: "Push notifications",
+      pushNotificationsDescription:
+        "Receive push notifications in your browser about real-time updates",
+    },
+    appearance: {
+      title: "Appearance",
+      theme: "Theme",
+      themeDescription:
+        "Choose between light theme (softer colors, ideal for daytime use), dark (reduces eye strain in low light environments) or follow your system settings",
+      light: "Light",
+      dark: "Dark",
+      system: "System",
+    },
+    preferences: {
+      title: "Preferences",
+      preferredPosition: "Preferred Position",
+      preferredPositionDescription:
+        "Choose your preferred position on the field. This information will be used to suggest matches and form balanced teams",
+    },
+    privacy: {
+      title: "Privacy",
+      publicProfile: "Public profile",
+      publicProfileDescription:
+        "Allow other players to see your profile and basic information",
+      showStatistics: "Show statistics",
+      showStatisticsDescription:
+        "Share your game statistics with other players (goals, assists, etc.)",
+      showMatchHistory: "Show match history",
+      showMatchHistoryDescription:
+        "Allow other players to see your match history",
+    },
+    saveButton: "Save Settings",
   },
 };
