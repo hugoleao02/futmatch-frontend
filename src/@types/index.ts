@@ -40,3 +40,6 @@ export * from "./enums/index";
 export * from "./auth/AuthResponse";
 export * from "./auth/LoginDTO";
 export * from "./auth/RegisterDTO";
+
+// Configuracoes
+export * from "./configuracoes/ConfiguracoesForm";

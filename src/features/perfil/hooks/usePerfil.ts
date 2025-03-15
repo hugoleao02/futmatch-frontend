@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Jogador } from "../../../@types";
+import { Jogador, PosicaoType } from "../../../@types";
 import { useToast } from "../../../hooks/useToast";
 import { PerfilService } from "../../../infrastructure/services";
 
@@ -55,7 +55,7 @@ export const usePerfil = () => {
       const updatedPerfil = await PerfilService.atualizarPerfil({
         ...perfil,
         nome: editData.nome,
-        posicao: editData.posicao,
+        posicao: editData.posicao as PosicaoType,
         citacao: editData.citacao,
       });
 

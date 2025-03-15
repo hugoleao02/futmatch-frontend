@@ -1,24 +1,12 @@
-import { useEffect, useState } from "react";
-import { PosicaoType } from "../../../@types/enums";
+import { useState } from "react";
+import { ConfiguracoesForm } from "../../../@types";
+import { useThemeContext } from "../../../contexts/ThemeContext";
 import { useToast } from "../../../hooks/useToast";
-import { api } from "../../../infrastructure/api";
-
-interface ConfiguracoesForm {
-  receberNotificacoes: boolean;
-  notificacoesEmail: boolean;
-  notificacoesPush: boolean;
-  perfilPublico: boolean;
-  mostrarEstatisticas: boolean;
-  mostrarHistoricoPartidas: boolean;
-  posicaoPreferida: PosicaoType;
-}
-
-interface ConfiguracoesVisuais {
-  tema: "light" | "dark" | "system";
-}
+import { atualizarConfiguracoes } from "../../../infrastructure/services";
 
 export const useConfiguracoes = () => {
   const { showToast } = useToast();
+  const { mode: tema, setMode: setTema } = useThemeContext();
   const [loading, setLoading] = useState(false);
   const [configuracoes, setConfiguracoes] = useState<ConfiguracoesForm>({
     receberNotificacoes: true,
@@ -27,36 +15,8 @@ export const useConfiguracoes = () => {
     perfilPublico: true,
     mostrarEstatisticas: true,
     mostrarHistoricoPartidas: true,
-    posicaoPreferida: "ATACANTE",
+    posicao: "ATACANTE",
   });
-
-  const [configuracoesVisuais, setConfiguracoesVisuais] =
-    useState<ConfiguracoesVisuais>(() => {
-      const temaSalvo = localStorage.getItem("tema");
-      return {
-        tema: (temaSalvo as "light" | "dark" | "system") || "system",
-      };
-    });
-
-  useEffect(() => {
-    carregarConfiguracoes();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("tema", configuracoesVisuais.tema);
-  }, [configuracoesVisuais.tema]);
-
-  const carregarConfiguracoes = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get("/api/jogadores/configuracoes");
-      setConfiguracoes(response.data);
-    } catch (error) {
-      showToast("Erro ao carregar configurações", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleChange = (field: keyof ConfiguracoesForm, value: any) => {
     setConfiguracoes((prev) => ({
@@ -66,16 +26,13 @@ export const useConfiguracoes = () => {
   };
 
   const handleTemaChange = (value: "light" | "dark" | "system") => {
-    setConfiguracoesVisuais((prev) => ({
-      ...prev,
-      tema: value,
-    }));
+    setTema(value);
   };
 
   const handleSave = async () => {
     try {
       setLoading(true);
-      await api.put("/api/jogadores/configuracoes", configuracoes);
+      await atualizarConfiguracoes(configuracoes);
       showToast("Configurações salvas com sucesso", "success");
     } catch (error) {
       showToast("Erro ao salvar configurações", "error");
@@ -87,7 +44,7 @@ export const useConfiguracoes = () => {
   return {
     loading,
     configuracoes,
-    configuracoesVisuais,
+    tema,
     handleChange,
     handleTemaChange,
     handleSave,

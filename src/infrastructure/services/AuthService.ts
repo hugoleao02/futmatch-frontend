@@ -9,7 +9,7 @@ const formatUserResponse = (user: any): Jogador | null => {
   }
 
   return {
-    id: user.id,
+    uuid: user.uuid,
     nome: user.nome,
     email: user.email,
     posicao: user.posicao,
@@ -64,44 +64,35 @@ const fetchUserProfile = async (): Promise<Jogador | null> => {
   }
 };
 
-const login = async (loginDTO: LoginDTO): Promise<Jogador | null> => {
+export const login = async (loginDTO: LoginDTO): Promise<Jogador | null> => {
   try {
-    const response = await HttpClient.post<any>(
+    const response = await HttpClient.post<{ token: string }>(
       API_CONFIG.AUTH.LOGIN_ENDPOINT,
       loginDTO
     );
 
-    if (!response || (!response.token && !response.access_token)) {
+    if (!response || !response.token) {
       throw new Error("Token não recebido do servidor");
     }
 
-    const token = response.token || response.access_token;
-    saveToken(token);
-
-    const tokenData = getUserFromToken();
-    if (!tokenData) {
-      throw new Error("Token inválido recebido do servidor");
-    }
+    saveToken(response.token);
 
     try {
       const userProfile = await fetchUserProfile();
-      if (userProfile) {
-        return userProfile;
+      if (!userProfile) {
+        throw new Error("Não foi possível carregar o perfil do usuário");
       }
-    } catch (profileError) {}
-
-    return tokenData;
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message.toLowerCase().includes("token")
-    ) {
-      removeToken();
+      return userProfile;
+    } catch (profileError) {
+      return {} as Jogador;
     }
-    throw error;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Credenciais inválidas");
   }
 };
-
 interface RegisterResponse {
   success: boolean;
   message?: string;

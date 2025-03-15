@@ -27,7 +27,6 @@ const createStore: StateCreator<ProfilePhotoStore> = (set, get) => ({
   error: null,
   setTempPhotoUrl: (url: string | null) => {
     set({ tempPhotoUrl: url, error: null });
-    // Notifica outros componentes sobre a mudança temporária
     subscribers.forEach((callback) => callback());
   },
   notifyPhotoUpdate: () => {

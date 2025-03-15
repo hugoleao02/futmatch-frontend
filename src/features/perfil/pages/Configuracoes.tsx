@@ -36,7 +36,7 @@ const Configuracoes: React.FC = () => {
   const {
     loading,
     configuracoes,
-    configuracoesVisuais,
+    tema,
     handleChange,
     handleTemaChange,
     handleSave,
@@ -50,7 +50,6 @@ const Configuracoes: React.FC = () => {
         </Typography>
 
         <Grid container spacing={3}>
-          {/* Notificações */}
           <Grid item xs={12} md={6}>
             <Card>
               <CardContent>
@@ -140,7 +139,7 @@ const Configuracoes: React.FC = () => {
                     placement="right"
                   >
                     <Select
-                      value={configuracoesVisuais.tema}
+                      value={tema}
                       onChange={(e) =>
                         handleTemaChange(
                           e.target.value as "light" | "dark" | "system"
@@ -182,10 +181,8 @@ const Configuracoes: React.FC = () => {
                     placement="right"
                   >
                     <Select
-                      value={configuracoes.posicaoPreferida}
-                      onChange={(e) =>
-                        handleChange("posicaoPreferida", e.target.value)
-                      }
+                      value={configuracoes.posicao}
+                      onChange={(e) => handleChange("posicao", e.target.value)}
                     >
                       {posicoes.map((posicao) => (
                         <MenuItem key={posicao.value} value={posicao.value}>

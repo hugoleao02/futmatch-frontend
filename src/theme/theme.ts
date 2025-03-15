@@ -21,7 +21,7 @@ const colors = {
 };
 
 // Criando tema base
-const baseTheme = createTheme({
+export const baseTheme = createTheme({
   breakpoints: {
     values: {
       xs: 0,

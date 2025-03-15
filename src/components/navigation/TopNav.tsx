@@ -1,5 +1,7 @@
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
 import SettingsIcon from "@mui/icons-material/Settings";
 import {
@@ -7,6 +9,11 @@ import {
   Badge,
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   InputBase,
   ListItemIcon,
@@ -16,66 +23,28 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import {
-  subscribeToPhotoUpdates,
-  useProfilePhoto,
-} from "../../hooks/useProfilePhoto";
+import { useTopNavLogic } from "./hooks/useTopNavLogic";
 
 const TopNav: React.FC = () => {
   const theme = useTheme();
-  const { user, logout } = useAuth();
   const {
+    user,
     photoUrl,
     tempPhotoUrl,
-    isLoading: isLoadingPhoto,
-    updatePhoto,
-    forceUpdate,
-  } = useProfilePhoto();
-  const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    if (user) {
-      updatePhoto();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    // Inscreve-se para atualizações de foto
-    const unsubscribe = subscribeToPhotoUpdates(() => {
-      forceUpdate();
-    });
-
-    // Limpa a inscrição quando o componente é desmontado
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    logout();
-    handleClose();
-    navigate("/login");
-  };
-
-  const handleProfile = () => {
-    handleClose();
-    navigate("/perfil");
-  };
+    isLoadingPhoto,
+    searchFocused,
+    setSearchFocused,
+    anchorEl,
+    openLogoutDialog,
+    t,
+    handleMenu,
+    handleClose,
+    handleProfile,
+    handleLogout,
+    confirmLogout,
+    navigate,
+    setOpenLogoutDialog,
+  } = useTopNavLogic();
 
   return (
     <Box
@@ -87,7 +56,6 @@ const TopNav: React.FC = () => {
         position: "relative",
       }}
     >
-      {/* Barra de Pesquisa */}
       <Box
         sx={{
           display: "flex",
@@ -127,7 +95,6 @@ const TopNav: React.FC = () => {
         />
       </Box>
 
-      {/* Botão Criar Partida */}
       <Button
         variant="contained"
         color="primary"
@@ -148,8 +115,6 @@ const TopNav: React.FC = () => {
       >
         {t("common.createRoom")}
       </Button>
-
-      {/* Notificações */}
       {user && (
         <Tooltip title="Notificações">
           <IconButton
@@ -169,20 +134,10 @@ const TopNav: React.FC = () => {
         </Tooltip>
       )}
 
-      {/* Avatar e Menu do Usuário */}
       {user && (
         <>
-          <Tooltip title="Menu do Usuário">
-            <IconButton
-              onClick={handleMenu}
-              sx={{
-                p: 0,
-                "&:hover": {
-                  transform: "scale(1.05)",
-                  transition: "transform 0.2s",
-                },
-              }}
-            >
+          <Tooltip title={t("common.userMenue")}>
+            <IconButton onClick={handleMenu} sx={{ p: 0 }}>
               <Avatar
                 src={tempPhotoUrl || photoUrl}
                 sx={{
@@ -203,22 +158,15 @@ const TopNav: React.FC = () => {
           </Tooltip>
 
           <Menu
-            id="menu-appbar"
             anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
             <MenuItem onClick={handleProfile}>
-              <Typography>Meu Perfil</Typography>
+              <ListItemIcon>
+                <PersonIcon fontSize="small" />
+              </ListItemIcon>
+              {t("common.userMenu")}
             </MenuItem>
             <MenuItem onClick={() => navigate("/configuracoes")}>
               <ListItemIcon>
@@ -227,11 +175,32 @@ const TopNav: React.FC = () => {
               {t("common.settings")}
             </MenuItem>
             <MenuItem onClick={handleLogout}>
-              <Typography>Sair</Typography>
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              <Typography>{t("auth.logout.title")}</Typography>
             </MenuItem>
           </Menu>
         </>
       )}
+
+      <Dialog
+        open={openLogoutDialog}
+        onClose={() => setOpenLogoutDialog(false)}
+      >
+        <DialogTitle>{t("auth.logout.title")}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t("auth.logout.confirm")}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenLogoutDialog(false)} color="primary">
+            {t("common.cancel")}
+          </Button>
+          <Button onClick={confirmLogout} color="error" autoFocus>
+            {t("auth.logout.confirmButton")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

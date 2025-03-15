@@ -58,13 +58,13 @@ export const getUserFromToken = (): Jogador | null => {
 
     const payload = JSON.parse(jsonPayload);
 
-    const userId = payload.id || payload.userId || payload.sub || payload.uuid;
+    const userId = payload.uuid;
     if (!userId) {
       return null;
     }
 
     return {
-      id: Number(userId) || userId,
+      uuid: userId,
       nome: payload.nome || payload.name || "Usuário",
       email: payload.email || payload.sub || "",
       posicao: payload.posicao || "ATACANTE",

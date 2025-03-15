@@ -1,6 +1,5 @@
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import { LoginDTO } from "../@types/auth/LoginDTO";
 import { RegisterDTO } from "../@types/auth/RegisterDTO";
 import { RegisterResponse } from "../@types/auth/RegisterResponse";
@@ -9,63 +8,75 @@ import { Toast } from "../components/Toast/Toast";
 import { useToast } from "../hooks/useToast";
 import { AuthService } from "../infrastructure/services/AuthService";
 import { getToken } from "../infrastructure/services/TokenService";
-
 interface AuthContextData {
   user: Jogador | null;
   loading: boolean;
-  login: (loginDTO: LoginDTO) => Promise<Jogador>;
+  login: (loginDTO: LoginDTO) => Promise<void>;
   register: (registerDTO: RegisterDTO) => Promise<RegisterResponse>;
   logout: () => void;
-  loadUserProfile: () => Promise<void>;
+  refreshUserProfile: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextData>(
   {} as AuthContextData
 );
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<Jogador | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { toast, showToast, hideToast } = useToast();
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
-  const loadUserProfile = useCallback(async () => {
+  const loadUser = async () => {
+    const token = getToken();
+    if (token) {
+      try {
+        const userProfile = await AuthService.fetchUserProfile();
+        setUser(userProfile);
+      } catch (error) {
+        console.error("Erro ao carregar perfil:", error);
+      }
+    }
+  };
+
+  const refreshUserProfile = async () => {
     try {
-      const token = getToken();
-      if (!token) {
-        setUser(null);
+      const updatedUser = await AuthService.fetchUserProfile();
+      if (!updatedUser) {
+        showToast("Não foi possível atualizar o perfil", "error");
         return;
       }
-
-      const userProfile = await AuthService.fetchUserProfile();
-      if (userProfile) {
-        setUser(userProfile);
-      } else {
-        setUser(null);
-      }
+      setUser(updatedUser);
     } catch (error) {
-      setUser(null);
-    } finally {
-      setLoading(false);
+      showToast("Erro ao atualizar perfil", "error");
     }
-  }, []);
+  };
 
   useEffect(() => {
-    loadUserProfile();
-  }, [loadUserProfile]);
+    loadUser();
+  }, []);
 
-  const login = async (loginDTO: LoginDTO): Promise<Jogador> => {
+  const login = async (loginDTO: LoginDTO) => {
     try {
-      navigate("/");
-      const user = await AuthService.login(loginDTO);
-      if (!user) {
-        throw new Error("Falha no login");
+      setLoading(true);
+      const response = await AuthService.login(loginDTO);
+      setUser(response);
+
+      if (response && Object.keys(response).length === 0) {
+        showToast("Login realizado com sucesso, carregando perfil...", "info");
+        refreshUserProfile();
       }
-      setUser(user);
-      return user;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast(t("auth.errors.invalidCredentials"), "error");
+      }
+      throw error; // Propaga o erro para o componente de login
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,6 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     registerDTO: RegisterDTO
   ): Promise<RegisterResponse> => {
     try {
+      setLoading(true);
       const response = await AuthService.register(registerDTO);
 
       if (!response.success) {
@@ -93,26 +105,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         success: false,
         message: errorMessage,
       };
+    } finally {
+      setLoading(false);
     }
   };
 
-  const logout = useCallback(() => {
+  const logout = () => {
     AuthService.logout();
     setUser(null);
-    navigate("/login");
-  }, [navigate]);
-
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    loadUserProfile,
+    showToast("Logout realizado com sucesso", "info");
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        refreshUserProfile,
+      }}
+    >
       {children}
       <Toast
         open={toast.open}

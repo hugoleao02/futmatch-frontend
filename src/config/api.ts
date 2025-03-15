@@ -12,5 +12,6 @@ export const API_CONFIG = {
   },
   ENDPOINTS: {
     SALAS: "/salas",
+    CONFIGURACOES: "/configuracoes",
   },
 };

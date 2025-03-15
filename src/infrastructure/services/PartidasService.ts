@@ -1,4 +1,4 @@
-import { Partida } from "../../features/partidas/services/partidasService";
+import { Partida } from "../../@types/partida/Partida";
 import { api } from "../api";
 
 export class PartidasService {

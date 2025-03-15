@@ -93,7 +93,6 @@ const Perfil: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Grid container spacing={3}>
-        {/* Perfil Principal */}
         <Grid item xs={12} md={4}>
           <Paper
             elevation={3}
