@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: futmatch-frontend
+    env: docker
+    region: oregon
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 10000
+    buildCommand: docker build -t futmatch-frontend .
+    startCommand: docker run -p $PORT:$PORT futmatch-frontend
