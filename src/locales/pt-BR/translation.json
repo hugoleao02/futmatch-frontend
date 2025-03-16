@@ -1,0 +1,60 @@
+{
+  "settings": {
+    "title": "Configurações da Conta",
+    "saveButton": "Salvar Alterações",
+    "notifications": {
+      "title": "Notificações",
+      "receiveNotifications": "Ativar notificações",
+      "receiveNotificationsDescription": "Receba avisos sobre novas partidas, convites de amigos e atualizações do sistema",
+      "emailNotifications": "E-mail",
+      "emailNotificationsDescription": "Receba as notificações principais no seu e-mail",
+      "pushNotifications": "Push",
+      "pushNotificationsDescription": "Receba notificações instantâneas direto no seu navegador"
+    },
+    "appearance": {
+      "title": "Visual",
+      "theme": "Modo de Cor",
+      "themeDescription": "Escolha entre modo claro, escuro ou siga o padrão do sistema",
+      "light": "Modo Claro",
+      "dark": "Modo Escuro",
+      "system": "Padrão do Sistema"
+    },
+    "preferences": {
+      "title": "Preferências de Jogo",
+      "preferredPosition": "Sua Posição",
+      "preferredPositionDescription": "Escolha sua posição principal para que outros jogadores saibam onde você joga melhor"
+    },
+    "privacy": {
+      "title": "Privacidade",
+      "publicProfile": "Perfil Público",
+      "publicProfileDescription": "Outros jogadores poderão ver seu perfil e suas informações públicas",
+      "showStatistics": "Estatísticas",
+      "showStatisticsDescription": "Mostre seus números de gols, assistências e partidas jogadas",
+      "showMatchHistory": "Histórico",
+      "showMatchHistoryDescription": "Mostre as partidas que você já jogou e seus resultados"
+    },
+    "contact": {
+      "title": "Contatos",
+      "phone": "Celular",
+      "phoneDescription": "Seu número para contato com outros jogadores",
+      "showPhone": "Mostrar Celular",
+      "showPhoneDescription": "Seu número ficará visível para outros jogadores",
+      "whatsapp": "WhatsApp",
+      "whatsappDescription": "Use o mesmo número para contato via WhatsApp",
+      "telegram": "Telegram",
+      "telegramDescription": "Use o mesmo número para contato via Telegram"
+    }
+  },
+  "auth": {
+    "register": {
+      "positions": {
+        "goleiro": "Goleiro",
+        "zagueiro": "Zagueiro",
+        "lateral": "Lateral",
+        "volante": "Volante",
+        "meia": "Meia",
+        "atacante": "Atacante"
+      }
+    }
+  }
+}

@@ -132,7 +132,7 @@ const Register: React.FC = () => {
                         required
                         fullWidth
                         name="senha"
-                        label={`${t("auth.register.password")} *`}
+                        label={t("auth.register.password")}
                         type={showPassword ? "text" : "password"}
                         id="senha"
                         autoComplete="new-password"
@@ -152,9 +152,9 @@ const Register: React.FC = () => {
                                 edge="end"
                               >
                                 {showPassword ? (
-                                  <VisibilityOffOutlinedIcon />
-                                ) : (
                                   <VisibilityOutlinedIcon />
+                                ) : (
+                                  <VisibilityOffOutlinedIcon />
                                 )}
                               </IconButton>
                             </InputAdornment>
@@ -170,7 +170,7 @@ const Register: React.FC = () => {
                         required
                         fullWidth
                         name="confirmSenha"
-                        label={`${t("auth.register.confirmPassword")} *`}
+                        label={t("auth.register.confirmPassword")}
                         type={showConfirmPassword ? "text" : "password"}
                         id="confirmSenha"
                         autoComplete="new-password"
@@ -187,14 +187,14 @@ const Register: React.FC = () => {
                           endAdornment: (
                             <InputAdornment position="end">
                               <IconButton
-                                aria-label="toggle confirm password visibility"
+                                aria-label="toggle password visibility"
                                 onClick={handleToggleConfirmPasswordVisibility}
                                 edge="end"
                               >
                                 {showConfirmPassword ? (
-                                  <VisibilityOffOutlinedIcon />
-                                ) : (
                                   <VisibilityOutlinedIcon />
+                                ) : (
+                                  <VisibilityOffOutlinedIcon />
                                 )}
                               </IconButton>
                             </InputAdornment>
@@ -225,7 +225,9 @@ const Register: React.FC = () => {
                       >
                         {posicoes.map((posicao) => (
                           <MenuItem key={posicao.value} value={posicao.value}>
-                            {posicao.label}
+                            {t(
+                              `auth.register.positions.${posicao.value.toLowerCase()}`
+                            )}
                           </MenuItem>
                         ))}
                       </Field>

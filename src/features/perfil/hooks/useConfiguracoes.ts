@@ -2,40 +2,103 @@ import { useState } from "react";
 import { ConfiguracoesForm } from "../../../@types";
 import { useThemeContext } from "../../../contexts/ThemeContext";
 import { useToast } from "../../../hooks/useToast";
-import { atualizarConfiguracoes } from "../../../infrastructure/services";
+
+type SectionHandlers = {
+  [K in keyof ConfiguracoesForm]?: () => Promise<void>;
+};
 
 export const useConfiguracoes = () => {
   const { showToast } = useToast();
   const { mode: tema, setMode: setTema } = useThemeContext();
   const [loading, setLoading] = useState(false);
+  const [temaTemporal, setTemaTemporal] = useState<"light" | "dark" | "system">(
+    tema
+  );
   const [configuracoes, setConfiguracoes] = useState<ConfiguracoesForm>({
-    receberNotificacoes: true,
-    notificacoesEmail: true,
-    notificacoesPush: true,
-    perfilPublico: true,
-    mostrarEstatisticas: true,
-    mostrarHistoricoPartidas: true,
-    posicao: "ATACANTE",
+    privacidade: {
+      perfilPublico: true,
+      mostrarEstatisticas: true,
+      mostrarHistoricoPartidas: true,
+    },
+    notificacoes: {
+      receberNotificacoes: true,
+      notificacoesEmail: true,
+      notificacoesPush: true,
+    },
+    preferencias: {
+      posicao: "ATACANTE",
+    },
+    contato: {
+      telefone: "",
+      whatsapp: false,
+      telegram: false,
+      mostrarTelefone: false,
+    },
+    aparencia: {
+      tema: tema,
+    },
   });
 
-  const handleChange = (field: keyof ConfiguracoesForm, value: any) => {
-    setConfiguracoes((prev) => ({
+  const sectionHandlers: SectionHandlers = {
+    aparencia: async () => {
+      setTema(temaTemporal);
+    },
+    notificacoes: async () => {},
+    privacidade: async () => {
+      // Lógica específica para privacidade
+    },
+    preferencias: async () => {
+      // Lógica específica para preferências
+    },
+    contato: async () => {
+      // Lógica específica para contato
+    },
+  };
+
+  const handleChange = (
+    section: keyof ConfiguracoesForm,
+    field: string,
+    value: any
+  ) => {
+    setConfiguracoes((prev: ConfiguracoesForm) => ({
       ...prev,
-      [field]: value,
+      [section]: {
+        ...prev[section],
+        [field]: value,
+      },
     }));
   };
 
   const handleTemaChange = (value: "light" | "dark" | "system") => {
-    setTema(value);
+    setTemaTemporal(value);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (section?: keyof ConfiguracoesForm) => {
     try {
       setLoading(true);
-      await atualizarConfiguracoes(configuracoes);
-      showToast("Configurações salvas com sucesso", "success");
+
+      if (section) {
+        const sectionHandler = sectionHandlers[section];
+        if (sectionHandler) {
+          await sectionHandler();
+        }
+      } else {
+        // await ConfiguracoesService.salvarTudo(configuracoes);
+      }
+
+      showToast(
+        section
+          ? `${
+              section.charAt(0).toUpperCase() + section.slice(1)
+            } salva com sucesso`
+          : "Configurações salvas com sucesso",
+        "success"
+      );
     } catch (error) {
-      showToast("Erro ao salvar configurações", "error");
+      showToast(
+        section ? `Erro ao salvar ${section}` : "Erro ao salvar configurações",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -44,7 +107,7 @@ export const useConfiguracoes = () => {
   return {
     loading,
     configuracoes,
-    tema,
+    tema: temaTemporal,
     handleChange,
     handleTemaChange,
     handleSave,

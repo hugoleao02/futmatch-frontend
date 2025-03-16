@@ -1,5 +1,6 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { LoginDTO } from "../@types/auth/LoginDTO";
 import { RegisterDTO } from "../@types/auth/RegisterDTO";
 import { RegisterResponse } from "../@types/auth/RegisterResponse";
@@ -8,6 +9,7 @@ import { Toast } from "../components/Toast/Toast";
 import { useToast } from "../hooks/useToast";
 import { AuthService } from "../infrastructure/services/AuthService";
 import { getToken } from "../infrastructure/services/TokenService";
+
 interface AuthContextData {
   user: Jogador | null;
   loading: boolean;
@@ -15,6 +17,8 @@ interface AuthContextData {
   register: (registerDTO: RegisterDTO) => Promise<RegisterResponse>;
   logout: () => void;
   refreshUserProfile: () => Promise<void>;
+  isAuthenticated: boolean;
+  initialLoadComplete: boolean;
 }
 
 export const AuthContext = createContext<AuthContextData>(
@@ -25,19 +29,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<Jogador | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const { toast, showToast, hideToast } = useToast();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const loadUser = async () => {
-    const token = getToken();
-    if (token) {
-      try {
-        const userProfile = await AuthService.fetchUserProfile();
-        setUser(userProfile);
-      } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
+    try {
+      const token = getToken();
+      if (!token) {
+        setUser(null);
+        return;
       }
+
+      const userProfile = await AuthService.fetchUserProfile();
+      if (userProfile) {
+        setUser(userProfile);
+      } else {
+        setUser(null);
+        localStorage.removeItem("auth_token");
+      }
+    } catch (error) {
+      console.error("Erro ao carregar perfil:", error);
+      setUser(null);
+      localStorage.removeItem("auth_token");
+    } finally {
+      setLoading(false);
+      setInitialLoadComplete(true);
     }
   };
 
@@ -55,8 +74,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
-    loadUser();
-  }, []);
+    const token = getToken();
+    const currentPath = window.location.pathname;
+    const publicRoutes = ["/login", "/register", "/recuperar-senha"];
+
+    if (!token && !publicRoutes.includes(currentPath)) {
+      navigate("/login");
+    } else {
+      loadUser();
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (initialLoadComplete && !user && !loading) {
+      const currentPath = window.location.pathname;
+      const publicRoutes = ["/login", "/register", "/recuperar-senha"];
+
+      if (!publicRoutes.includes(currentPath)) {
+        navigate("/login");
+      }
+    }
+  }, [initialLoadComplete, user, loading, navigate]);
 
   const login = async (loginDTO: LoginDTO) => {
     try {
@@ -74,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         showToast(t("auth.errors.invalidCredentials"), "error");
       }
-      throw error; // Propaga o erro para o componente de login
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -113,7 +151,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = () => {
     AuthService.logout();
     setUser(null);
+    localStorage.removeItem("auth_token");
     showToast("Logout realizado com sucesso", "info");
+    navigate("/login");
   };
 
   return (
@@ -125,6 +165,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         register,
         logout,
         refreshUserProfile,
+        isAuthenticated: !!user,
+        initialLoadComplete,
       }}
     >
       {children}
@@ -136,4 +178,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       />
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };

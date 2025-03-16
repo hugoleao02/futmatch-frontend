@@ -275,6 +275,7 @@ const Perfil: React.FC = () => {
                       textAlign: "center",
                       bgcolor: "background.default",
                       borderRadius: 2,
+                      marginLeft: 2,
                     }}
                   >
                     <SportsSoccerIcon
@@ -319,6 +320,7 @@ const Perfil: React.FC = () => {
                       textAlign: "center",
                       bgcolor: "background.default",
                       borderRadius: 2,
+                      marginRight: 2,
                     }}
                   >
                     <StarIcon
@@ -341,6 +343,7 @@ const Perfil: React.FC = () => {
                       textAlign: "center",
                       bgcolor: "background.default",
                       borderRadius: 2,
+                      marginLeft: 2,
                     }}
                   >
                     <WhatshotIcon
