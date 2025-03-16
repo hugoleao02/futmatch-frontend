@@ -314,6 +314,16 @@ export default {
       showMatchHistoryDescription:
         "Permite que outros jogadores vejam seu histórico de partidas jogadas",
     },
+    contact: {
+      title: "Contato",
+      phone: "Telefone",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+      phoneDescription:
+        "Seu número de telefone para contato com outros jogadores",
+      showPhone: "Mostrar Telefone",
+      showPhoneDescription: "Seu número ficará visível para outros jogadores",
+    },
     saveButton: "Salvar Configurações",
   },
 };
