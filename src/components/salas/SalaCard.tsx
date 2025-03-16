@@ -17,7 +17,7 @@ import { Sala } from "../../@types/sala";
 
 interface SalaCardProps {
   sala: Sala;
-  onVerDetalhes: (salaId: string | number) => void;
+  onVerDetalhes: (salaId: number) => void;
 }
 
 const SalaCard: React.FC<SalaCardProps> = ({ sala, onVerDetalhes }) => {
@@ -105,11 +105,13 @@ const SalaCard: React.FC<SalaCardProps> = ({ sala, onVerDetalhes }) => {
           size="small"
           variant="contained"
           fullWidth
-          onClick={() =>
-            onVerDetalhes(
-              typeof sala.id === "string" ? parseInt(sala.id, 10) : sala.id
-            )
-          }
+          onClick={() => {
+            const salaId =
+              typeof sala.id === "string" ? parseInt(sala.id, 10) : sala.id;
+            if (!isNaN(salaId)) {
+              onVerDetalhes(salaId);
+            }
+          }}
         >
           {t("Ver Detalhes")}
         </Button>
