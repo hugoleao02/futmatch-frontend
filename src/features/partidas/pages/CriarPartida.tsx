@@ -32,7 +32,7 @@ import { ptBR } from "date-fns/locale";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import { CriarPartidaDTO } from "../../../@types";
 const steps = ["Informações Básicas", "Local e Horário", "Configurações"];
@@ -66,6 +66,7 @@ const initialFormData: FormData = {
 };
 
 const CriarPartida: React.FC = () => {
+  const { salaId } = useParams<{ salaId: string }>();
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -138,11 +139,12 @@ const CriarPartida: React.FC = () => {
           maxJogadores: values.maxPlayers,
           nivelHabilidade: values.skillLevel,
           observacoes: values.description,
+          salaId: Number(salaId),
         };
 
         setSuccess(true);
         setTimeout(() => {
-          navigate("/dashboard/partidas");
+          navigate(`/dashboard/salas/${salaId}`);
         }, 2000);
       } catch (err) {
         setError("Erro ao criar partida");
