@@ -4,11 +4,10 @@ import { HttpClient } from "../api/HttpClient";
 import { getUserFromToken, removeToken, saveToken } from "./TokenService";
 
 const formatUserResponse = (user: any): Jogador | null => {
-  if (!user || !user.email) {
-    return null;
-  }
+  if (!user) return null;
 
   return {
+    id: user.id,
     uuid: user.uuid,
     nome: user.nome,
     email: user.email,
@@ -16,23 +15,23 @@ const formatUserResponse = (user: any): Jogador | null => {
     fotoPerfilUrl: user.fotoPerfilUrl,
     citacao: user.citacao,
     estiloJogo: user.estiloJogo,
-    ranking: user.ranking || 0,
-    rankingLocal: user.rankingLocal || 0,
-    melhorNota: user.melhorNota || 0,
-    sequenciaVitorias: user.sequenciaVitorias || 0,
-    maiorSequenciaVitorias: user.maiorSequenciaVitorias || 0,
+    ranking: user.ranking,
+    rankingLocal: user.rankingLocal,
+    melhorNota: user.melhorNota,
+    sequenciaVitorias: user.sequenciaVitorias,
+    maiorSequenciaVitorias: user.maiorSequenciaVitorias,
     avatarPersonalizadoUrl: user.avatarPersonalizadoUrl,
     temaPerfilUrl: user.temaPerfilUrl,
     badgePersonalizado: user.badgePersonalizado,
     tituloDestaque: user.tituloDestaque,
-    rankingAmigos: user.rankingAmigos || 0,
+    rankingAmigos: user.rankingAmigos,
     identificador: user.identificador,
     nomeCompleto: user.nomeCompleto,
     telefone: user.telefone,
     nivelCompetitividade: user.nivelCompetitividade,
     tipoJogador: user.tipoJogador,
     notaMedia: user.notaMedia,
-    totalPartidas: user.totalPartidas || 0,
+    totalPartidas: user.totalPartidas,
     partidasGanhas: user.partidasGanhas,
     partidasPerdidas: user.partidasPerdidas,
     partidasEmpatadas: user.partidasEmpatadas,

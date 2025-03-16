@@ -502,7 +502,8 @@ const DetalhesSala: React.FC = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body1" gutterBottom>
-                      {t("Criado por")}: {sala.criadoPor}
+                      {t("Criado por")}:{" "}
+                      {sala.criadoPor?.nome || t("Desconhecido")}
                     </Typography>
                     <Typography variant="body1">
                       {t("Data de Criação")}:{" "}
@@ -631,7 +632,7 @@ const DetalhesSala: React.FC = () => {
                       key={jogador.id}
                       secondaryAction={
                         (isUserOwner() || isUserModerator()) &&
-                        jogador.id.toString() !== sala.criadoPor ? (
+                        jogador.id !== sala.criadoPor?.id ? (
                           <IconButton
                             edge="end"
                             aria-label="remove"
@@ -649,7 +650,7 @@ const DetalhesSala: React.FC = () => {
                         primary={
                           <Box sx={{ display: "flex", alignItems: "center" }}>
                             {jogador.apelido}
-                            {jogador.id.toString() === sala.criadoPor && (
+                            {jogador.id === sala.criadoPor?.id && (
                               <Chip
                                 size="small"
                                 icon={<StarIcon />}
@@ -659,7 +660,8 @@ const DetalhesSala: React.FC = () => {
                               />
                             )}
                             {sala.moderadores?.some(
-                              (m) => m.id === jogador.id
+                              (moderador: Jogador) =>
+                                moderador.id === jogador.id
                             ) && (
                               <Chip
                                 size="small"

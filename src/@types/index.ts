@@ -13,12 +13,6 @@ export * from "./forms/FormularioLogin";
 export * from "./jogador/Estatisticas";
 export * from "./jogador/Jogador";
 
-// Partida
-export * from "./partida/CriarPartidaDTO";
-export * from "./partida/FiltroPartidaDTO";
-export * from "./partida/Partida";
-export * from "./partida/PartidaDestaque";
-
 // Sala
 export * from "./sala/CriarSalaDTO";
 export * from "./sala/Mensagem";
@@ -35,3 +29,9 @@ export * from "./api/ApiError";
 
 // Configuracoes
 export * from "./configuracoes/ConfiguracoesForm";
+
+// Partida
+export * from "./partida/CriarPartidaDTO";
+export * from "./partida/FiltroPartidaDTO";
+export * from "./partida/Partida";
+export * from "./partida/PartidaDestaque";

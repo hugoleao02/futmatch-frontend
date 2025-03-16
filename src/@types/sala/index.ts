@@ -25,3 +25,7 @@ export interface FiltroSalaDTO {
   nivelMaximo?: number;
   minimoFairPlay?: number;
 }
+
+export * from "./CriarSalaDTO";
+export * from "./Mensagem";
+export * from "./Sala";

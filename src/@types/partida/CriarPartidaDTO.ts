@@ -2,9 +2,9 @@ export interface CriarPartidaDTO {
   titulo: string;
   data: string;
   local: string;
+  nivelHabilidade: string;
   maxJogadores: number;
-  nivelHabilidade?: string;
-  observacoes?: string;
+  salaId: number;
 }
 
 export interface AtualizarPlacarDTO {
