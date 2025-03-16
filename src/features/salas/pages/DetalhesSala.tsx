@@ -38,6 +38,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { EnviarMensagemDTO, Mensagem, Sala } from "../../../@types";
+import { Jogador } from "../../../@types/jogador/Jogador";
 import { SalasService } from "../../../infrastructure/services";
 
 interface TabPanelProps {
@@ -644,12 +645,14 @@ const DetalhesSala: React.FC = () => {
                       }
                     >
                       <ListItemAvatar>
-                        <Avatar>{jogador.apelido.charAt(0)}</Avatar>
+                        <Avatar>
+                          {jogador.apelido?.charAt(0) || jogador.nome.charAt(0)}
+                        </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={
                           <Box sx={{ display: "flex", alignItems: "center" }}>
-                            {jogador.apelido}
+                            {jogador.apelido || jogador.nome}
                             {jogador.id === sala.criadoPor?.id && (
                               <Chip
                                 size="small"
@@ -678,8 +681,8 @@ const DetalhesSala: React.FC = () => {
                               {jogador.posicao
                                 ? t(jogador.posicao)
                                 : t("Sem posição")}{" "}
-                              •{t("Nível")}: {jogador.nivelHabilidade} •
-                              {t("Fair Play")}: {jogador.pontuacaoFairPlay}
+                              •{t("Nível")}: {jogador.nivelHabilidade || 0} •
+                              {t("Fair Play")}: {jogador.pontuacaoFairPlay || 0}
                             </Typography>
                           </Box>
                         }

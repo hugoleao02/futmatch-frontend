@@ -5,6 +5,7 @@ export interface CriarPartidaDTO {
   nivelHabilidade: string;
   maxJogadores: number;
   salaId: number;
+  observacoes?: string;
 }
 
 export interface AtualizarPlacarDTO {

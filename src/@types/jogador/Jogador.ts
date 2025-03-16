@@ -5,6 +5,9 @@ export interface Jogador {
   id: string | number;
   uuid?: string;
   nome: string;
+  apelido?: string;
+  email: string;
+  posicao: PosicaoType;
   fotoPerfilUrl?: string;
   citacao?: string;
   estiloJogo?: string;
@@ -21,14 +24,14 @@ export interface Jogador {
   estatisticas?: Estatisticas;
   identificador?: string | null;
   nomeCompleto?: string | null;
-  email: string;
   telefone?: string | null;
   nivelCompetitividade?: string | null;
-  posicao: PosicaoType;
   tipoJogador?: string | null;
   notaMedia?: number | null;
   totalPartidas?: number;
   partidasGanhas?: number | null;
   partidasPerdidas?: number | null;
   partidasEmpatadas?: number | null;
+  nivelHabilidade?: number;
+  pontuacaoFairPlay?: number;
 }
