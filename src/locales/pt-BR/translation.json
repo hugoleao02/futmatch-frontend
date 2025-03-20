@@ -5,49 +5,112 @@
     "notifications": {
       "title": "Notificações",
       "receiveNotifications": "Ativar notificações",
-      "receiveNotificationsDescription": "Receba avisos sobre novas partidas, convites de amigos e atualizações do sistema",
+      "receiveNotificationsDescription": "Receba alertas sobre novas partidas, convites de amigos e atualizações do sistema",
       "emailNotifications": "E-mail",
       "emailNotificationsDescription": "Receba as notificações principais no seu e-mail",
-      "pushNotifications": "Push",
-      "pushNotificationsDescription": "Receba notificações instantâneas direto no seu navegador"
+      "pushNotifications": "Notificações Push",
+      "pushNotificationsDescription": "Receba notificações instantâneas diretamente no seu navegador"
     },
     "appearance": {
-      "title": "Visual",
-      "theme": "Modo de Cor",
-      "themeDescription": "Escolha entre modo claro, escuro ou siga o padrão do sistema",
-      "light": "Modo Claro",
-      "dark": "Modo Escuro",
+      "title": "Aparência",
+      "theme": "Tema",
+      "themeDescription": "Escolha entre tema claro, escuro ou siga o padrão do sistema",
+      "light": "Tema Claro",
+      "dark": "Tema Escuro",
       "system": "Padrão do Sistema"
     },
     "preferences": {
       "title": "Preferências de Jogo",
-      "preferredPosition": "Sua Posição",
-      "preferredPositionDescription": "Escolha sua posição principal para que outros jogadores saibam onde você joga melhor"
+      "preferredPosition": "Posição em Campo",
+      "preferredPositionDescription": "Escolha sua posição principal para que outros jogadores saibam onde você joga melhor",
+      "competitiveLevel": "Nível Competitivo",
+      "competitiveLevelDescription": "Escolha seu nível de competitividade",
+      "playStyle": "Estilo de Jogo",
+      "playStyleDescription": "Escolha seu estilo de jogo preferido",
+      "levels": {
+        "casual": "Casual",
+        "intermediate": "Intermediário",
+        "competitive": "Competitivo",
+        "professional": "Profissional"
+      },
+      "styles": {
+        "offensive": "Ofensivo",
+        "defensive": "Defensivo",
+        "balanced": "Equilibrado",
+        "tactical": "Tático",
+        "aggressive": "Agressivo",
+        "technical": "Técnico"
+      }
     },
     "privacy": {
       "title": "Privacidade",
       "publicProfile": "Perfil Público",
-      "publicProfileDescription": "Outros jogadores poderão ver seu perfil e suas informações públicas",
+      "publicProfileDescription": "Permitir que outros jogadores vejam seu perfil e informações públicas",
       "showStatistics": "Estatísticas",
-      "showStatisticsDescription": "Mostre seus números de gols, assistências e partidas jogadas",
+      "showStatisticsDescription": "Exibir suas estatísticas de gols, assistências e partidas jogadas",
       "showMatchHistory": "Histórico",
-      "showMatchHistoryDescription": "Mostre as partidas que você já jogou e seus resultados"
+      "showMatchHistoryDescription": "Exibir seu histórico de partidas e resultados"
     },
     "contact": {
       "title": "Contatos",
+      "name": "Nome",
+      "nameDescription": "Seu nome completo para identificação",
+      "email": "E-mail",
+      "emailDescription": "Seu e-mail principal para contato",
       "phone": "Celular",
-      "phoneDescription": "Seu número para contato com outros jogadores",
-      "showPhone": "Mostrar Celular",
+      "phoneDescription": "Seu número para contato",
+      "showPhone": "Exibir número de celular",
       "showPhoneDescription": "Seu número ficará visível para outros jogadores",
+      "useWhatsApp": "Usar este número no WhatsApp",
       "whatsapp": "WhatsApp",
-      "whatsappDescription": "Use o mesmo número para contato via WhatsApp",
+      "whatsappDescription": "Usar o mesmo número para contato via WhatsApp",
       "telegram": "Telegram",
-      "telegramDescription": "Use o mesmo número para contato via Telegram"
+      "telegramDescription": "Permitir contato via Telegram",
+      "telegramNumber": "Usuário do Telegram",
+      "telegramNumberDescription": "Seu nome de usuário no Telegram (opcional)"
+    }
+  },
+  "navigation": {
+    "home": "Início",
+    "games": "Partidas",
+    "rooms": "Salas",
+    "createRoom": "Criar Sala",
+    "ranking": "Ranking",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "search": "Buscar",
+    "notifications": "Notificações",
+    "menu": "Menu"
+  },
+  "sidebar": {
+    "version": "FutMatch v{{version}}",
+    "userProfile": {
+      "title": "Perfil do Usuário",
+      "email": "E-mail"
     }
   },
   "auth": {
+    "login": {
+      "title": "Entrar",
+      "email": "E-mail",
+      "password": "Senha",
+      "forgotPassword": "Esqueceu sua senha?",
+      "loginButton": "Entrar",
+      "registerLink": "Não tem uma conta? Cadastre-se",
+      "rememberMe": "Lembrar-me"
+    },
     "register": {
+      "title": "Criar Conta",
+      "name": "Nome completo",
+      "email": "E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "phone": "Celular",
+      "birthDate": "Data de nascimento",
+      "registerButton": "Cadastrar",
+      "loginLink": "Já tem uma conta? Entre aqui",
       "positions": {
+        "title": "Posição em campo",
         "goleiro": "Goleiro",
         "zagueiro": "Zagueiro",
         "lateral": "Lateral",
@@ -55,6 +118,89 @@
         "meia": "Meia",
         "atacante": "Atacante"
       }
+    },
+    "logout": {
+      "title": "Sair da Conta",
+      "confirm": "Tem certeza que deseja sair?",
+      "confirmWithName": "{{name}}, tem certeza que deseja sair?",
+      "confirmButton": "Sair"
+    },
+    "validation": {
+      "required": "Campo obrigatório",
+      "email": "E-mail inválido",
+      "minPassword": "A senha deve ter pelo menos {{min}} caracteres",
+      "passwordMatch": "As senhas não conferem",
+      "phone": "Número de celular inválido",
+      "birthDate": "Data de nascimento inválida",
+      "minAge": "Você deve ter pelo menos {{min}} anos"
+    }
+  },
+  "match": {
+    "create": {
+      "title": "Criar Partida",
+      "matchTitle": "Título da partida",
+      "location": "Local",
+      "dateTime": "Data e hora",
+      "maxPlayers": "Número máximo de jogadores",
+      "skillLevel": "Nível de habilidade",
+      "description": "Descrição",
+      "createButton": "Criar Partida"
+    },
+    "edit": {
+      "title": "Editar Partida",
+      "saveButton": "Salvar Alterações"
+    },
+    "validation": {
+      "required": "Campo obrigatório",
+      "minTitle": "O título deve ter pelo menos {{min}} caracteres",
+      "minPlayers": "Mínimo de {{min}} jogadores",
+      "maxPlayers": "Máximo de {{max}} jogadores"
+    },
+    "skillLevels": {
+      "beginner": "Iniciante",
+      "intermediate": "Intermediário",
+      "advanced": "Avançado",
+      "professional": "Profissional"
+    }
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "loading": "Carregando...",
+    "error": {
+      "generic": "Ocorreu um erro. Tente novamente.",
+      "network": "Erro de conexão. Verifique sua internet.",
+      "notFound": "Não encontrado",
+      "unauthorized": "Acesso não autorizado",
+      "validation": "Por favor, verifique os campos"
+    },
+    "success": {
+      "save": "Salvo com sucesso",
+      "create": "Criado com sucesso",
+      "update": "Atualizado com sucesso",
+      "delete": "Excluído com sucesso"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "edit": {
+      "title": "Editar Perfil",
+      "avatar": "Foto de perfil",
+      "name": "Nome",
+      "bio": "Biografia",
+      "saveButton": "Salvar Perfil"
+    },
+    "stats": {
+      "title": "Estatísticas",
+      "matches": "Partidas",
+      "goals": "Gols",
+      "assists": "Assistências",
+      "rating": "Avaliação"
     }
   }
 }

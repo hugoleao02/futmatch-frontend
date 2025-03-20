@@ -9,12 +9,14 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Logo from "../common/Logo";
 import { useNavigation } from "./hooks/useNavigation";
 import { useUserProfile } from "./hooks/useUserProfile";
 
 const Sidebar = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { user, photoUrl, tempPhotoUrl } = useUserProfile();
   const { navigate, menuItems, isActive } = useNavigation();
 
@@ -115,7 +117,7 @@ const Sidebar = () => {
         }}
       >
         <Typography variant="caption" color="text.secondary">
-          FutMatch v1.0.0
+          {t("sidebar.version", { version: "1.0.0" })}
         </Typography>
       </Box>
     </Box>
