@@ -2,6 +2,7 @@ import {
   Box,
   Card,
   CardContent,
+  Checkbox,
   FormControlLabel,
   FormGroup,
   Grid,
@@ -39,7 +40,36 @@ export const ContatoConfig: React.FC<ContatoConfigProps> = ({
           {t("settings.contact.title")}
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
+            <Tooltip
+              title={t("settings.contact.nameDescription")}
+              arrow
+              placement="right"
+            >
+              <TextField
+                fullWidth
+                label={t("settings.contact.name")}
+                value={configuracoes.contato.nome}
+                onChange={(e) => onChange("contato", "nome", e.target.value)}
+              />
+            </Tooltip>
+          </Grid>
+          <Grid item xs={6}>
+            <Tooltip
+              title={t("settings.contact.emailDescription")}
+              arrow
+              placement="right"
+            >
+              <TextField
+                fullWidth
+                type="email"
+                label={t("settings.contact.email")}
+                value={configuracoes.contato.email}
+                onChange={(e) => onChange("contato", "email", e.target.value)}
+              />
+            </Tooltip>
+          </Grid>
+          <Grid item xs={6}>
             <Tooltip
               title={t("settings.contact.phoneDescription")}
               arrow
@@ -51,6 +81,33 @@ export const ContatoConfig: React.FC<ContatoConfigProps> = ({
                 value={configuracoes.contato.telefone}
                 onChange={(e) =>
                   onChange("contato", "telefone", e.target.value)
+                }
+              />
+            </Tooltip>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={configuracoes.contato.whatsapp}
+                  onChange={(e) =>
+                    onChange("contato", "whatsapp", e.target.checked)
+                  }
+                />
+              }
+              label={t("settings.contact.useWhatsApp")}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Tooltip
+              title={t("settings.contact.telegramNumberDescription")}
+              arrow
+              placement="right"
+            >
+              <TextField
+                fullWidth
+                label={t("settings.contact.telegramNumber")}
+                value={configuracoes.contato.telegramNumber}
+                onChange={(e) =>
+                  onChange("contato", "telegramNumber", e.target.value)
                 }
               />
             </Tooltip>
@@ -72,23 +129,6 @@ export const ContatoConfig: React.FC<ContatoConfigProps> = ({
                     />
                   }
                   label={t("settings.contact.showPhone")}
-                />
-              </Tooltip>
-              <Tooltip
-                title={t("settings.contact.whatsappDescription")}
-                arrow
-                placement="right"
-              >
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={configuracoes.contato.whatsapp}
-                      onChange={(e) =>
-                        onChange("contato", "whatsapp", e.target.checked)
-                      }
-                    />
-                  }
-                  label={t("settings.contact.whatsapp")}
                 />
               </Tooltip>
               <Tooltip
