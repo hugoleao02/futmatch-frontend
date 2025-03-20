@@ -6,43 +6,50 @@ export const loginStyles = (theme: Theme) => ({
     display: "flex",
     flexDirection: "column",
     position: "relative",
-    background: `
-      radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.8), transparent 50%),
-      radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.8), transparent 50%),
-      radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.8), transparent 50%),
-      radial-gradient(circle at 0% 100%, rgba(59, 130, 246, 0.8), transparent 50%)
-    `,
-    backgroundColor: "#0f172a",
-    "&::before": {
-      content: '""',
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: "rgba(15, 23, 42, 0.3)",
-      backdropFilter: "blur(100px)",
-    },
+    background:
+      theme.palette.mode === "dark"
+        ? `linear-gradient(135deg, 
+          rgba(40, 167, 69, 0.2) 0%, 
+          rgba(0, 0, 0, 0.9) 100%)`
+        : `linear-gradient(135deg, 
+          rgba(33, 150, 243, 0.1) 0%, 
+          rgba(255, 255, 255, 0.9) 100%)`,
+    backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff",
   },
   container: {
     position: "relative",
     zIndex: 1,
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    minHeight: "100vh",
+    padding: theme.spacing(3),
   },
   boxContent: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    width: "100%",
   },
   paper: {
-    position: "relative",
+    padding: { xs: 3, sm: 4 },
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: theme.spacing(4),
     width: "100%",
+    borderRadius: 2,
+    position: "relative",
     overflow: "hidden",
+    backgroundColor:
+      theme.palette.mode === "dark"
+        ? "rgba(26, 32, 39, 0.8)"
+        : "rgba(255, 255, 255, 0.9)",
+    backdropFilter: "blur(10px)",
+    boxShadow:
+      theme.palette.mode === "dark"
+        ? "0 8px 32px rgba(0, 0, 0, 0.3)"
+        : "0 8px 32px rgba(0, 0, 0, 0.1)",
+    transition: "transform 0.2s ease-in-out",
+    "&:hover": {
+      transform: "translateY(-4px)",
+    },
   },
   gradientBar: {
     position: "absolute",
@@ -50,46 +57,92 @@ export const loginStyles = (theme: Theme) => ({
     left: 0,
     right: 0,
     height: "4px",
-    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    background:
+      theme.palette.mode === "dark"
+        ? `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+        : `linear-gradient(90deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
   },
   logoBox: {
-    marginBottom: theme.spacing(3),
+    mb: 3,
+    mt: 1,
+    textAlign: "center",
   },
   avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-    width: theme.spacing(7),
-    height: theme.spacing(7),
+    mb: 2,
+    width: 56,
+    height: 56,
+    backgroundColor:
+      theme.palette.mode === "dark"
+        ? theme.palette.primary.main
+        : theme.palette.primary.light,
+    boxShadow:
+      theme.palette.mode === "dark"
+        ? "0 4px 12px rgba(40, 167, 69, 0.3)"
+        : "0 4px 12px rgba(33, 150, 243, 0.2)",
   },
   avatarIcon: {
-    fontSize: "2rem",
+    fontSize: 32,
+    color:
+      theme.palette.mode === "dark"
+        ? theme.palette.common.white
+        : theme.palette.primary.contrastText,
   },
   title: {
-    marginBottom: theme.spacing(3),
-    color: theme.palette.text.primary,
+    fontWeight: 700,
+    mb: 4,
+    background:
+      theme.palette.mode === "dark"
+        ? `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`
+        : `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+    backgroundClip: "text",
+    WebkitBackgroundClip: "text",
+    color: "transparent",
+    textAlign: "center",
   },
   textField: {
-    marginBottom: theme.spacing(2),
-  },
-  submitButton: {
-    margin: theme.spacing(3, 0, 2),
-    padding: theme.spacing(1.5),
-    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-    "&:hover": {
-      background: `linear-gradient(45deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 1,
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? "rgba(255, 255, 255, 0.05)"
+          : "rgba(0, 0, 0, 0.02)",
+      transition: "all 0.3s ease",
+      "&:hover": {
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255, 255, 255, 0.1)"
+            : "rgba(0, 0, 0, 0.04)",
+      },
+      "&.Mui-focused": {
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255, 255, 255, 0.15)"
+            : "rgba(0, 0, 0, 0.06)",
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 4px 12px rgba(40, 167, 69, 0.15)"
+            : "0 4px 12px rgba(33, 150, 243, 0.15)",
+      },
     },
   },
-  linkContainer: {
-    display: "flex",
-    justifyContent: "center",
-    width: "100%",
-    marginTop: theme.spacing(2),
-  },
-  registerLink: {
-    color: theme.palette.primary.main,
-    textDecoration: "none",
+  submitButton: {
+    mt: 3,
+    mb: 2,
+    py: 1.5,
+    fontSize: "1rem",
+    fontWeight: 600,
+    borderRadius: 1,
+    background:
+      theme.palette.mode === "dark"
+        ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+        : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+    transition: "all 0.3s ease",
     "&:hover": {
-      textDecoration: "underline",
+      transform: "translateY(-2px)",
+      boxShadow:
+        theme.palette.mode === "dark"
+          ? "0 6px 16px rgba(40, 167, 69, 0.25)"
+          : "0 6px 16px rgba(33, 150, 243, 0.25)",
     },
   },
   linksContainer: {
@@ -101,30 +154,49 @@ export const loginStyles = (theme: Theme) => ({
     mt: 2,
   },
   forgotPasswordLink: {
-    color: theme.palette.primary.main,
+    color:
+      theme.palette.mode === "dark"
+        ? theme.palette.primary.light
+        : theme.palette.primary.main,
     textDecoration: "none",
     transition: "color 0.2s ease",
+    fontWeight: 500,
+    fontSize: "0.875rem",
     "&:hover": {
-      color: theme.palette.primary.dark,
+      color: theme.palette.primary.main,
     },
   },
-  socialButton: {
-    borderRadius: 2,
-    px: 3,
-    py: 1,
-    borderColor: "rgba(0, 0, 0, 0.12)",
-    color: "text.primary",
+  registerLink: {
+    color:
+      theme.palette.mode === "dark"
+        ? theme.palette.primary.light
+        : theme.palette.primary.main,
+    textDecoration: "none",
+    fontWeight: 500,
+    fontSize: "0.875rem",
+    transition: "color 0.2s ease",
     "&:hover": {
-      backgroundColor: "rgba(0, 0, 0, 0.04)",
+      color: theme.palette.primary.main,
     },
   },
-  socialButtonsContainer: {
-    display: "flex",
-    justifyContent: "center",
-    gap: 2,
-  },
-  socialIcon: {
-    width: 20,
-    height: 20,
+  quickJoinButton: {
+    borderColor:
+      theme.palette.mode === "dark"
+        ? "rgba(255, 255, 255, 0.2)"
+        : "rgba(0, 0, 0, 0.12)",
+    color:
+      theme.palette.mode === "dark"
+        ? theme.palette.common.white
+        : theme.palette.text.primary,
+    "&:hover": {
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(0, 0, 0, 0.04)",
+      borderColor:
+        theme.palette.mode === "dark"
+          ? "rgba(255, 255, 255, 0.3)"
+          : "rgba(0, 0, 0, 0.2)",
+    },
   },
 });

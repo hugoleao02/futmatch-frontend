@@ -1,20 +1,22 @@
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import {
   Avatar,
   Box,
   Button,
   Container,
   Divider,
+  Grid,
   IconButton,
   InputAdornment,
   Link,
   Paper,
   TextField,
   Typography,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { Field, Form, Formik } from "formik";
@@ -22,6 +24,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import Logo from "../../../components/Logo";
 import { Toast } from "../../../components/Toast/Toast";
+import { useThemeContext } from "../../../contexts/ThemeContext";
 import { schemaLogin } from "../../../schemas";
 import { useLoginLogic } from "../hooks/useLoginLogic";
 import { loginStyles } from "../styles/Login.styles";
@@ -29,6 +32,8 @@ import { loginStyles } from "../styles/Login.styles";
 const Login: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { isDarkMode, toggleTheme } = useThemeContext();
   const {
     initialValues,
     showPassword,
@@ -38,10 +43,27 @@ const Login: React.FC = () => {
     hideToast,
   } = useLoginLogic();
 
-  const styles = loginStyles(theme);
+  const styles = loginStyles(theme, isMobile);
 
   return (
     <Box sx={styles.root}>
+      <IconButton
+        onClick={toggleTheme}
+        sx={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          color: "white",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(10px)",
+          "&:hover": {
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
+          },
+        }}
+      >
+        {isDarkMode ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
+      </IconButton>
+
       <Container maxWidth="sm" sx={styles.container}>
         <Box sx={styles.boxContent}>
           <Paper elevation={24} sx={styles.paper}>
@@ -55,12 +77,7 @@ const Login: React.FC = () => {
               <SportsSoccerIcon sx={styles.avatarIcon} />
             </Avatar>
 
-            <Typography
-              component="h1"
-              variant="h4"
-              gutterBottom
-              sx={styles.title}
-            >
+            <Typography component="h1" variant="h4" sx={styles.title}>
               {t("auth.login.title")}
             </Typography>
 
@@ -72,64 +89,53 @@ const Login: React.FC = () => {
             >
               {({ isSubmitting, touched, errors }) => (
                 <Form style={{ width: "100%" }}>
-                  <Field
-                    as={TextField}
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="email"
-                    label={t("auth.login.email")}
-                    name="email"
-                    autoComplete="email"
-                    autoFocus
-                    error={touched.email && Boolean(errors.email)}
-                    helperText={touched.email && errors.email}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <EmailOutlinedIcon color="primary" />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={styles.textField}
-                  />
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <Field
+                        as={TextField}
+                        required
+                        fullWidth
+                        id="email"
+                        label={t("auth.login.email")}
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
+                        error={touched.email && Boolean(errors.email)}
+                        helperText={touched.email && errors.email}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <EmailOutlinedIcon color="primary" />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={styles.textField}
+                      />
+                    </Grid>
 
-                  <Field
-                    as={TextField}
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="senha"
-                    label={`${t("auth.login.password")} *`}
-                    type={showPassword ? "text" : "password"}
-                    id="senha"
-                    autoComplete="current-password"
-                    error={touched.senha && Boolean(errors.senha)}
-                    helperText={touched.senha && errors.senha}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <LockOutlinedIcon color="primary" />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleTogglePasswordVisibility}
-                            edge="end"
-                          >
-                            {showPassword ? (
-                              <VisibilityOffOutlinedIcon />
-                            ) : (
-                              <VisibilityOutlinedIcon />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={styles.textField}
-                  />
+                    <Grid item xs={12}>
+                      <Field
+                        as={TextField}
+                        required
+                        fullWidth
+                        name="senha"
+                        label={t("auth.login.password")}
+                        type={showPassword ? "text" : "password"}
+                        id="senha"
+                        autoComplete="current-password"
+                        error={touched.senha && Boolean(errors.senha)}
+                        helperText={touched.senha && errors.senha}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <LockOutlinedIcon color="primary" />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={styles.textField}
+                      />
+                    </Grid>
+                  </Grid>
 
                   <Button
                     type="submit"
@@ -161,45 +167,20 @@ const Login: React.FC = () => {
                     </Link>
                   </Box>
 
-                  <Divider sx={{ my: 4 }}>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ px: 2 }}
-                    >
+                  <Divider sx={{ my: 3 }}>
+                    <Typography variant="body2" color="text.secondary">
                       {t("auth.login.or")}
                     </Typography>
                   </Divider>
 
-                  <Box sx={styles.socialButtonsContainer}>
-                    <Button
-                      variant="outlined"
-                      startIcon={
-                        <img
-                          src="/google-icon.png"
-                          alt="Google"
-                          style={styles.socialIcon}
-                        />
-                      }
-                      sx={styles.socialButton}
-                    >
-                      Google
-                    </Button>
-
-                    <Button
-                      variant="outlined"
-                      startIcon={
-                        <img
-                          src="/facebook-icon.png"
-                          alt="Facebook"
-                          style={styles.socialIcon}
-                        />
-                      }
-                      sx={styles.socialButton}
-                    >
-                      Facebook
-                    </Button>
-                  </Box>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="inherit"
+                    sx={styles.quickJoinButton}
+                  >
+                    {t("auth.login.quickJoin")}
+                  </Button>
                 </Form>
               )}
             </Formik>

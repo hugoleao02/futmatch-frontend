@@ -1,52 +1,51 @@
 import { Theme } from "@mui/material";
 
-export const registerStyles = (theme: Theme, isMobile: boolean) => ({
+export const registerStyles = (theme: Theme) => ({
   root: {
     minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
     position: "relative",
-    background: `
-      radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.8), transparent 50%),
-      radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.8), transparent 50%),
-      radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.8), transparent 50%),
-      radial-gradient(circle at 0% 100%, rgba(59, 130, 246, 0.8), transparent 50%)
-    `,
-    backgroundColor: "#0f172a",
-    "&::before": {
-      content: '""',
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: "rgba(15, 23, 42, 0.3)",
-      backdropFilter: "blur(100px)",
-    },
+    background:
+      theme.palette.mode === "dark"
+        ? `linear-gradient(135deg, 
+          rgba(40, 167, 69, 0.2) 0%, 
+          rgba(0, 0, 0, 0.9) 100%)`
+        : `linear-gradient(135deg, 
+          rgba(33, 150, 243, 0.1) 0%, 
+          rgba(255, 255, 255, 0.9) 100%)`,
+    backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff",
   },
   container: {
     position: "relative",
     zIndex: 1,
-  },
-  boxContent: {
-    marginTop: isMobile ? 4 : 8,
-    marginBottom: 4,
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "100vh",
+    padding: theme.spacing(3),
+  },
+  boxContent: {
+    width: "100%",
   },
   paper: {
-    padding: { xs: 3, sm: 5 },
+    padding: { xs: 3, sm: 4 },
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     width: "100%",
-    borderRadius: 3,
+    borderRadius: 2,
     position: "relative",
     overflow: "hidden",
-    background: "rgba(255, 255, 255, 0.98)",
+    backgroundColor:
+      theme.palette.mode === "dark"
+        ? "rgba(26, 32, 39, 0.8)"
+        : "rgba(255, 255, 255, 0.9)",
     backdropFilter: "blur(10px)",
-    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+    boxShadow:
+      theme.palette.mode === "dark"
+        ? "0 8px 32px rgba(0, 0, 0, 0.3)"
+        : "0 8px 32px rgba(0, 0, 0, 0.1)",
     transition: "transform 0.2s ease-in-out",
     "&:hover": {
       transform: "translateY(-4px)",
@@ -57,28 +56,44 @@ export const registerStyles = (theme: Theme, isMobile: boolean) => ({
     top: 0,
     left: 0,
     right: 0,
-    height: "6px",
-    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    height: "4px",
+    background:
+      theme.palette.mode === "dark"
+        ? `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+        : `linear-gradient(90deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
   },
   logoBox: {
-    mb: 4,
-    mt: 2,
+    mb: 3,
+    mt: 1,
     textAlign: "center",
   },
   avatar: {
     mb: 2,
-    bgcolor: theme.palette.secondary.main,
-    width: 64,
-    height: 64,
-    boxShadow: "0 4px 12px rgba(255, 193, 7, 0.2)",
+    width: 56,
+    height: 56,
+    backgroundColor:
+      theme.palette.mode === "dark"
+        ? theme.palette.primary.main
+        : theme.palette.primary.light,
+    boxShadow:
+      theme.palette.mode === "dark"
+        ? "0 4px 12px rgba(40, 167, 69, 0.3)"
+        : "0 4px 12px rgba(33, 150, 243, 0.2)",
   },
   avatarIcon: {
-    fontSize: 36,
+    fontSize: 32,
+    color:
+      theme.palette.mode === "dark"
+        ? theme.palette.common.white
+        : theme.palette.primary.contrastText,
   },
   title: {
     fontWeight: 700,
-    mb: 3,
-    background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
+    mb: 4,
+    background:
+      theme.palette.mode === "dark"
+        ? `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`
+        : `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
     backgroundClip: "text",
     WebkitBackgroundClip: "text",
     color: "transparent",
@@ -86,42 +101,70 @@ export const registerStyles = (theme: Theme, isMobile: boolean) => ({
   },
   textField: {
     "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
+      borderRadius: 1,
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? "rgba(255, 255, 255, 0.05)"
+          : "rgba(0, 0, 0, 0.02)",
       transition: "all 0.3s ease",
       "&:hover": {
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255, 255, 255, 0.1)"
+            : "rgba(0, 0, 0, 0.04)",
       },
       "&.Mui-focused": {
-        boxShadow: "0 4px 12px rgba(40, 167, 69, 0.15)",
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255, 255, 255, 0.15)"
+            : "rgba(0, 0, 0, 0.06)",
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 4px 12px rgba(40, 167, 69, 0.15)"
+            : "0 4px 12px rgba(33, 150, 243, 0.15)",
       },
+    },
+    "& .MuiSelect-select": {
+      paddingTop: "12px",
+      paddingBottom: "12px",
     },
   },
   submitButton: {
     mt: 3,
     mb: 2,
     py: 1.5,
-    fontSize: "1.1rem",
+    fontSize: "1rem",
     fontWeight: 600,
-    borderRadius: 2,
-    background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
+    borderRadius: 1,
+    background:
+      theme.palette.mode === "dark"
+        ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+        : `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
     transition: "all 0.3s ease",
     "&:hover": {
       transform: "translateY(-2px)",
-      boxShadow: "0 6px 16px rgba(255, 193, 7, 0.25)",
-    },
-  },
-  loginLink: {
-    color: theme.palette.primary.main,
-    textDecoration: "none",
-    fontWeight: 500,
-    transition: "color 0.2s ease",
-    "&:hover": {
-      color: theme.palette.primary.dark,
+      boxShadow:
+        theme.palette.mode === "dark"
+          ? "0 6px 16px rgba(40, 167, 69, 0.25)"
+          : "0 6px 16px rgba(33, 150, 243, 0.25)",
     },
   },
   linkContainer: {
     display: "flex",
     justifyContent: "center",
     mt: 2,
+  },
+  loginLink: {
+    color:
+      theme.palette.mode === "dark"
+        ? theme.palette.primary.light
+        : theme.palette.primary.main,
+    textDecoration: "none",
+    fontWeight: 500,
+    fontSize: "0.875rem",
+    transition: "color 0.2s ease",
+    "&:hover": {
+      color: theme.palette.primary.main,
+    },
   },
 });

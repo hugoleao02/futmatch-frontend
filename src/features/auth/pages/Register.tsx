@@ -1,4 +1,6 @@
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import SportsIcon from "@mui/icons-material/Sports";
@@ -9,7 +11,6 @@ import {
   Avatar,
   Box,
   Button,
-  CircularProgress,
   Container,
   Grid,
   IconButton,
@@ -19,14 +20,14 @@ import {
   Paper,
   TextField,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Logo } from "../../../components";
 import { Toast } from "../../../components/Toast/Toast";
+import { useThemeContext } from "../../../contexts/ThemeContext";
 import { useToast } from "../../../hooks/useToast";
 import { useRegisterForm } from "../hooks/useRegisterForm";
 import { schemaCadastro } from "../schemas/autenticacao";
@@ -35,7 +36,7 @@ import { registerStyles } from "../styles/Register.styles";
 const Register: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const { toast, hideToast } = useToast();
   const {
     initialValues,
@@ -47,10 +48,28 @@ const Register: React.FC = () => {
     handleToggleConfirmPasswordVisibility,
   } = useRegisterForm();
 
-  const styles = registerStyles(theme, isMobile);
+  const { mode, setMode } = useThemeContext();
+  const styles = registerStyles(theme);
 
   return (
     <Box sx={styles.root}>
+      <IconButton
+        onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+        sx={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          color: "white",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(10px)",
+          "&:hover": {
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
+          },
+        }}
+      >
+        {mode === "dark" ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
+      </IconButton>
+
       <Container maxWidth="sm" sx={styles.container}>
         <Box sx={styles.boxContent}>
           <Paper elevation={24} sx={styles.paper}>
@@ -64,12 +83,7 @@ const Register: React.FC = () => {
               <SportsSoccerIcon sx={styles.avatarIcon} />
             </Avatar>
 
-            <Typography
-              component="h1"
-              variant="h4"
-              gutterBottom
-              sx={styles.title}
-            >
+            <Typography component="h1" variant="h4" sx={styles.title}>
               {t("auth.register.title")}
             </Typography>
 
@@ -265,13 +279,12 @@ const Register: React.FC = () => {
                     type="submit"
                     fullWidth
                     variant="contained"
+                    disabled={isSubmitting}
                     sx={styles.submitButton}
                   >
-                    {isSubmitting ? (
-                      <CircularProgress size={24} color="inherit" />
-                    ) : (
-                      t("auth.register.submit")
-                    )}
+                    {isSubmitting
+                      ? t("common.loading")
+                      : t("auth.register.submit")}
                   </Button>
 
                   <Box sx={styles.linkContainer}>
