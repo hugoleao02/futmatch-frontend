@@ -1,31 +1,27 @@
 import { Partida } from "../../@types/partida/Partida";
-import { api } from "../api";
+import { HttpClient } from "../api/HttpClient";
 
 export class PartidasService {
   static async listar(): Promise<Partida[]> {
-    const response = await api.get("/partidas");
-    return response.data;
+    return await HttpClient.get("/partidas");
   }
 
   static async obter(id: number): Promise<Partida> {
-    const response = await api.get(`/partidas/${id}`);
-    return response.data;
+    return await HttpClient.get(`/partidas/${id}`);
   }
 
   static async criar(partida: Omit<Partida, "id">): Promise<Partida> {
-    const response = await api.post("/partidas", partida);
-    return response.data;
+    return await HttpClient.post("/partidas", partida);
   }
 
   static async atualizar(
     id: number,
     partida: Partial<Partida>
   ): Promise<Partida> {
-    const response = await api.put(`/partidas/${id}`, partida);
-    return response.data;
+    return await HttpClient.put(`/partidas/${id}`, partida);
   }
 
   static async deletar(id: number): Promise<void> {
-    await api.delete(`/partidas/${id}`);
+    await HttpClient.delete(`/partidas/${id}`);
   }
 }

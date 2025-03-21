@@ -1,5 +1,5 @@
 import { Jogador } from "../../@types";
-import { API_CONFIG } from "../../config/api";
+import { API_CONFIG } from "../../config/apiConfig";
 
 const TOKEN_KEY = API_CONFIG.TOKEN.STORAGE_KEY;
 

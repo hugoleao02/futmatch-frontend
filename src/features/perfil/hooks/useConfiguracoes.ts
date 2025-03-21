@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ConfiguracoesForm } from "../../../@types";
 import { useThemeContext } from "../../../contexts/ThemeContext";
 import { useToast } from "../../../hooks/useToast";
+import { ConfiguracaoService } from "../../../infrastructure/services/ConfiguracaoService";
 
 type SectionHandlers = {
   [K in keyof ConfiguracoesForm]?: () => Promise<void>;
@@ -39,19 +40,69 @@ export const useConfiguracoes = () => {
     },
   });
 
+  useEffect(() => {
+    carregarConfiguracoes();
+  }, []);
+
+  const carregarConfiguracoes = async () => {
+    try {
+      setLoading(true);
+      const response = await ConfiguracaoService.buscarConfiguracao();
+
+      setConfiguracoes({
+        privacidade: {
+          perfilPublico: response.perfilPublico,
+          mostrarEstatisticas: response.mostrarEstatisticas,
+          mostrarHistoricoPartidas: response.mostrarHistoricoPartidas,
+        },
+        notificacoes: {
+          receberNotificacoes: response.receberNotificacoes,
+          notificacoesEmail: response.notificacoesEmail,
+          notificacoesPush: response.notificacoesPush,
+        },
+        preferencias: {
+          posicao: response.posicao,
+        },
+        contato: {
+          telefone: response.telefone || "",
+          whatsapp: response.whatsapp || false,
+          telegram: response.telegram || false,
+          mostrarTelefone: response.mostrarTelefone || false,
+        },
+        aparencia: {
+          tema: tema,
+        },
+      });
+    } catch (error) {
+      showToast("Erro ao carregar configurações", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const sectionHandlers: SectionHandlers = {
     aparencia: async () => {
       setTema(temaTemporal);
     },
-    notificacoes: async () => {},
+    notificacoes: async () => {
+      await ConfiguracaoService.atualizarConfiguracao({
+        notificacoes: configuracoes.notificacoes,
+      });
+    },
     privacidade: async () => {
-      // Lógica específica para privacidade
+      await ConfiguracaoService.atualizarConfiguracao({
+        privacidade: configuracoes.privacidade,
+      });
     },
     preferencias: async () => {
-      // Lógica específica para preferências
+      await ConfiguracaoService.atualizarConfiguracao({
+        preferencias: configuracoes.preferencias,
+      });
     },
     contato: async () => {
-      // Lógica específica para contato
+      await ConfiguracaoService.atualizarConfiguracao({
+        contato: configuracoes.contato,
+      });
     },
   };
 
@@ -83,7 +134,7 @@ export const useConfiguracoes = () => {
           await sectionHandler();
         }
       } else {
-        // await ConfiguracoesService.salvarTudo(configuracoes);
+        await ConfiguracaoService.atualizarConfiguracao(configuracoes);
       }
 
       showToast(

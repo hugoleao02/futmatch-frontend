@@ -1,5 +1,5 @@
 import { Jogador, LoginDTO, RegisterDTO } from "../../@types";
-import { API_CONFIG } from "../../config/api";
+import { API_CONFIG } from "../../config/apiConfig";
 import { HttpClient } from "../api/HttpClient";
 import { getUserFromToken, removeToken, saveToken } from "./TokenService";
 
@@ -92,6 +92,7 @@ export const login = async (loginDTO: LoginDTO): Promise<Jogador | null> => {
     throw new Error("Credenciais inválidas");
   }
 };
+
 interface RegisterResponse {
   success: boolean;
   message?: string;

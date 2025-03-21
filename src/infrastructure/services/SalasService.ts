@@ -3,7 +3,7 @@ import { EnviarMensagemDTO } from "../../@types/sala/EnviarMensagemDTO";
 import { FiltroSalaDTO } from "../../@types/sala/FiltroSalaDTO";
 import { Mensagem } from "../../@types/sala/Mensagem";
 import { Sala } from "../../@types/sala/Sala";
-import { API_CONFIG } from "../../config/api";
+import { API_CONFIG } from "../../config/apiConfig";
 import { HttpClient, isApiError } from "../api/HttpClient";
 
 interface ServiceResult<T> {

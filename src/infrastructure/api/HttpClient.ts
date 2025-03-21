@@ -4,7 +4,7 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
-import { API_CONFIG } from "../../config/api";
+import { API_CONFIG } from "../../config/apiConfig";
 import { getToken, removeToken } from "../services/TokenService";
 
 export interface IApiError {
@@ -130,10 +130,7 @@ export const isApiError = (error: unknown): error is IApiError => {
   );
 };
 
-export const get = async <T>(
-  url: string,
-  config?: AxiosRequestConfig
-): Promise<T> => {
+const get = async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
   try {
     const response: AxiosResponse<T> = await api.get(url, config);
     return response.data;
@@ -148,7 +145,7 @@ export const get = async <T>(
   }
 };
 
-export const post = async <T>(
+const post = async <T>(
   url: string,
   data?: any,
   config?: AxiosRequestConfig
@@ -167,7 +164,7 @@ export const post = async <T>(
   }
 };
 
-export const put = async <T>(
+const put = async <T>(
   url: string,
   data?: any,
   config?: AxiosRequestConfig
@@ -186,10 +183,7 @@ export const put = async <T>(
   }
 };
 
-export const del = async <T>(
-  url: string,
-  config?: AxiosRequestConfig
-): Promise<T> => {
+const del = async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
   try {
     const response: AxiosResponse<T> = await api.delete(url, config);
     return response.data;
@@ -209,4 +203,4 @@ export const HttpClient = {
   post,
   put,
   delete: del,
-};
+} as const;

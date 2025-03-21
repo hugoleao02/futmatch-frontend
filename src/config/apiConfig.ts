@@ -12,6 +12,8 @@ export const API_CONFIG = {
   },
   ENDPOINTS: {
     SALAS: "/salas",
-    CONFIGURACOES: "/configuracoes",
+    CONFIGURACAO: "/configuracao",
+    PERFIL: "/jogadores/me",
+    FOTO_PERFIL: "/v1/profile-photos",
   },
 };

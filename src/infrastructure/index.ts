@@ -1,4 +1,4 @@
-export * from "./api/HttpClient";
+export * from "./api/httpClient";
 
 export * from "./adapters/UserAdapter";
 
