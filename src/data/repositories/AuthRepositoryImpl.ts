@@ -1,15 +1,20 @@
-import type { AuthRepository } from '../../core/ports/AuthRepository';
+import type { IAuthRepository } from '../../core/repositories/IAuthRepository';
 import type { User } from '../../core/entities/User';
+import type { LoginResponse, RegisterResponse } from '../../core/types/api';
 import { api } from '../../infra/http/api';
 
-export class AuthRepositoryImpl implements AuthRepository {
-  async login(email: string, password: string): Promise<{ user: User; token: string }> {
-    const response = await api.post('/login', { email, password });
+export class AuthRepositoryImpl implements IAuthRepository {
+  async login(email: string, senha: string): Promise<LoginResponse> {
+    const response = await api.post<LoginResponse>('/auth/login', { email, senha });
     return response.data;
   }
 
-  async register(name: string, email: string, password: string): Promise<User> {
-    const response = await api.post('/register', { name, email, password });
+  async register(nome: string, email: string, senha: string): Promise<RegisterResponse> {
+    const response = await api.post<RegisterResponse>('/auth/register', { nome, email, senha });
     return response.data;
+  }
+
+  async logout(): Promise<void> {
+    localStorage.removeItem('token');
   }
 } 

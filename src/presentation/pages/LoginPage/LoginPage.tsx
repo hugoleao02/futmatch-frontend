@@ -2,16 +2,33 @@ import { Box, Button, Typography, Paper } from "@mui/material";
 import { Input } from "../../../components/Input/Input";
 import { Logo } from "./components/Logo";
 import { styles } from "./styles";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../infra/di/AuthProvider";
+import { toast } from 'react-toastify';
+
+interface LoginFormInputs {
+  email: string;
+  senha: string;
+}
 
 export function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
+  const navigate = useNavigate();
+  const { useCases: { loginUseCase } } = useAuth();
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    // TODO: Implementar lógica de login
-    console.log({ email, password });
+  const onSubmit = async (data: LoginFormInputs) => {
+    try {
+      const result = await loginUseCase.execute(data.email, data.senha);
+      localStorage.setItem('token', result.token);
+      navigate('/');
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error('Erro ao fazer login');
+      }
+    }
   };
 
   return (
@@ -32,29 +49,29 @@ export function LoginPage() {
         <Box 
           component="form" 
           sx={styles.form}
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
         >
           <Input
             label="E-mail"
             type="email"
-            name="email"
             autoComplete="email"
             required
             fullWidth
             placeholder="Digite seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            error={!!errors.email}
+            helperText={errors.email ? 'E-mail é obrigatório' : ''}
+            {...register('email', { required: true })}
           />
           <Input
             label="Senha"
             type="password"
-            name="password"
             autoComplete="current-password"
             required
             fullWidth
             placeholder="Digite sua senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            error={!!errors.senha}
+            helperText={errors.senha ? 'Senha é obrigatória' : ''}
+            {...register('senha', { required: true })}
           />
           <Button
             type="submit"
@@ -71,6 +88,7 @@ export function LoginPage() {
           <Box
             component="span"
             sx={styles.footerLink}
+            onClick={() => navigate('/register')}
           >
             Cadastre-se
           </Box>

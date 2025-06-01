@@ -1,16 +1,19 @@
 import React, { createContext, useContext } from 'react';
-import { AuthRepositoryImpl } from '../../data/repositories/AuthRepositoryImpl';
-import { LoginUseCase } from '../../core/use-cases/LoginUseCase';
+import type { Container } from './types';
+import { container } from './container';
 
-const authRepo = new AuthRepositoryImpl();
-const loginUseCase = new LoginUseCase(authRepo);
+const AuthContext = createContext<Container | null>(null);
 
-const AuthContext = createContext({ loginUseCase });
-
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <AuthContext.Provider value={{ loginUseCase }}>
+  <AuthContext.Provider value={container}>
     {children}
   </AuthContext.Provider>
 ); 

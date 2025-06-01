@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import logo from '../../../assets/logo.png';
+import logo from '../../../../assets/logo.png';
 
 interface LogoProps {
   size?: 'small' | 'large';
