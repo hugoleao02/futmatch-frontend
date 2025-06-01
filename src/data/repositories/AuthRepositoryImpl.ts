@@ -1,5 +1,4 @@
 import type { IAuthRepository } from '../../core/repositories/IAuthRepository';
-import type { User } from '../../core/entities/User';
 import type { LoginResponse, RegisterResponse } from '../../core/types/api';
 import { api } from '../../infra/http/api';
 
