@@ -1,0 +1,102 @@
+import type { SxProps, Theme } from '@mui/material';
+
+export const styles = {
+  container: {
+    minHeight: '100vh',
+    minWidth: '100vw',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'linear-gradient(135deg, #00432D 0%, #00543A 100%)',
+    px: { xs: 2, sm: 0 },
+    boxSizing: 'border-box',
+  },
+  paper: {
+    p: { xs: 2, sm: 3, md: 4 },
+    maxWidth: { xs: '100%', sm: 380, md: 420 },
+    width: { xs: '100%', sm: 380, md: 420 },
+    borderRadius: 5,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    background: 'rgba(0,67,45,0.97)',
+    mx: { xs: 1, sm: 0 },
+    boxShadow: '0 8px 32px 0 rgba(0,0,0,0.25)',
+    position: 'relative',
+  },
+  logo: {
+    width: { xs: 80, sm: 100 },
+    height: { xs: 80, sm: 100 },
+    objectFit: 'contain',
+    boxShadow: '0 4px 16px 0 rgba(0,0,0,0.18)',
+    borderRadius: '50%',
+    background: '#00432D',
+    border: '4px solid #AD9B60',
+    position: 'relative',
+    top: 0,
+  },
+  title: {
+    fontSize: { xs: '2rem', sm: '2.5rem' },
+    fontWeight: 700,
+    color: '#AD9B60',
+    fontFamily: 'Pacifico, cursive',
+    mb: 1,
+    textShadow: '0 2px 8px rgba(0,0,0,0.18)',
+    textAlign: 'center',
+  },
+  subtitle: {
+    color: '#AD9B60',
+    fontSize: { xs: '1rem', sm: '1.15rem' },
+    fontWeight: 400,
+    textAlign: 'center',
+    mb: { xs: 2, sm: 3 },
+    textShadow: '0 1px 4px rgba(0,0,0,0.10)'
+  },
+  form: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: { xs: 2, sm: 2.5 }
+  },
+  submitButton: {
+    mt: { xs: 0.5, sm: 1 },
+    bgcolor: '#00432D',
+    color: '#AD9B60',
+    fontWeight: 700,
+    fontSize: { xs: '1.15rem', sm: '1.25rem' },
+    borderRadius: 22,
+    py: 1.3,
+    '&:hover': { bgcolor: '#00543A', color: '#AD9B60' },
+    boxShadow: 3,
+    border: '2px solid #AD9B60',
+    transition: '0.2s',
+  },
+  footerText: {
+    color: '#AD9B60',
+    fontSize: { xs: '1rem', sm: '1.1rem' },
+    textAlign: 'center',
+    mt: { xs: 2, sm: 3 },
+    fontWeight: 400,
+    textShadow: '0 1px 4px rgba(0,0,0,0.10)'
+  },
+  footerLink: {
+    textDecoration: 'underline',
+    cursor: 'pointer',
+    fontWeight: 700,
+    color: '#AD9B60',
+    textShadow: '0 1px 4px rgba(0,0,0,0.10)'
+  },
+  footerLogo: {
+    width: { xs: 48, sm: 58 },
+    height: { xs: 48, sm: 58 },
+    objectFit: 'contain',
+    mt: { xs: 3, sm: 4 },
+    mb: 0,
+    boxShadow: '0 4px 16px 0 rgba(0,0,0,0.18)',
+    borderRadius: '50%',
+    background: '#00432D',
+    border: '3px solid #AD9B60',
+    position: 'relative',
+    left: 'auto',
+  }
+} as Record<string, SxProps<Theme>>; 
