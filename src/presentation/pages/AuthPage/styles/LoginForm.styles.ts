@@ -1,35 +1,11 @@
 import type { SxProps, Theme } from '@mui/material';
 
-export const textFieldStyles: SxProps<Theme> = {
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
-    fontSize: '1.1rem',
-    height: '56px',
-    '&.Mui-focused fieldset': {
-      borderColor: '#1B5E20',
-      borderWidth: '3px',
-    },
-  },
-  '& .MuiInputLabel-root': {
-    fontSize: '1.1rem',
-    '&.Mui-focused': {
-      color: '#1B5E20',
-    },
-  },
-};
-
-export const formStyles: SxProps<Theme> = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 4,
-};
-
-export const titleStyles: SxProps<Theme> = {
-  fontWeight: 'bold',
-  color: 'text.primary',
-  textAlign: 'center',
-  mb: 2,
-};
+// Re-export shared form styles
+export {
+  baseFormStyles as formStyles,
+  baseTextFieldStyles as textFieldStyles,
+  baseTitleStyles as titleStyles,
+} from '../../../../shared/styles/formStyles';
 
 export const forgotPasswordStyles: SxProps<Theme> = {
   color: '#1B5E20',

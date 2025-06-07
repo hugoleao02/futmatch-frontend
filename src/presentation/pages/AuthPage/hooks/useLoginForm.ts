@@ -1,9 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useAuth } from '../../../../infra/di/AuthProvider';
+import { useContainer } from '../../../../infra/di/useContainer';
+import { useAuth } from '../../../../shared/hooks';
 
 export const useLoginForm = () => {
-  const { useCases } = useAuth();
+  const { useCases } = useContainer();
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const { loginUseCase } = useCases;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,8 +20,9 @@ export const useLoginForm = () => {
 
     try {
       const response = await loginUseCase.execute(email, password);
-      localStorage.setItem('token', response.token);
+      login(response.token);
       toast.success('Login realizado com sucesso!');
+      navigate('/home');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erro ao fazer login');
     } finally {

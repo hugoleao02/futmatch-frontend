@@ -1,13 +1,13 @@
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { AppRoutes } from './presentation/routes';
-import { AuthProvider } from './infra/di/AuthProvider';
 import 'react-toastify/dist/ReactToastify.css';
+import { ContainerProvider } from './infra/di/ContainerContext';
+import { AppRoutes } from './presentation/routes';
 
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
+      <ContainerProvider>
         <AppRoutes />
         <ToastContainer
           position="top-right"
@@ -21,7 +21,7 @@ function App() {
           pauseOnHover
           theme="colored"
         />
-      </AuthProvider>
+      </ContainerProvider>
     </BrowserRouter>
   );
 }

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../../../../infra/di/AuthProvider';
+import { useContainer } from '../../../../infra/di/useContainer';
 
 interface UseRegisterFormProps {
   setActiveTab: (tab: number) => void;
 }
 
 export const useRegisterForm = ({ setActiveTab }: UseRegisterFormProps) => {
-  const { useCases } = useAuth();
+  const { useCases } = useContainer();
   const { registerUseCase } = useCases;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
