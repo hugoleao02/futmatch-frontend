@@ -1,101 +1,152 @@
-import { Box, Button, Typography, Paper } from "@mui/material";
-import { Input } from "../../../components/Input/Input";
+import { Box, Typography, Paper, Tabs, Tab, Container } from "@mui/material";
 import { Logo } from "./components/Logo";
-import { styles } from "./styles";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../infra/di/AuthProvider";
-import { toast } from 'react-toastify';
-
-interface LoginFormInputs {
-  email: string;
-  senha: string;
-}
+import React, { useState } from 'react';
+import { LoginForm } from "./components/LoginForm";
+import { RegisterForm } from "./components/RegisterForm";
 
 export function LoginPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
-  const navigate = useNavigate();
-  const { useCases: { loginUseCase } } = useAuth();
+  const [activeTab, setActiveTab] = useState(0);
 
-  const onSubmit = async (data: LoginFormInputs) => {
-    try {
-      const result = await loginUseCase.execute(data.email, data.senha);
-      localStorage.setItem('token', result.token);
-      navigate('/');
-    } catch (err) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error('Erro ao fazer login');
-      }
-    }
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
   };
 
   return (
-    <Box sx={styles.container}>
-      <Paper elevation={0} sx={styles.paper}>
-        <Box mb={2}>
-          <Logo size="large" />
-        </Box>
-
-        <Typography sx={styles.title} component="h1">
-          FutMatch
-        </Typography>
-
-        <Typography variant="body1" sx={styles.subtitle}>
-          Login ou cadastre-se para encontrar<br />partidas de futebol pelada
-        </Typography>
-
-        <Box 
-          component="form" 
-          sx={styles.form}
-          onSubmit={handleSubmit(onSubmit)}
+    <Container
+      maxWidth={false}
+      sx={{
+        minHeight: '100vh',
+        minWidth: '100vw',
+        background: 'linear-gradient(135deg, #0D47A1 0%, #1A237E 50%, #212121 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: { xs: 2, sm: 3, lg: 4 },
+        fontFamily: 'Inter, sans-serif',
+      }}
+    >
+      <Paper
+        elevation={10}
+        sx={{
+          borderRadius: '24px',
+          display: 'flex',
+          flexDirection: { xs: 'column', lg: 'row' },
+          width: '100%',
+          maxWidth: '1100px',
+          overflow: 'hidden',
+          transition: 'transform 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'scale(1.005)',
+          },
+        }}
+      >
+        <Box
+          sx={{
+            width: { xs: '100%', lg: '50%' }, 
+            p: { xs: 4, sm: 6 },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            background: 'linear-gradient(45deg, #1B5E20 0%, #0D47A1 50%, #FFB300 100%)',
+            color: 'white',
+            borderRadius: { lg: '24px 0 0 24px' },
+          }}
         >
-          <Input
-            label="E-mail"
-            type="email"
-            autoComplete="email"
-            required
-            fullWidth
-            placeholder="Digite seu e-mail"
-            error={!!errors.email}
-            helperText={errors.email ? 'E-mail é obrigatório' : ''}
-            {...register('email', { required: true })}
-          />
-          <Input
-            label="Senha"
-            type="password"
-            autoComplete="current-password"
-            required
-            fullWidth
-            placeholder="Digite sua senha"
-            error={!!errors.senha}
-            helperText={errors.senha ? 'Senha é obrigatória' : ''}
-            {...register('senha', { required: true })}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={styles.submitButton}
+          <Logo size="large" />
+          <Typography
+            variant="h3"
+            component="h1"
+            sx={{
+              fontWeight: 'bold',
+              mb: 2,
+              lineHeight: 1.2,
+              textShadow: '3px 3px 6px rgba(0,0,0,0.6)',
+              fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+            }}
           >
-            Entrar
-          </Button>
+            Sua pelada nunca mais será a mesma.
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              opacity: 0.95,
+              textShadow: '1px 1px 3px rgba(0,0,0,0.5)',
+              fontSize: { xs: '1.1rem', sm: '1.25rem' },
+            }}
+          >
+            Conecte-se. Jogue. Divirta-se. Encontre sua partida perfeita.
+          </Typography>
         </Box>
 
-        <Typography variant="body2" sx={styles.footerText}>
-          Não tem uma conta?{' '}
-          <Box
-            component="span"
-            sx={styles.footerLink}
-            onClick={() => navigate('/register')}
+        <Box
+          sx={{
+            width: { xs: '100%', lg: '50%' },
+            p: { xs: 4, sm: 6, md: 8 },
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+          }}
+        >
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            centered
+            sx={{ mb: 5 }}
+            TabIndicatorProps={{
+              sx: {
+                backgroundColor: '#1B5E20',
+                height: 5,
+                borderRadius: '5px 5px 0 0',
+              },
+            }}
           >
-            Cadastre-se
-          </Box>
-        </Typography>
+            <Tab
+              label="Login"
+              sx={{
+                fontSize: { xs: '1.1rem', sm: '1.3rem' },
+                fontWeight: 'bold',
+                textTransform: 'none',
+                color: activeTab === 0 ? '#1B5E20' : 'text.secondary',
+                '&.Mui-selected': {
+                  color: '#1B5E20',
+                },
+                borderRadius: '10px 10px 0 0',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  backgroundColor: '#E8F5E9',
+                  transform: 'scale(1.03)',
+                },
+              }}
+            />
+            <Tab
+              label="Cadastro"
+              sx={{
+                fontSize: { xs: '1.1rem', sm: '1.3rem' },
+                fontWeight: 'bold',
+                textTransform: 'none',
+                color: activeTab === 1 ? '#1B5E20' : 'text.secondary',
+                '&.Mui-selected': {
+                  color: '#1B5E20',
+                },
+                borderRadius: '10px 10px 0 0',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  backgroundColor: '#E8F5E9',
+                  transform: 'scale(1.03)',
+                },
+              }}
+            />
+          </Tabs>
 
-        <Logo size="small" />
+          {activeTab === 0 ? (
+            <LoginForm setActiveTab={setActiveTab} />
+          ) : (
+            <RegisterForm setActiveTab={setActiveTab} />
+          )}
+        </Box>
       </Paper>
-    </Box>
+    </Container>
   );
-} 
+}

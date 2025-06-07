@@ -1,7 +1,10 @@
 import { Routes as RouterRoutes, Route, Navigate, useLocation } from 'react-router-dom';
-import { HomePage } from '../pages/HomePage';
+
 import { LoginPage } from '../pages/LoginPage/LoginPage';
-import { RegisterPage } from '../pages/registerPage/RegisterPage';
+// import { RegisterPage } from '../pages/registerPage/RegisterPage'; // Manter como antes se você removeu ou redirecionou
+// Se você está usando o redirecionamento conforme a última instrução:
+// import { RegisterPage } from '../pages/registerPage/RegisterPage'; // Remover esta linha
+// Exemplo: <Route path="/register" element={<Navigate to="/login" replace />} />
 
 function isAuthenticated() {
   return !!localStorage.getItem('token');
@@ -29,14 +32,17 @@ export function AppRoutes() {
       </div>
       <RouterRoutes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        {/* Se você removeu RegisterPage.tsx e quer redirecionar */}
+        {/* <Route path="/register" element={<Navigate to="/login" replace />} /> */}
+        {/* Se você ainda tiver RegisterPage, mas não a está usando mais diretamente na rota */}
+        <Route path="/register" element={<LoginPage />} /> {/* Aponta para LoginPage agora que é unificada */}
         <Route path="/" element={
           <PrivateRoute>
-            <HomePage />
+            <div>Página Principal</div>
           </PrivateRoute>
         } />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </RouterRoutes>
     </>
   );
-} 
+}
