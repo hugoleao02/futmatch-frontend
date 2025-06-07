@@ -50,13 +50,13 @@ export const styles = {
     fontWeight: 400,
     textAlign: 'center',
     mb: { xs: 2, sm: 3 },
-    textShadow: '0 1px 4px rgba(0,0,0,0.10)'
+    textShadow: '0 1px 4px rgba(0,0,0,0.10)',
   },
   form: {
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    gap: { xs: 2, sm: 2.5 }
+    gap: { xs: 2, sm: 2.5 },
   },
   submitButton: {
     mt: { xs: 0.5, sm: 1 },
@@ -77,14 +77,14 @@ export const styles = {
     textAlign: 'center',
     mt: { xs: 2, sm: 3 },
     fontWeight: 400,
-    textShadow: '0 1px 4px rgba(0,0,0,0.10)'
+    textShadow: '0 1px 4px rgba(0,0,0,0.10)',
   },
   footerLink: {
     textDecoration: 'underline',
     cursor: 'pointer',
     fontWeight: 700,
     color: '#AD9B60',
-    textShadow: '0 1px 4px rgba(0,0,0,0.10)'
+    textShadow: '0 1px 4px rgba(0,0,0,0.10)',
   },
   footerLogo: {
     width: { xs: 48, sm: 58 },
@@ -98,5 +98,5 @@ export const styles = {
     border: '3px solid #AD9B60',
     position: 'relative',
     left: 'auto',
-  }
-} as Record<string, SxProps<Theme>>; 
+  },
+} as Record<string, SxProps<Theme>>;

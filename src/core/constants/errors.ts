@@ -5,4 +5,4 @@ export const AUTH_ERRORS = {
   LOGIN_ERROR: 'Erro ao fazer login',
   REGISTER_ERROR: 'Erro ao realizar cadastro',
   INVALID_CREDENTIALS: 'Usuário ou senha inválidos',
-} as const; 
+} as const;

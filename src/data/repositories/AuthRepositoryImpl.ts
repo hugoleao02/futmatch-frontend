@@ -16,4 +16,4 @@ export class AuthRepositoryImpl implements IAuthRepository {
   async logout(): Promise<void> {
     localStorage.removeItem('token');
   }
-} 
+}

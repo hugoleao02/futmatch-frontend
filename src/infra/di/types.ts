@@ -10,4 +10,4 @@ export interface Container {
     loginUseCase: ILoginUseCase;
     registerUseCase: IRegisterUseCase;
   };
-} 
+}

@@ -13,7 +13,5 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <AuthContext.Provider value={container}>
-    {children}
-  </AuthContext.Provider>
-); 
+  <AuthContext.Provider value={container}>{children}</AuthContext.Provider>
+);

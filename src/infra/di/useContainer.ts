@@ -7,4 +7,4 @@ export function useContainer() {
     throw new Error('useContainer must be used within a ContainerProvider');
   }
   return container;
-} 
+}

@@ -22,4 +22,4 @@ export class LoginUseCase implements ILoginUseCase {
       throw new Error(AUTH_ERRORS.INVALID_CREDENTIALS);
     }
   }
-} 
+}

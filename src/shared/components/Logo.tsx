@@ -1,21 +1,19 @@
 import { Box } from '@mui/material';
-import logo from '../../../../assets/logo.png';
+import LogoImg from '../../assets/logo.png';
 
 interface LogoProps {
   size?: 'small' | 'large';
 }
 
 export function Logo({ size = 'large' }: LogoProps) {
-  const dimensions = size === 'large' 
-    ? { xs: 80, sm: 100 }
-    : { xs: 48, sm: 58 };
+  const dimensions = size === 'large' ? { xs: 80, sm: 100 } : { xs: 48, sm: 58 };
 
   const borderWidth = size === 'large' ? 4 : 3;
 
   return (
     <Box
       component="img"
-      src={logo}
+      src={LogoImg}
       alt="Logo FutMatch"
       sx={{
         width: dimensions,
@@ -30,4 +28,4 @@ export function Logo({ size = 'large' }: LogoProps) {
       }}
     />
   );
-} 
+}

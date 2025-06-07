@@ -26,4 +26,4 @@ export class RegisterUseCase implements IRegisterUseCase {
       throw new Error(AUTH_ERRORS.REGISTER_ERROR);
     }
   }
-} 
+}

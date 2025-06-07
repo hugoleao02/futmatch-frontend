@@ -12,4 +12,4 @@ export interface RegisterResponse {
 export interface ApiError {
   message: string;
   statusCode: number;
-} 
+}

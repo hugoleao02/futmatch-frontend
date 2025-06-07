@@ -18,4 +18,4 @@ export const container: Container = {
     loginUseCase,
     registerUseCase,
   },
-}; 
+};

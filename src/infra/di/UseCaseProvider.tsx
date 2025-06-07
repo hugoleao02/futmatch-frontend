@@ -22,4 +22,4 @@ export const UseCaseProvider: React.FC<{ children: React.ReactNode }> = ({ child
   <UseCaseContext.Provider value={{ loginUseCase, registerUseCase }}>
     {children}
   </UseCaseContext.Provider>
-); 
+);
