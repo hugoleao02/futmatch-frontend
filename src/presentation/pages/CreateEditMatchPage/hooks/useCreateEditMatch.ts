@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import type { Participacao, PartidaRequest, PartidaResponse } from '../../../../core/types/api';
 import { Esporte, TipoPartida } from '../../../../core/types/api';
 import { api } from '../../../../infra/http/api';
@@ -105,15 +106,13 @@ export const useCreateEditMatch = () => {
         tipoPartida,
       };
 
-      console.log('Enviando requisição:', partidaRequest);
-
       const response = await api.post<PartidaResponse>('/partidas', partidaRequest);
 
       if (response.status === 201) {
         navigate('/home');
       }
     } catch (error: any) {
-      console.error('Erro ao salvar partida:', error);
+      toast.error('Erro ao salvar partida:', error);
     } finally {
       setLoading(false);
     }
