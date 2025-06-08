@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import type { Participacao, PartidaRequest, PartidaResponse } from '../../../../core/types/api';
+import type {
+  Participacao,
+  PartidaRequest,
+  PartidaResponse,
+  PartidaUpdateRequest,
+} from '../../../../core/types/api';
 import { Esporte, TipoPartida } from '../../../../core/types/api';
 import { api } from '../../../../infra/http/api';
 
@@ -41,10 +46,12 @@ export const useCreateEditMatch = () => {
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [matchId, setMatchId] = useState<string | null>(null);
 
   useEffect(() => {
-    const matchId = new URLSearchParams(window.location.search).get('id');
-    if (matchId) {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (id) {
+      setMatchId(id);
       setIsEdit(true);
       setLoading(true);
 
@@ -96,23 +103,50 @@ export const useCreateEditMatch = () => {
       // Formatar a data para o formato ISO que o backend espera
       const dataHoraFormatada = dataHora.toISOString();
 
-      const partidaRequest: PartidaRequest = {
-        nome,
-        esporte,
-        latitude,
-        longitude,
-        dataHora: dataHoraFormatada,
-        totalJogadores,
-        tipoPartida,
-      };
+      if (isEdit && matchId) {
+        // Atualizar partida existente
+        const partidaUpdateRequest: PartidaUpdateRequest = {
+          id: matchId,
+          nome,
+          esporte,
+          latitude,
+          longitude,
+          dataHora: dataHoraFormatada,
+          totalJogadores,
+          tipoPartida,
+        };
 
-      const response = await api.post<PartidaResponse>('/partidas', partidaRequest);
+        const response = await api.put<PartidaResponse>(
+          `/partidas/${matchId}`,
+          partidaUpdateRequest,
+        );
 
-      if (response.status === 201) {
-        navigate('/home');
+        if (response.status === 200) {
+          toast.success('Partida atualizada com sucesso!');
+          navigate('/home');
+        }
+      } else {
+        // Criar nova partida
+        const partidaRequest: PartidaRequest = {
+          nome,
+          esporte,
+          latitude,
+          longitude,
+          dataHora: dataHoraFormatada,
+          totalJogadores,
+          tipoPartida,
+        };
+
+        const response = await api.post<PartidaResponse>('/partidas', partidaRequest);
+
+        if (response.status === 201) {
+          toast.success('Partida criada com sucesso!');
+          navigate('/home');
+        }
       }
     } catch (error: any) {
-      toast.error('Erro ao salvar partida:', error);
+      console.error('Erro ao salvar partida:', error);
+      toast.error(error.message || 'Erro ao salvar partida');
     } finally {
       setLoading(false);
     }

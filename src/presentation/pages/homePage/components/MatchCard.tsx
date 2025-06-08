@@ -1,5 +1,6 @@
 import {
   CalendarToday as CalendarTodayIcon,
+  Edit as EditIcon,
   EmojiEvents as EmojiEventsIcon,
   Group as GroupIcon,
   LocationOn as LocationOnIcon,
@@ -9,6 +10,7 @@ import {
 } from '@mui/icons-material';
 import { Box, Button, Card, CardActions, CardContent, Grid, Typography } from '@mui/material';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Match } from '../../../../core/usecases/interfaces/IHomeUseCase';
 import { homeStyles } from '../styles/homeStyles';
 
@@ -23,6 +25,12 @@ export const MatchCard: React.FC<MatchCardProps> = ({
   onMatchDetailsClick,
   onOpenRecapModal,
 }) => {
+  const navigate = useNavigate();
+
+  const handleEditClick = () => {
+    navigate(`/match/edit?id=${match.id}`);
+  };
+
   return (
     <Grid size={{ xs: 12, sm: 6, md: 4 }}>
       <Card elevation={3} sx={homeStyles.matchCard}>
@@ -78,13 +86,23 @@ export const MatchCard: React.FC<MatchCardProps> = ({
               Gerar Resumo ✨
             </Button>
           ) : (
-            <Button
-              size="small"
-              sx={homeStyles.detailsButton}
-              onClick={() => onMatchDetailsClick(match.id)}
-            >
-              Ver Detalhes
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                size="small"
+                sx={homeStyles.editButton}
+                onClick={handleEditClick}
+                startIcon={<EditIcon />}
+              >
+                Editar
+              </Button>
+              <Button
+                size="small"
+                sx={homeStyles.detailsButton}
+                onClick={() => onMatchDetailsClick(match.id)}
+              >
+                Ver Detalhes
+              </Button>
+            </Box>
           )}
         </CardActions>
       </Card>

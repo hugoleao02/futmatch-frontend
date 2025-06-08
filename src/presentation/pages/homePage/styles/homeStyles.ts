@@ -158,6 +158,12 @@ export const homeStyles = {
     '&:hover': { backgroundColor: '#E3F2FD' },
   } as SxProps<Theme>,
 
+  editButton: {
+    color: THEME.colors.primary.main,
+    fontWeight: THEME.typography.fontWeight.bold,
+    '&:hover': { backgroundColor: '#E3F2FD' },
+  } as SxProps<Theme>,
+
   recapButton: {
     color: '#F57C00',
     fontWeight: THEME.typography.fontWeight.bold,

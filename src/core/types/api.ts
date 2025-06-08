@@ -44,6 +44,10 @@ export interface PartidaRequest {
   tipoPartida: TipoPartida;
 }
 
+export interface PartidaUpdateRequest extends PartidaRequest {
+  id: string;
+}
+
 export interface Participacao {
   id: string;
   usuarioId: string;

@@ -1,84 +1,53 @@
+import type { IPartidaRepository } from '../repositories/IPartidaRepository';
 import type { IHomeUseCase, Match, Room, SearchFilters } from './interfaces/IHomeUseCase';
 
 export class HomeUseCase implements IHomeUseCase {
+  constructor(private readonly partidaRepository: IPartidaRepository) {}
+
   async getMatches(filters?: SearchFilters): Promise<Match[]> {
-    // Dados mock - aqui você integraria com repositório real
-    const mockMatches: Match[] = [
-      {
-        id: '1',
-        name: 'Pelada da Vila',
-        sport: 'Futebol',
-        location: 'Rua das Flores, 123 - Centro',
-        date: '10/06/2025',
-        time: '20:00',
-        currentPlayers: 8,
-        totalPlayers: 12,
-        type: 'Pública',
-        distance: '2.5 km',
-        status: 'Próxima',
-        isRoomMatch: false,
-      },
-      {
-        id: '2',
-        name: 'Futsal Noturno - Ginásio X',
-        sport: 'Futsal',
-        location: 'Av. Principal, 456 - Bairro Novo',
-        date: '11/06/2025',
-        time: '19:30',
-        currentPlayers: 6,
-        totalPlayers: 10,
-        type: 'Pública',
-        distance: '5.1 km',
-        status: 'Próxima',
-        isRoomMatch: false,
-      },
-      {
-        id: '3',
-        name: 'Jogo Secreto - Campo Y',
-        sport: 'Futebol',
-        location: 'Rua Escondida, 789 - Zona Sul',
-        date: '03/06/2025',
-        time: '21:00',
-        currentPlayers: 10,
-        totalPlayers: 10,
-        type: 'Privada',
-        distance: '1.8 km',
-        status: 'Finalizada',
-        isRoomMatch: true,
-        roomId: 'room1',
-      },
-      {
-        id: '4',
-        name: 'Rachão Amigos do Bola',
-        sport: 'Futebol',
-        location: 'Praça da Bandeira, S/N',
-        date: '10/06/2025',
-        time: '18:30',
-        currentPlayers: 11,
-        totalPlayers: 12,
-        type: 'Pública',
-        distance: '0.9 km',
-        status: 'Próxima',
-        isRoomMatch: false,
-      },
-    ];
+    try {
+      const partidas = await this.partidaRepository.listarPartidas();
 
-    // Aplicar filtros se fornecidos
-    if (!filters) return mockMatches;
+      // Converter PartidaResponse para Match
+      const matches: Match[] = partidas.map(partida => ({
+        id: partida.id,
+        name: partida.nome,
+        sport: partida.esporte,
+        location: `${partida.latitude}, ${partida.longitude}`,
+        date: new Date(partida.dataHora).toLocaleDateString('pt-BR'),
+        time: new Date(partida.dataHora).toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        currentPlayers: partida.participantes?.length || 0,
+        totalPlayers: partida.totalJogadores,
+        type: partida.tipoPartida === 'PUBLICA' ? 'Pública' : 'Privada',
+        distance: '0 km', // TODO: Implementar cálculo de distância
+        status: new Date(partida.dataHora) > new Date() ? 'Próxima' : 'Finalizada',
+        isRoomMatch: false,
+      }));
 
-    return mockMatches.filter(match => {
-      if (filters.sport && filters.sport !== 'Todos' && match.sport !== filters.sport) return false;
-      if (filters.matchType && filters.matchType !== 'Todos' && match.type !== filters.matchType)
-        return false;
-      if (
-        filters.location &&
-        !match.location.toLowerCase().includes(filters.location.toLowerCase())
-      )
-        return false;
-      if (filters.date && match.date !== filters.date) return false;
-      if (filters.time && match.time !== filters.time) return false;
-      return true;
-    });
+      // Aplicar filtros se fornecidos
+      if (!filters) return matches;
+
+      return matches.filter(match => {
+        if (filters.sport && filters.sport !== 'Todos' && match.sport !== filters.sport)
+          return false;
+        if (filters.matchType && filters.matchType !== 'Todos' && match.type !== filters.matchType)
+          return false;
+        if (
+          filters.location &&
+          !match.location.toLowerCase().includes(filters.location.toLowerCase())
+        )
+          return false;
+        if (filters.date && match.date !== filters.date) return false;
+        if (filters.time && match.time !== filters.time) return false;
+        return true;
+      });
+    } catch (error) {
+      console.error('Erro ao buscar partidas:', error);
+      return [];
+    }
   }
 
   async getUserRooms(): Promise<Room[]> {
