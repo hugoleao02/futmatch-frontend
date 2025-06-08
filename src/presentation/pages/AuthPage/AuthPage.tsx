@@ -1,17 +1,17 @@
-import { Box, Typography, Tabs, Tab, Container, Paper } from '@mui/material';
+import { Box, Container, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { Logo } from '../../../shared/components/Logo';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import { useAuthPage } from './hooks/useAuthPage';
 import {
-  containerStyles,
-  paperStyles,
   brandColumnStyles,
+  containerStyles,
   formColumnStyles,
+  paperStyles,
   tabStyles,
 } from './styles/AuthPage.styles';
 
-export function LoginPage() {
+export function AuthPage() {
   const { activeTab, handleTabChange, setActiveTab } = useAuthPage();
 
   return (

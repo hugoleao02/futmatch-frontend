@@ -6,6 +6,7 @@ export const homeStyles = {
     flexGrow: 1,
     backgroundColor: THEME.colors.background.default,
     minHeight: '100vh',
+    minWidth: '100vw',
     fontFamily: THEME.typography.fontFamily.primary,
   } as SxProps<Theme>,
 

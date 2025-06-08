@@ -1,7 +1,8 @@
 import { Navigate, Route, Routes as RouterRoutes, useLocation } from 'react-router-dom';
 import { useAuth } from '../../shared/hooks';
 
-import { LoginPage } from '../pages/AuthPage/AuthPage';
+import { AuthPage } from '../pages/AuthPage';
+import CreateEditMatchPage from '../pages/CreateEditMatchPage';
 import { HomePage } from '../pages/homePage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -35,7 +36,7 @@ export function AppRoutes() {
               <div className="absolute bottom-12 right-1/3 w-40 h-12 bg-cyan-400/20 blur-2xl rounded-full" />
               <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent" />
             </div>
-            <LoginPage />
+            <AuthPage />
           </>
         }
       />
@@ -52,6 +53,22 @@ export function AppRoutes() {
         element={
           <PrivateRoute>
             <HomePage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/match/create"
+        element={
+          <PrivateRoute>
+            <CreateEditMatchPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/match/edit"
+        element={
+          <PrivateRoute>
+            <CreateEditMatchPage />
           </PrivateRoute>
         }
       />

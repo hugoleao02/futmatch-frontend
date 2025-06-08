@@ -35,7 +35,7 @@ export const useHomeHandlers = () => {
 
   const handleCreateNewSoloMatch = useCallback(() => {
     handleCloseCreateMenu();
-    toast.info('Funcionalidade de criar partida avulsa em desenvolvimento');
+    navigate('/match/create');
   }, []);
 
   const handleMatchDetailsClick = useCallback((matchId: string) => {

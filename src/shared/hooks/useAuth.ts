@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { STORAGE_KEYS } from '../constants/app';
 import { useLocalStorage } from './useLocalStorage';
 
 export const useAuth = () => {
-  const [token, setToken] = useLocalStorage<string | null>('token', null);
+  const [token, setToken] = useLocalStorage<string | null>(STORAGE_KEYS.token, null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
