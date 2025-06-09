@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { SearchFilters } from '../../core/usecases/interfaces/IHomeUseCase';
+import type { SearchFilters } from '@domain/usecases/interfaces/IHomeUseCase';
 
 export const useFilters = (initialFilters: SearchFilters) => {
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);

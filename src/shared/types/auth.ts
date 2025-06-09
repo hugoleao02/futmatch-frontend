@@ -1,4 +1,4 @@
-import type { AuthenticatedUser, UserRole } from '../../core/entities/User';
+import type { AuthenticatedUser, UserRole } from '@domain/entities/User';
 import type { LoadingState } from './common';
 
 // Estados de autenticação

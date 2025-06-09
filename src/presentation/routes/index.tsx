@@ -1,6 +1,7 @@
+import { useAuth } from '@shared/hooks';
+import type { RouteObject } from 'react-router-dom';
 import { Navigate, Route, Routes as RouterRoutes, useLocation } from 'react-router-dom';
-import { useAuth } from '../../shared/hooks';
-import { routes, ROUTES } from './routes';
+import { ROUTES, routes } from './routes';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -20,7 +21,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 export function AppRoutes() {
   return (
     <RouterRoutes>
-      {routes.map(route => (
+      {routes.map((route: RouteObject) => (
         <Route
           key={route.path}
           path={route.path}

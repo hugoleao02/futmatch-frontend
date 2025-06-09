@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast, type ToastOptions } from 'react-toastify';
 
 export function useLocalStorage<T>(
@@ -11,9 +11,18 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
+      console.error('Erro ao ler do localStorage:', error);
       return initialValue;
     }
   });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(storedValue));
+    } catch (error) {
+      console.error('Erro ao salvar no localStorage:', error);
+    }
+  }, [key, storedValue]);
 
   // Função para atualizar o valor
   const setValue = (value: T | ((val: T) => T)) => {
@@ -31,5 +40,5 @@ export function useLocalStorage<T>(
     }
   };
 
-  return [storedValue, setValue];
+  return [storedValue, setValue] as const;
 }

@@ -1,0 +1,27 @@
+export class NotificationService {
+  private static instance: NotificationService;
+
+  private constructor() {}
+
+  static getInstance(): NotificationService {
+    if (!NotificationService.instance) {
+      NotificationService.instance = new NotificationService();
+    }
+    return NotificationService.instance;
+  }
+
+  async sendEmail(to: string, subject: string, body: string): Promise<void> {
+    // TODO: Implementar integração com serviço de email
+    console.log('Enviando email:', { to, subject, body });
+  }
+
+  async sendPushNotification(userId: string, title: string, body: string): Promise<void> {
+    // TODO: Implementar integração com serviço de push notification
+    console.log('Enviando push notification:', { userId, title, body });
+  }
+
+  async sendSMS(phone: string, message: string): Promise<void> {
+    // TODO: Implementar integração com serviço de SMS
+    console.log('Enviando SMS:', { phone, message });
+  }
+}

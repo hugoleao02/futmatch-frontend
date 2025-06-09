@@ -11,8 +11,11 @@ export const API_CONFIG = {
   version: 'v1',
 } as const;
 
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
 export const STORAGE_KEYS = {
-  token: 'futmatch_token',
+  token: '@futmatch:token',
+  refreshToken: 'futmatch_refresh_token',
   user: 'futmatch_user',
   theme: 'futmatch_theme',
   language: 'futmatch_language',

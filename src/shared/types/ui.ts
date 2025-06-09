@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { SelectOption } from './common';
 
 // Tamanhos componentes
 export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -76,7 +77,7 @@ export interface InputProps extends BaseComponentProps {
 
 // Props para select
 export interface SelectProps<T = string> extends BaseComponentProps {
-  options: UISelectOption<T>[];
+  options: SelectOption<T>[];
   value?: T;
   defaultValue?: T;
   placeholder?: string;
@@ -88,13 +89,6 @@ export interface SelectProps<T = string> extends BaseComponentProps {
   label?: string;
   helperText?: string;
   onChange?: (value: T | T[]) => void;
-}
-
-export interface UISelectOption<T = string> {
-  label: string;
-  value: T;
-  disabled?: boolean;
-  group?: string;
 }
 
 // Props para modal
