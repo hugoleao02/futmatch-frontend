@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast, type ToastOptions } from 'react-toastify';
 
 export function useLocalStorage<T>(
   key: string,
@@ -10,7 +11,6 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
@@ -27,7 +27,7 @@ export function useLocalStorage<T>(
       // Salvar no localStorage
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
+      toast.error(`Error setting localStorage key "${key}":`, error as ToastOptions);
     }
   };
 

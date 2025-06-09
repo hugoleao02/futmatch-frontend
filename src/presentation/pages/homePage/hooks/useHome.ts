@@ -31,7 +31,6 @@ export const useHome = () => {
       setMatches(matchesData);
       setRooms(roomsData);
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
     } finally {
       setLoading(false);
     }
@@ -48,7 +47,6 @@ export const useHome = () => {
       const filteredMatches = await useCases.homeUseCase.getMatches(filters);
       setMatches(filteredMatches);
     } catch (error) {
-      console.error('Erro ao buscar partidas:', error);
     } finally {
       setLoading(false);
     }

@@ -1,1 +1,1 @@
-export { default } from './CreateEditMatchPage';
+export { default as CreateEditMatchPage } from './CreateEditMatchPage';

@@ -45,7 +45,6 @@ export const GameRecapGenerator: React.FC<GameRecapGeneratorProps> = ({
       const recap = await onGenerateRecap(matchName, recapInput);
       setGeneratedRecap(recap);
     } catch (err) {
-      console.error('Erro ao gerar resumo:', err);
       setError('Ocorreu um erro ao gerar o resumo. Tente novamente mais tarde.');
     } finally {
       setLoading(false);

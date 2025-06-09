@@ -11,11 +11,8 @@ export const api = axios.create({
 api.interceptors.request.use(
   config => {
     const token = localStorage.getItem(STORAGE_KEYS.token);
-    console.log('Token:', token);
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('Headers:', config.headers);
     }
 
     return config;
@@ -28,9 +25,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 403) {
-      localStorage.removeItem(STORAGE_KEYS.token);
-    }
     return Promise.reject(error);
   },
 );

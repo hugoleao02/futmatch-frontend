@@ -145,7 +145,6 @@ export const useCreateEditMatch = () => {
         }
       }
     } catch (error: any) {
-      console.error('Erro ao salvar partida:', error);
       toast.error(error.message || 'Erro ao salvar partida');
     } finally {
       setLoading(false);

@@ -1,3 +1,4 @@
+import { toast, type ToastOptions } from 'react-toastify';
 import type { IPartidaRepository } from '../repositories/IPartidaRepository';
 import type { IHomeUseCase, Match, Room, SearchFilters } from './interfaces/IHomeUseCase';
 
@@ -45,7 +46,7 @@ export class HomeUseCase implements IHomeUseCase {
         return true;
       });
     } catch (error) {
-      console.error('Erro ao buscar partidas:', error);
+      toast.error('Erro ao buscar partidas:', error as ToastOptions);
       return [];
     }
   }

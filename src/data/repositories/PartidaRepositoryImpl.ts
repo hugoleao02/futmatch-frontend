@@ -5,7 +5,6 @@ import { api } from '../../infra/http/api';
 export class PartidaRepositoryImpl implements IPartidaRepository {
   async listarPartidas(): Promise<PartidaResponse[]> {
     const response = await api.get<PartidaResponse[]>('/partidas');
-    console.log('Resposta da API:', response.data);
     return response.data;
   }
 

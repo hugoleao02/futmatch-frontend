@@ -1,3 +1,5 @@
+import { toast, type ToastOptions } from 'react-toastify';
+
 // LocalStorage wrapper with error handling
 export const storage = {
   get: <T>(key: string, defaultValue?: T): T | null => {
@@ -13,7 +15,7 @@ export const storage = {
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.error('Storage set error:', error);
+      toast.error('Storage set error:', error as ToastOptions);
     }
   },
 
@@ -21,7 +23,7 @@ export const storage = {
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      console.error('Storage remove error:', error);
+      toast.error('Storage remove error:', error as ToastOptions);
     }
   },
 
@@ -29,7 +31,7 @@ export const storage = {
     try {
       localStorage.clear();
     } catch (error) {
-      console.error('Storage clear error:', error);
+      toast.error('Storage clear error:', error as ToastOptions);
     }
   },
 
@@ -57,7 +59,7 @@ export const sessionStorage = {
     try {
       window.sessionStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.error('SessionStorage set error:', error);
+      toast.error('SessionStorage set error:', error as ToastOptions);
     }
   },
 
@@ -65,7 +67,7 @@ export const sessionStorage = {
     try {
       window.sessionStorage.removeItem(key);
     } catch (error) {
-      console.error('SessionStorage remove error:', error);
+      toast.error('SessionStorage remove error:', error as ToastOptions);
     }
   },
 
@@ -73,7 +75,7 @@ export const sessionStorage = {
     try {
       window.sessionStorage.clear();
     } catch (error) {
-      console.error('SessionStorage clear error:', error);
+      toast.error('SessionStorage clear error:', error as ToastOptions);
     }
   },
 };

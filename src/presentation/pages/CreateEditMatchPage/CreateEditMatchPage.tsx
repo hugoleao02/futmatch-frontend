@@ -4,18 +4,6 @@ import { MatchForm } from './components/MatchForm';
 import { useCreateEditMatch } from './hooks/useCreateEditMatch';
 import { styles } from './styles';
 
-// --- Dados Mock para simular o carregamento de uma partida existente para edição ---
-const mockExistingMatch = {
-  id: 'matchToEdit123',
-  name: 'Pelada de Aniversário',
-  sport: 'Futsal',
-  location: 'Quadra do Parque Central',
-  date: '2025-07-20', // Formato YYYY-MM-DD para input type="date"
-  time: '17:00',
-  totalPlayers: 10,
-  type: 'Privada',
-};
-
 const CreateEditMatchPage: React.FC = () => {
   const {
     nome,

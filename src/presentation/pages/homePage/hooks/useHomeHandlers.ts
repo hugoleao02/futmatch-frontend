@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { ROUTES } from '../../../../presentation/routes/routes';
 import { useAuth } from '../../../../shared/hooks';
 
 export const useHomeHandlers = () => {
@@ -13,7 +14,7 @@ export const useHomeHandlers = () => {
   const handleLogout = useCallback(() => {
     authLogout();
     toast.success('Logout realizado com sucesso!');
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   }, [authLogout, navigate]);
 
   const handleProfileClick = useCallback(() => {
@@ -35,12 +36,15 @@ export const useHomeHandlers = () => {
 
   const handleCreateNewSoloMatch = useCallback(() => {
     handleCloseCreateMenu();
-    navigate('/match/create');
-  }, []);
+    navigate(ROUTES.MATCH.CREATE);
+  }, [navigate]);
 
-  const handleMatchDetailsClick = useCallback((matchId: string) => {
-    toast.info(`Detalhes da partida ${matchId} em desenvolvimento`);
-  }, []);
+  const handleMatchDetailsClick = useCallback(
+    (matchId: string) => {
+      navigate(ROUTES.MATCH.DETAILS.replace(':id', matchId));
+    },
+    [navigate],
+  );
 
   const handleRoomDetailsClick = useCallback((roomId: string) => {
     toast.info(`Detalhes da sala ${roomId} em desenvolvimento`);
