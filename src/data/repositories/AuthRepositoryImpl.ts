@@ -1,25 +1,40 @@
-import { api } from '../../infra/http/api';
+import type { IAuthRepository } from '../../domain/repositories/IAuthRepository';
+import type { IHttpClient } from '../../domain/repositories/IHttpClient';
+import type { IStorage } from '../../domain/repositories/IStorage';
+import type {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+} from '../../domain/types';
 import { STORAGE_KEYS } from '../../shared/constants';
-import type { IAuthRepository } from '../../domain/repositories/IAuthRepository.ts';
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../../domain/types';
 
 export class AuthRepositoryImpl implements IAuthRepository {
+  constructor(
+    private readonly httpClient: IHttpClient,
+    private readonly storage: IStorage,
+  ) {}
+
   async login(loginRequest: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>('/auth/login', loginRequest);
-    const { token } = response.data;
-
-    // Salva o token no localStorage
-    localStorage.setItem(STORAGE_KEYS.token, token);
-
-    return response.data;
+    const response = await this.httpClient.post<LoginResponse>('/auth/login', loginRequest);
+    const { token } = response;
+    this.#setToken(token);
+    return response;
   }
 
-  async register(registerRequest:RegisterRequest): Promise<RegisterResponse> {
-    const response = await api.post<RegisterResponse>('/auth/register', registerRequest);
-    return response.data;
+  async register(registerRequest: RegisterRequest): Promise<RegisterResponse> {
+    return this.httpClient.post<RegisterResponse>('/auth/register', registerRequest);
   }
 
   async logout(): Promise<void> {
-    localStorage.removeItem(STORAGE_KEYS.token);
+    this.#removeToken();
+  }
+
+  #setToken(token: string): void {
+    this.storage.setItem(STORAGE_KEYS.token, token);
+  }
+
+  #removeToken(): void {
+    this.storage.removeItem(STORAGE_KEYS.token);
   }
 }
