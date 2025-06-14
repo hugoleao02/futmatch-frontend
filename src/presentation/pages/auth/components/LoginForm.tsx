@@ -15,8 +15,8 @@ import {
   titleStyles,
   forgotPasswordStyles,
   submitButtonStyles,
-} from '../styles/LoginForm.styles';
-import { useLoginForm } from '../hooks/useLoginForm';
+} from '../styles/LoginForm.styles.ts';
+import { useLoginForm } from '../hooks/useLoginForm.ts';
 
 const LoginForm = () => {
   const {

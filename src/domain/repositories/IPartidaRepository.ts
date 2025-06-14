@@ -1,4 +1,4 @@
-import type { PartidaRequest, PartidaResponse, PartidaUpdateRequest } from '../types/api';
+import type { PartidaRequest, PartidaResponse, PartidaUpdateRequest } from '../types';
 
 export interface IPartidaRepository {
   listarPartidas(): Promise<PartidaResponse[]>;

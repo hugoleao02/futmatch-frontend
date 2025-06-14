@@ -1,5 +1,5 @@
-import type { RegisterResponse } from '../../types/api';
+import type { RegisterRequest, RegisterResponse } from '../../types';
 
 export interface IRegisterUseCase {
-  execute(nome: string, email: string, senha: string): Promise<RegisterResponse>;
+  execute(registerRequest: RegisterRequest): Promise<RegisterResponse>;
 }

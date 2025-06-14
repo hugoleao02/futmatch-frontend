@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useContainer } from '../../../../infra/di/useContainer';
+import { useContainer } from '../../../../infra/di/useContainer.ts';
 
 interface UseRegisterFormProps {
   setActiveTab: (tab: number) => void;

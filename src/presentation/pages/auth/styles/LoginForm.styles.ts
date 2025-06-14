@@ -5,7 +5,7 @@ export {
   baseFormStyles as formStyles,
   baseTextFieldStyles as textFieldStyles,
   baseTitleStyles as titleStyles,
-} from '../../../../shared/styles/formStyles';
+} from '../../../../shared/styles/formStyles.ts';
 
 export const forgotPasswordStyles: SxProps<Theme> = {
   color: '#1B5E20',

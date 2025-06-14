@@ -1,5 +1,5 @@
-import type { LoginResponse } from '../../types/api';
+import type { LoginRequest, LoginResponse } from '../../types';
 
 export interface ILoginUseCase {
-  execute(email: string, senha: string): Promise<LoginResponse>;
+  execute(loginRequest: LoginRequest): Promise<LoginResponse>;
 }

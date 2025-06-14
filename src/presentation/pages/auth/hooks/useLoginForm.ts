@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useContainer } from '../../../../infra/di/useContainer';
+import { useContainer } from '../../../../infra/di/useContainer.ts';
 import { useAuth } from '../../../../shared/hooks';
 
 export const useLoginForm = () => {

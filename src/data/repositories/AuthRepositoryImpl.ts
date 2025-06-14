@@ -1,11 +1,11 @@
-import type { IAuthRepository } from '../../core/repositories/IAuthRepository';
-import type { LoginResponse, RegisterResponse } from '../../core/types/api';
 import { api } from '../../infra/http/api';
-import { STORAGE_KEYS } from '../../shared/constants/app';
+import { STORAGE_KEYS } from '../../shared/constants';
+import type { IAuthRepository } from '../../domain/repositories/IAuthRepository.ts';
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../../domain/types';
 
 export class AuthRepositoryImpl implements IAuthRepository {
-  async login(email: string, senha: string): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>('/auth/login', { email, senha });
+  async login(loginRequest: LoginRequest): Promise<LoginResponse> {
+    const response = await api.post<LoginResponse>('/auth/login', loginRequest);
     const { token } = response.data;
 
     // Salva o token no localStorage
@@ -14,8 +14,8 @@ export class AuthRepositoryImpl implements IAuthRepository {
     return response.data;
   }
 
-  async register(nome: string, email: string, senha: string): Promise<RegisterResponse> {
-    const response = await api.post<RegisterResponse>('/auth/register', { nome, email, senha });
+  async register(registerRequest:RegisterRequest): Promise<RegisterResponse> {
+    const response = await api.post<RegisterResponse>('/auth/register', registerRequest);
     return response.data;
   }
 

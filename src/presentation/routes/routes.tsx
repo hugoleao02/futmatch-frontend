@@ -1,5 +1,5 @@
 import type { RouteObject } from 'react-router-dom';
-import { AuthPage } from '../pages/AuthPage';
+import { AuthPage } from '../pages/auth';
 import { CreateEditMatchPage } from '../pages/CreateEditMatchPage';
 import { HomePage } from '../pages/homePage';
 import { MatchDetailsPage } from '../pages/MatchDetailsPage';

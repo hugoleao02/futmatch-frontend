@@ -1,15 +1,15 @@
 import { Box, Container, Paper, Tab, Tabs, Typography } from '@mui/material';
-import { Logo } from '../../../shared/components/Logo';
-import LoginForm from './components/LoginForm';
-import RegisterForm from './components/RegisterForm';
-import { useAuthPage } from './hooks/useAuthPage';
+import { Logo } from '../../../shared/components/Logo.tsx';
+import LoginForm from './components/LoginForm.tsx';
+import RegisterForm from './components/RegisterForm.tsx';
+import { useAuthPage } from './hooks/useAuthPage.ts';
 import {
   brandColumnStyles,
   containerStyles,
   formColumnStyles,
   paperStyles,
   tabStyles,
-} from './styles/AuthPage.styles';
+} from './styles/AuthPage.styles.ts';
 
 export function AuthPage() {
   const { activeTab, handleTabChange, setActiveTab } = useAuthPage();

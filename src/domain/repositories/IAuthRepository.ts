@@ -1,7 +1,7 @@
-import type { LoginResponse, RegisterResponse } from '../types/api';
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../types';
 
 export interface IAuthRepository {
-  login(email: string, senha: string): Promise<LoginResponse>;
-  register(nome: string, email: string, senha: string): Promise<RegisterResponse>;
+  login(loginRequest: LoginRequest): Promise<LoginResponse>;
+  register(registerRequest: RegisterRequest): Promise<RegisterResponse>;
   logout(): Promise<void>;
 }

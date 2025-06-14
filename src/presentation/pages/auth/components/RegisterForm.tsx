@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useRegisterForm } from '../hooks/useRegisterForm';
+import { useRegisterForm } from '../hooks/useRegisterForm.ts';
 import {
   formStyles,
   linkStyles,
@@ -17,7 +17,7 @@ import {
   submitButtonStyles,
   textFieldStyles,
   titleStyles,
-} from '../styles/RegisterForm.styles';
+} from '../styles/RegisterForm.styles.ts';
 
 interface RegisterFormProps {
   setActiveTab: (tab: number) => void;
