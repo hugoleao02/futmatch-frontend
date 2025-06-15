@@ -1,7 +1,6 @@
 import {
   CalendarToday as CalendarTodayIcon,
   Edit as EditIcon,
-  EmojiEvents as EmojiEventsIcon,
   Group as GroupIcon,
   LocationOn as LocationOnIcon,
   Lock as LockIcon,
@@ -11,25 +10,33 @@ import {
 import { Box, Button, Card, CardActions, CardContent, Grid, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Match } from '../../../../core/usecases/interfaces/IHomeUseCase';
+import type { Partida } from '../../../../domain/entities/Partida.ts';
+import { TipoPartida } from '../../../../domain/enums';
 import { homeStyles } from '../styles/homeStyles';
 
-interface MatchCardProps {
-  match: Match;
+interface PartidaCardProps {
+  partida: Partida;
   onMatchDetailsClick: (matchId: string) => void;
   onOpenRecapModal: (matchName: string) => void;
 }
 
-export const MatchCard: React.FC<MatchCardProps> = ({
-  match,
+export const PartidaCard: React.FC<PartidaCardProps> = ({
+  partida,
   onMatchDetailsClick,
-  onOpenRecapModal,
 }) => {
   const navigate = useNavigate();
 
   const handleEditClick = () => {
-    navigate(`/match/edit?id=${match.id}`);
+    navigate(`/match/edit?id=${partida.id}`);
   };
+
+  // Separar data e hora
+  const [date, time] = partida.dataHora
+    ? partida.dataHora.toLocaleDateString('pt-BR').split('T')
+    : ['', ''];
+
+  // Participantes
+  const currentPlayers = partida.participantes ? partida.participantes.length : 0;
 
   return (
     <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -37,73 +44,64 @@ export const MatchCard: React.FC<MatchCardProps> = ({
         <CardContent>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
             <Typography variant="h6" component="div" sx={homeStyles.cardTitle}>
-              {match.name}
+              {partida.nome}
             </Typography>
             <Typography
               variant="body2"
-              color={match.type === 'Pública' ? 'primary' : 'error'}
+              color={partida.tipoPartida === TipoPartida.PUBLICA ? 'primary' : 'error'}
               sx={{ fontWeight: 'bold' }}
             >
-              {match.type === 'Pública' ? (
+              {partida.tipoPartida === TipoPartida.PUBLICA ? (
                 <PublicIcon sx={homeStyles.icon} />
               ) : (
                 <LockIcon sx={homeStyles.icon} />
               )}
-              {match.type}
+              {partida.tipoPartida === TipoPartida.PUBLICA ? 'Pública' : 'Privada'}
             </Typography>
           </Box>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             <SportsSoccerIcon sx={homeStyles.icon} />
-            {match.sport} - {match.location}
+            {partida.esporte}
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             <CalendarTodayIcon sx={homeStyles.icon} />
-            {match.date} às {match.time}
+            {date} {time && `às ${time.substring(0, 5)}`}
           </Typography>
 
           <Typography variant="body2" color="text.secondary">
             <GroupIcon sx={homeStyles.icon} />
-            Vagas: {match.currentPlayers}/{match.totalPlayers} (
-            <strong>{match.totalPlayers - match.currentPlayers} restantes</strong>)
+            Vagas: {currentPlayers}/{partida.totalJogadores} (
+            <strong>{partida.totalJogadores - currentPlayers} restantes</strong>)
           </Typography>
 
+          {/* Se quiser mostrar localização, pode exibir latitude/longitude */}
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontWeight: 'medium' }}>
             <LocationOnIcon sx={homeStyles.icon} />
-            {match.distance} daqui
+            {`Lat: ${partida.latitude}, Lon: ${partida.longitude}`}
           </Typography>
         </CardContent>
 
         <CardActions sx={homeStyles.cardActions}>
-          {match.status === 'Finalizada' ? (
+          {/* Se não tiver status, pode remover ou ajustar essa lógica */}
+          <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
               size="small"
-              sx={homeStyles.recapButton}
-              onClick={() => onOpenRecapModal(match.name)}
-              startIcon={<EmojiEventsIcon />}
+              sx={homeStyles.editButton}
+              onClick={handleEditClick}
+              startIcon={<EditIcon />}
             >
-              Gerar Resumo ✨
+              Editar
             </Button>
-          ) : (
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                size="small"
-                sx={homeStyles.editButton}
-                onClick={handleEditClick}
-                startIcon={<EditIcon />}
-              >
-                Editar
-              </Button>
-              <Button
-                size="small"
-                sx={homeStyles.detailsButton}
-                onClick={() => onMatchDetailsClick(match.id)}
-              >
-                Ver Detalhes
-              </Button>
-            </Box>
-          )}
+            <Button
+              size="small"
+              sx={homeStyles.detailsButton}
+              onClick={() => onMatchDetailsClick(partida.id)}
+            >
+              Ver Detalhes
+            </Button>
+          </Box>
         </CardActions>
       </Card>
     </Grid>

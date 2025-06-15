@@ -1,1 +1,0 @@
-export { MatchDetailsPage } from './MatchDetailsPage';

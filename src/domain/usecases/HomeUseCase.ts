@@ -1,48 +1,43 @@
 import { toast, type ToastOptions } from 'react-toastify';
+import type { Sala } from '../entities/Sala.ts';
 import type { IPartidaRepository } from '../repositories/IPartidaRepository';
-import type { IHomeUseCase, Match, Room, SearchFilters } from './interfaces/IHomeUseCase';
+import type { PartidaResponse } from '../types';
+import type { IHomeUseCase, SearchFilters } from './interfaces/IHomeUseCase';
 
 export class HomeUseCase implements IHomeUseCase {
   constructor(private readonly partidaRepository: IPartidaRepository) {}
 
-  async getMatches(filters?: SearchFilters): Promise<Match[]> {
+  async getPartidas(filters?: SearchFilters): Promise<PartidaResponse[]> {
     try {
       const partidas = await this.partidaRepository.listarPartidas();
 
-      // Converter PartidaResponse para Match
-      const matches: Match[] = partidas.map(partida => ({
+      const partidaResponses: PartidaResponse[] = partidas.map(partida => ({
         id: partida.id,
-        name: partida.nome,
-        sport: partida.esporte,
-        location: `${partida.latitude}, ${partida.longitude}`,
-        date: new Date(partida.dataHora).toLocaleDateString('pt-BR'),
-        time: new Date(partida.dataHora).toLocaleTimeString('pt-BR', {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        currentPlayers: partida.participantes?.length || 0,
-        totalPlayers: partida.totalJogadores,
-        type: partida.tipoPartida === 'PUBLICA' ? 'Pública' : 'Privada',
-        distance: '0 km', // TODO: Implementar cálculo de distância
-        status: new Date(partida.dataHora) > new Date() ? 'Próxima' : 'Finalizada',
-        isRoomMatch: false,
+        nome: partida.nome,
+        esporte: partida.esporte,
+        latitude: partida.latitude,
+        longitude: partida.longitude,
+        dataHora: partida.dataHora,
+        totalJogadores: partida.totalJogadores,
+        tipoPartida: partida.tipoPartida,
+        criador: partida.criador,
+        participantes: partida.participantes || [],
       }));
 
       // Aplicar filtros se fornecidos
-      if (!filters) return matches;
+      if (!filters) return partidaResponses;
 
-      return matches.filter(match => {
-        if (filters.sport && filters.sport !== 'Todos' && match.sport !== filters.sport)
-          return false;
-        if (filters.matchType && filters.matchType !== 'Todos' && match.type !== filters.matchType)
+      return partidaResponses.filter(match => {
+        if (filters.sport && filters.sport !== 'Todos' && match.esporte !== filters.sport)
           return false;
         if (
-          filters.location &&
-          !match.location.toLowerCase().includes(filters.location.toLowerCase())
+          filters.matchType &&
+          filters.matchType !== 'Todos' &&
+          match.tipoPartida !== filters.matchType
         )
           return false;
-        if (filters.date && match.date !== filters.date) return false;
-        if (filters.time && match.time !== filters.time) return false;
+
+        if (filters.date && match.dataHora !== filters.date) return false;
         return true;
       });
     } catch (error) {
@@ -51,26 +46,26 @@ export class HomeUseCase implements IHomeUseCase {
     }
   }
 
-  async getUserRooms(): Promise<Room[]> {
+  async getUserRooms(): Promise<Sala[]> {
     // Dados mock - aqui você integraria com repositório real
     return [
       {
         id: 'room1',
-        name: 'Amigos da Pelada',
-        description: 'Nosso grupo para peladas de fim de semana!',
-        membersCount: 15,
-        type: 'Privada',
+        nome: 'Amigos da Pelada',
+        descricao: 'Nosso grupo para peladas de fim de semana!',
+        totalParticipantes: 15,
+        tipo: 'Privada',
         avatar: 'https://placehold.co/60x60/1B5E20/FFFFFF?text=A',
-        recentMatch: 'Jogo Secreto - Campo Y',
+        partidaRecente: 'Jogo Secreto - Campo Y',
       },
       {
         id: 'room2',
-        name: 'Futsal da Empresa',
-        description: 'Peladas semanais com a galera do trabalho.',
-        membersCount: 22,
-        type: 'Pública',
-        avatar: 'https://placehold.co/60x60/0D47A1/FFFFFF?text=E',
-        recentMatch: 'Última partida: 01/06',
+        nome: 'Pelada do Bairro',
+        descricao: 'Peladas semanais no campo do bairro!',
+        totalParticipantes: 20,
+        tipo: 'Pública',
+        avatar: 'https://placehold.co/60x60/1976D2/FFFFFF?text=P',
+        partidaRecente: 'Pelada do Sábado - Campo X',
       },
     ];
   }

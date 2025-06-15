@@ -7,8 +7,8 @@ import {
 import { AppBar, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../../routes/routes';
-import { styles } from '../styles';
+import { ROUTES } from '../../../routes/routes.tsx';
+import { styles } from '../styles.ts';
 
 interface HeaderProps {
   isCriador: boolean;

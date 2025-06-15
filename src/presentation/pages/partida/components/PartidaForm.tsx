@@ -1,9 +1,9 @@
 import { Box, Button, CircularProgress, MenuItem, TextField } from '@mui/material';
 import React from 'react';
-import { Esporte, TipoPartida } from '../../../../core/types/api';
 import { styles } from '../styles';
+import { Esporte, TipoPartida } from '../../../../domain/enums';
 
-interface MatchFormProps {
+interface PartidaFormProps {
   nome: string;
   esporte: Esporte;
   latitude: number;
@@ -26,7 +26,7 @@ interface MatchFormProps {
   onBack: () => void;
 }
 
-export const MatchForm: React.FC<MatchFormProps> = ({
+export const PartidaForm: React.FC<PartidaFormProps> = ({
   nome,
   esporte,
   latitude,

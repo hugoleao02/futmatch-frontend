@@ -1,7 +1,6 @@
 import type { Participacao } from './Participacao.ts';
-import type { TipoPartida } from './TipoPartida.ts';
-import type { Esporte } from './Esporte.ts';
-
+import type { TipoPartida } from '../enums/TipoPartida.ts';
+import type { Esporte } from '../enums/Esporte.ts';
 
 export interface PartidaResponse {
   id: string;

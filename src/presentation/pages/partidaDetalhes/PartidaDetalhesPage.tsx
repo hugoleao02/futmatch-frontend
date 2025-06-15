@@ -25,14 +25,14 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
-import { TipoPartida } from '../../../core/types/api';
-import { CancelDialog } from './components/CancelDialog';
-import { Header } from './components/Header';
-import { SortTeamsModal } from './components/SortTeamsModal';
-import { useMatchDetailsPageHandlers } from './hooks/useMatchDetailsPageHandlers';
-import { styles } from './styles';
+import { CancelDialog } from './components';
+import { Header } from './components';
+import { SortTeamsModal } from './components';
+import { usePartidasDetalhesPageHandlers } from './hooks/usePartidasDetalhesPageHandlers.ts';
+import { styles } from './styles.ts';
+import { TipoPartida } from '../../../domain/enums';
 
-export function MatchDetailsPage() {
+export function PartidaDetalhesPage() {
   const {
     formatarDataHora,
     handleOpenSortModal,
@@ -51,7 +51,7 @@ export function MatchDetailsPage() {
     handleAceitarSolicitacao,
     handleRecusarSolicitacao,
     handleSortearTimes,
-  } = useMatchDetailsPageHandlers();
+  } = usePartidasDetalhesPageHandlers();
 
   if (loading) {
     return (

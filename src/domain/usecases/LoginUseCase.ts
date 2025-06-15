@@ -1,8 +1,7 @@
 import { isRequired, isValidEmail } from '../../shared/utils';
 import { AUTH_ERRORS } from '../constants/errors';
 import type { IAuthRepository } from '../repositories/IAuthRepository';
-import type { LoginRequest } from '../types/LoginRequest';
-import type { LoginResponse } from '../types/LoginResponse';
+import type { LoginRequest, LoginResponse } from '../types';
 import type { ILoginUseCase } from './interfaces/ILoginUseCase';
 
 export class LoginUseCase implements ILoginUseCase {

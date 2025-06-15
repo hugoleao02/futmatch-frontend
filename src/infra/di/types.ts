@@ -1,8 +1,9 @@
-import type { IAuthRepository } from '../../core/repositories/IAuthRepository';
-import type { IPartidaRepository } from '../../core/repositories/IPartidaRepository';
-import type { IHomeUseCase } from '../../core/usecases/interfaces/IHomeUseCase';
-import type { ILoginUseCase } from '../../core/usecases/interfaces/ILoginUseCase';
-import type { IRegisterUseCase } from '../../core/usecases/interfaces/IRegisterUseCase';
+import type { IAuthRepository } from '../../domain/repositories/IAuthRepository.ts';
+import type { IPartidaRepository } from '../../domain/repositories/IPartidaRepository.ts';
+import type { ILoginUseCase } from '../../domain/usecases/interfaces/ILoginUseCase.ts';
+import type { IRegisterUseCase } from '../../domain/usecases/interfaces/IRegisterUseCase.ts';
+import type { IHomeUseCase } from '../../domain/usecases/interfaces/IHomeUseCase.ts';
+
 
 export interface Container {
   repositories: {

@@ -25,14 +25,14 @@ interface RegisterFormProps {
 
 const RegisterForm = ({ setActiveTab }: RegisterFormProps) => {
   const {
-    name,
-    setName,
+    nome,
+    setNome,
     email,
     setEmail,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
+    senha,
+    setSenha,
+    confirmarSenha,
+    setConfirmarSenha,
     showPassword,
     loading,
     handleSubmit,
@@ -50,8 +50,8 @@ const RegisterForm = ({ setActiveTab }: RegisterFormProps) => {
         label="Seu nome ou apelido (visível para outros)"
         variant="outlined"
         fullWidth
-        value={name}
-        onChange={e => setName(e.target.value)}
+        value={nome}
+        onChange={e => setNome(e.target.value)}
         required
         sx={textFieldStyles}
       />
@@ -72,8 +72,8 @@ const RegisterForm = ({ setActiveTab }: RegisterFormProps) => {
         variant="outlined"
         fullWidth
         type={showPassword ? 'text' : 'password'}
-        value={password}
-        onChange={e => setPassword(e.target.value)}
+        value={senha}
+        onChange={e => setSenha(e.target.value)}
         required
         sx={textFieldStyles}
         InputProps={{
@@ -101,8 +101,8 @@ const RegisterForm = ({ setActiveTab }: RegisterFormProps) => {
         variant="outlined"
         fullWidth
         type="password"
-        value={confirmPassword}
-        onChange={e => setConfirmPassword(e.target.value)}
+        value={confirmarSenha}
+        onChange={e => setConfirmarSenha(e.target.value)}
         required
         sx={textFieldStyles}
       />

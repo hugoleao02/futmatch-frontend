@@ -183,7 +183,7 @@ interface RegisterFormProps {
 />
 ```
 
-### MatchCard
+### PartidaCard
 
 ```typescript
 interface MatchCardProps {
@@ -195,7 +195,7 @@ interface MatchCardProps {
 
 **Exemplo de Uso:**
 ```tsx
-<MatchCard
+<PartidaCard
   match={match}
   onJoin={handleJoin}
   onLeave={handleLeave}

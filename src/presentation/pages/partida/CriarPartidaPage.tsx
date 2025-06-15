@@ -1,10 +1,10 @@
 import { AppBar, Box, Paper, Toolbar, Typography } from '@mui/material';
 import React from 'react';
-import { MatchForm } from './components/MatchForm';
-import { useCreateEditMatch } from './hooks/useCreateEditMatch';
+import { PartidaForm } from './components/PartidaForm.tsx';
+import { useCriarPartida } from './hooks/useCriarPartida.ts';
 import { styles } from './styles';
 
-const CreateEditMatchPage: React.FC = () => {
+const CriarPartidaPage: React.FC = () => {
   const {
     nome,
     esporte,
@@ -27,7 +27,7 @@ const CreateEditMatchPage: React.FC = () => {
     handleTipoPartidaChange,
     handleSubmit,
     handleBack,
-  } = useCreateEditMatch();
+  } = useCriarPartida();
 
   return (
     <Box sx={styles.container}>
@@ -50,7 +50,7 @@ const CreateEditMatchPage: React.FC = () => {
           </Typography>
         )}
 
-        <MatchForm
+        <PartidaForm
           nome={nome}
           esporte={esporte}
           latitude={latitude}
@@ -77,4 +77,4 @@ const CreateEditMatchPage: React.FC = () => {
   );
 };
 
-export default CreateEditMatchPage;
+export default CriarPartidaPage;

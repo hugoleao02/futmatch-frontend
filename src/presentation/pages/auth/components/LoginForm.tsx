@@ -1,29 +1,29 @@
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Button,
   CircularProgress,
   IconButton,
   InputAdornment,
+  Link as MuiLink,
   TextField,
   Typography,
-  Link as MuiLink,
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import {
-  textFieldStyles,
-  formStyles,
-  titleStyles,
-  forgotPasswordStyles,
-  submitButtonStyles,
-} from '../styles/LoginForm.styles.ts';
 import { useLoginForm } from '../hooks/useLoginForm.ts';
+import {
+  forgotPasswordStyles,
+  formStyles,
+  submitButtonStyles,
+  textFieldStyles,
+  titleStyles,
+} from '../styles/LoginForm.styles.ts';
 
 const LoginForm = () => {
   const {
     email,
     setEmail,
-    password,
-    setPassword,
+    senha,
+    setSenha,
     showPassword,
     loading,
     handleSubmit,
@@ -51,8 +51,8 @@ const LoginForm = () => {
         variant="outlined"
         fullWidth
         type={showPassword ? 'text' : 'password'}
-        value={password}
-        onChange={e => setPassword(e.target.value)}
+        value={senha}
+        onChange={e => setSenha(e.target.value)}
         required
         sx={textFieldStyles}
         InputProps={{

@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { styles } from '../styles';
+import { styles } from '../styles.ts';
 
 interface SortTeamsModalProps {
   open: boolean;

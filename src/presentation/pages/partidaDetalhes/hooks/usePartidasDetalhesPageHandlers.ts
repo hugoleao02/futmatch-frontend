@@ -3,11 +3,11 @@ import { ptBR } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { api } from '../../../../infra/http/api';
-import { ROUTES } from '../../../routes/routes';
-import type { PartidaDetalhes, Time } from '../types';
+import { api } from '../../../../infra/http/api.ts';
+import { ROUTES } from '../../../routes/routes.tsx';
+import type { PartidaDetalhes, Time } from '../types.ts';
 
-export function useMatchDetailsPageHandlers() {
+export function usePartidasDetalhesPageHandlers() {
   const [openSortModal, setOpenSortModal] = useState(false);
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

@@ -1,4 +1,4 @@
-import { Esporte, TipoPartida } from '../../../core/types/api';
+import { TipoPartida, Esporte } from '../../../domain/enums';
 
 export interface Participante {
   id: string;

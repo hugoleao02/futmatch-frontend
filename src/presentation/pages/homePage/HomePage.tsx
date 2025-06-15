@@ -4,7 +4,7 @@ import React from 'react';
 import { AppBarSection } from './components/AppBarSection';
 import { FilterSection } from './components/FilterSection';
 import { GameRecapGenerator } from './components/GameRecapGenerator';
-import { MatchCard } from './components/MatchCard';
+import { PartidaCard } from './components/PartidaCard.tsx';
 import { RoomCard } from './components/RoomCard';
 import { useHome } from './hooks/useHome';
 import { useHomeHandlers } from './hooks/useHomeHandlers';
@@ -101,7 +101,7 @@ export const HomePage: React.FC = () => {
         ) : (
           <Grid container spacing={{ xs: 2, md: 3 }}>
             {availableMatches.map(match => (
-              <MatchCard
+              <PartidaCard
                 key={match.id}
                 match={match}
                 onMatchDetailsClick={handleMatchDetailsClick}

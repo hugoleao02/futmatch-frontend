@@ -1,8 +1,8 @@
 import type { RouteObject } from 'react-router-dom';
 import { AuthPage } from '../pages/auth';
-import { CreateEditMatchPage } from '../pages/CreateEditMatchPage';
+import { CreateEditMatchPage } from '../pages/partida';
 import { HomePage } from '../pages/homePage';
-import { MatchDetailsPage } from '../pages/MatchDetailsPage';
+import { PartidaDetalhesPage } from '../pages/partidaDetalhes';
 
 export const ROUTES = {
   LOGIN: '/login',
@@ -37,6 +37,6 @@ export const routes: RouteObject[] = [
   },
   {
     path: ROUTES.MATCH.DETAILS,
-    element: <MatchDetailsPage />,
+    element: <PartidaDetalhesPage />,
   },
 ];

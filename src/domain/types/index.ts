@@ -8,8 +8,4 @@ export type { RegisterRequest } from './RegisterRequest';
 export type { PartidaResponse } from './PartidaResponse';
 export type { PartidaRequest } from './PartidaRequest';
 export type { PartidaUpdateRequest } from './PartidaUpdateRequest';
-export type { TipoPartida } from './TipoPartida';
-
-
-// esporte
-export type { Esporte } from './Esporte';
+export type { Participacao } from './Participacao';

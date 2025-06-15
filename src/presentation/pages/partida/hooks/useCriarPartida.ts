@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import type {
-  Participacao,
-  PartidaRequest,
-  PartidaResponse,
-  PartidaUpdateRequest,
-} from '../../../../core/types/api';
-import { Esporte, TipoPartida } from '../../../../core/types/api';
-import { api } from '../../../../infra/http/api';
+import { api } from '../../../../infra/http/api.ts';
+
+import { Esporte, TipoPartida } from '../../../../domain/enums';
+import {
+  type Participacao,
+  type PartidaRequest,
+  type PartidaResponse,
+  type PartidaUpdateRequest,
+} from '../../../../domain/types';
 
 interface MatchData {
   nome: string;
@@ -33,7 +34,7 @@ const mockExistingMatch: MatchData = {
   participantes: [],
 };
 
-export const useCreateEditMatch = () => {
+export const useCriarPartida = () => {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
   const [esporte, setEsporte] = useState<Esporte>(Esporte.FUTEBOL);
@@ -144,8 +145,9 @@ export const useCreateEditMatch = () => {
           navigate('/home');
         }
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao salvar partida');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao salvar partida';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -1,7 +1,7 @@
 import type { BaseEntity } from '../../shared/types';
 
-import type { Participacao } from '../types/Participacao';
-import type { TipoPartida, Esporte } from '../types';
+import type { Participacao } from '../types';
+import { Esporte, TipoPartida } from '../enums';
 
 // Entidade principal de partida
 export interface Partida extends BaseEntity {
@@ -41,4 +41,26 @@ export interface Time {
   nome: string;
   cor: string;
   jogadores: Participacao[];
+}
+
+// Response para listagem de partidas
+export interface PartidaResponse {
+  id: string;
+  name: string;
+  sport: Esporte;
+  location: string;
+  date: string;
+  time: string;
+  currentPlayers: number;
+  totalPlayers: number;
+  type: string;
+  distance: string;
+  status: string;
+  isRoomMatch: boolean;
+  creator?: {
+    id: string;
+    name: string;
+  };
+  local?: string;
+  observacoes?: string;
 }

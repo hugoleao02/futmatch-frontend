@@ -10,7 +10,7 @@ export const useLoginForm = () => {
   const navigate = useNavigate();
   const { loginUseCase } = useCases;
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +19,7 @@ export const useLoginForm = () => {
     setLoading(true);
 
     try {
-      const response = await loginUseCase.execute(email, password);
+      const response = await loginUseCase.execute({ email, senha });
       login(response.token);
       toast.success('Login realizado com sucesso!');
       navigate('/home');
@@ -37,8 +37,8 @@ export const useLoginForm = () => {
   return {
     email,
     setEmail,
-    password,
-    setPassword,
+    senha,
+    setSenha,
     showPassword,
     loading,
     handleSubmit,

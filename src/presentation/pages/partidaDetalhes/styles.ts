@@ -5,6 +5,7 @@ export const styles = {
     flexGrow: 1,
     backgroundColor: '#f0f2f5',
     minHeight: '100vh',
+    minWidth: '100vw',
     fontFamily: 'Inter, sans-serif',
   },
   appBar: {

@@ -9,10 +9,10 @@ interface UseRegisterFormProps {
 export const useRegisterForm = ({ setActiveTab }: UseRegisterFormProps) => {
   const { useCases } = useContainer();
   const { registerUseCase } = useCases;
-  const [name, setName] = useState('');
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -20,14 +20,14 @@ export const useRegisterForm = ({ setActiveTab }: UseRegisterFormProps) => {
     e.preventDefault();
     setLoading(true);
 
-    if (password !== confirmPassword) {
+    if (senha !== confirmarSenha) {
       toast.error('As senhas não coincidem');
       setLoading(false);
       return;
     }
 
     try {
-      await registerUseCase.execute(name, email, password);
+      await registerUseCase.execute({ nome, email, senha });
       toast.success('Cadastro realizado com sucesso!');
       // Após o registro bem-sucedido, mudar para a aba de login
       setActiveTab(0);
@@ -47,14 +47,14 @@ export const useRegisterForm = ({ setActiveTab }: UseRegisterFormProps) => {
   };
 
   return {
-    name,
-    setName,
+    nome,
+    setNome,
     email,
     setEmail,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
+    senha,
+    setSenha,
+    confirmarSenha,
+    setConfirmarSenha,
     showPassword,
     loading,
     handleSubmit,
