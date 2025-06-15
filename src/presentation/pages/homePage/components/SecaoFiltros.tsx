@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
-import type { SearchFilters } from '../../../../domain/usecases/interfaces/IHomeUseCase';
+import type { SearchFilters } from '../../../../core/usecases/interfaces/IHomeUseCase';
 import { homeStyles } from '../styles/homeStyles';
 
 interface FilterSectionProps {

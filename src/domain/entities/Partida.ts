@@ -1,31 +1,48 @@
 import type { BaseEntity } from '../../shared/types';
-
-import type { Participacao } from '../types';
 import { Esporte, TipoPartida } from '../enums';
+import type { Participacao } from '../types';
+import type { Criador, Localizacao } from './types';
 
-// Entidade principal de partida
+/**
+ * Status possíveis para uma partida.
+ */
+export enum PartidaStatus {
+  Agendada = 'agendada',
+  EmAndamento = 'em_andamento',
+  Concluida = 'concluida',
+  Cancelada = 'cancelada',
+}
+
+/**
+ * Entidade principal de partida.
+ */
 export interface Partida extends BaseEntity {
   nome: string;
   esporte: Esporte;
-  latitude: number;
-  longitude: number;
+  localizacao: Localizacao;
   dataHora: Date;
+  duracao: number; // em minutos
   totalJogadores: number;
   tipoPartida: TipoPartida;
-  criador: {
-    id: string;
-    nome: string;
-  };
+  criador: Criador;
   participantes: Participacao[];
   status: PartidaStatus;
-  local?: string;
+  nivel: 'iniciante' | 'intermediario' | 'avancado';
+  regras?: string[];
   observacoes?: string;
+  tags?: string[];
+  salaId?: string;
+  custo?: number;
+  equipamentos?: string[];
+  requisitos?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+  deletedAt?: Date | null;
 }
 
-// Status da partida
-export type PartidaStatus = 'agendada' | 'em_andamento' | 'concluida' | 'cancelada';
-
-// Partida com informações detalhadas
+/**
+ * Partida com informações detalhadas.
+ */
 export interface PartidaDetalhada extends Partida {
   participantesConfirmados: number;
   vagasDisponiveis: number;
@@ -33,34 +50,56 @@ export interface PartidaDetalhada extends Partida {
   isParticipando: boolean;
   hasSolicitado: boolean;
   times?: Time[];
+  estatisticas: {
+    mediaParticipantes: number;
+    taxaConfirmacao: number;
+    avaliacaoMedia: number;
+  };
+  historico: {
+    dataCriacao: Date;
+    ultimaAtualizacao: Date;
+    alteracoes: {
+      data: Date;
+      tipo: 'criacao' | 'atualizacao' | 'cancelamento';
+      descricao: string;
+    }[];
+  };
 }
 
-// Time da partida
+/**
+ * Time da partida.
+ */
 export interface Time {
   id: string;
   nome: string;
   cor: string;
   jogadores: Participacao[];
+  capitao?: Criador;
+  estatisticas?: {
+    vitorias: number;
+    derrotas: number;
+    empates: number;
+  };
 }
 
-// Response para listagem de partidas
+/**
+ * Response para listagem de partidas.
+ */
 export interface PartidaResponse {
   id: string;
-  name: string;
-  sport: Esporte;
-  location: string;
-  date: string;
-  time: string;
-  currentPlayers: number;
-  totalPlayers: number;
-  type: string;
-  distance: string;
-  status: string;
-  isRoomMatch: boolean;
-  creator?: {
-    id: string;
-    name: string;
-  };
-  local?: string;
-  observacoes?: string;
+  nome: string;
+  esporte: Esporte;
+  localizacao: Localizacao;
+  data: string;
+  hora: string;
+  jogadoresAtuais: number;
+  totalJogadores: number;
+  tipo: TipoPartida;
+  distancia: string;
+  status: PartidaStatus;
+  isPartidaSala: boolean;
+  criador?: Criador;
+  nivel: 'iniciante' | 'intermediario' | 'avancado';
+  tags?: string[];
+  salaId?: string;
 }

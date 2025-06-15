@@ -12,14 +12,14 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-interface GameRecapGeneratorProps {
+interface GeradorResumoProps {
   open: boolean;
   onClose: () => void;
   matchName: string;
   onGenerateRecap: (matchName: string, details: string) => Promise<string>;
 }
 
-export const GameRecapGenerator: React.FC<GameRecapGeneratorProps> = ({
+export const GeradorResumo: React.FC<GeradorResumoProps> = ({
   open,
   onClose,
   matchName,

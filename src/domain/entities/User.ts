@@ -1,19 +1,28 @@
 import type { BaseEntity } from '../../shared/types';
 import type { UserPreferences } from './UserPreferences';
 
-// Roles do usuário
+/**
+ * Papéis possíveis para o usuário.
+ */
 export type UserRole = 'admin' | 'moderator' | 'user' | 'guest';
 
-// Entidade principal de usuário
+/**
+ * Entidade principal de usuário.
+ */
 export interface User extends BaseEntity {
   nome: string;
   email: string;
   avatar?: string;
   isEmailVerified?: boolean;
   lastLoginAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+  deletedAt?: Date | null;
 }
 
-// Usuário com informações de autenticação
+/**
+ * Usuário autenticado com permissões e preferências.
+ */
 export interface AuthenticatedUser extends User {
   role: UserRole;
   permissions: string[];
