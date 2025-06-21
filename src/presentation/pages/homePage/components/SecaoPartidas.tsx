@@ -1,6 +1,6 @@
 import { Grid, Paper } from '@mui/material';
 import React, { memo } from 'react';
-import type { Partida } from '../../../../domain/entities/Partida';
+import type { PartidaResponse } from '../../../../domain/types';
 import { TEXTO_VAZIO, TITULOS } from '../constants';
 import { homeStyles } from '../styles/homeStyles';
 import { ListaVazia } from './ListaVazia';
@@ -8,7 +8,7 @@ import { PartidaCard } from './PartidaCard';
 import { SecaoBase } from './SecaoBase';
 
 interface SecaoPartidasProps {
-  partidas: Partida[];
+  partidas: PartidaResponse[];
   mostrarMapa: boolean;
   onMatchDetailsClick: (matchId: string) => void;
   onOpenRecapModal: (matchName: string) => void;

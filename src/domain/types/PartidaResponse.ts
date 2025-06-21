@@ -1,6 +1,6 @@
-import type { Participacao } from './Participacao.ts';
-import type { TipoPartida } from '../enums/TipoPartida.ts';
 import type { Esporte } from '../enums/Esporte.ts';
+import type { TipoPartida } from '../enums/TipoPartida.ts';
+import type { Participacao } from './Participacao.ts';
 
 export interface PartidaResponse {
   id: string;
@@ -16,4 +16,5 @@ export interface PartidaResponse {
     nome: string;
   };
   participantes: Participacao[];
+  isPartidaSala?: boolean;
 }

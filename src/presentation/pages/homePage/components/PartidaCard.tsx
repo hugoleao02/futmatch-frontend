@@ -10,20 +10,17 @@ import {
 import { Box, Button, Card, CardActions, CardContent, Grid, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Partida } from '../../../../domain/entities/Partida.ts';
 import { TipoPartida } from '../../../../domain/enums';
+import type { PartidaResponse } from '../../../../domain/types';
 import { homeStyles } from '../styles/homeStyles';
 
 interface PartidaCardProps {
-  partida: Partida;
+  partida: PartidaResponse;
   onMatchDetailsClick: (matchId: string) => void;
   onOpenRecapModal: (matchName: string) => void;
 }
 
-export const PartidaCard: React.FC<PartidaCardProps> = ({
-  partida,
-  onMatchDetailsClick,
-}) => {
+export const PartidaCard: React.FC<PartidaCardProps> = ({ partida, onMatchDetailsClick }) => {
   const navigate = useNavigate();
 
   const handleEditClick = () => {
@@ -32,7 +29,7 @@ export const PartidaCard: React.FC<PartidaCardProps> = ({
 
   // Separar data e hora
   const [date, time] = partida.dataHora
-    ? partida.dataHora.toLocaleDateString('pt-BR').split('T')
+    ? new Date(partida.dataHora).toLocaleDateString('pt-BR').split('T')
     : ['', ''];
 
   // Participantes

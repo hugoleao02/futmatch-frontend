@@ -1,9 +1,13 @@
 import { createContext } from 'react';
-import { container } from './container';
-import type { Container } from './types';
+import { Container } from './container';
+import type { Container as ContainerType } from './types';
 
-export const ContainerContext = createContext<Container | null>(null);
+export const ContainerContext = createContext<ContainerType | null>(null);
 
 export function ContainerProvider({ children }: { children: React.ReactNode }) {
-  return <ContainerContext.Provider value={container}>{children}</ContainerContext.Provider>;
+  return (
+    <ContainerContext.Provider value={Container.getInstance()}>
+      {children}
+    </ContainerContext.Provider>
+  );
 }

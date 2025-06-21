@@ -1,8 +1,8 @@
 import React, { createContext, useContext } from 'react';
-import type { Container } from './types';
-import { container } from './container';
+import { Container } from './container';
+import type { Container as ContainerType } from './types';
 
-const AuthContext = createContext<Container | null>(null);
+const AuthContext = createContext<ContainerType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -13,5 +13,5 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <AuthContext.Provider value={container}>{children}</AuthContext.Provider>
+  <AuthContext.Provider value={Container.getInstance()}>{children}</AuthContext.Provider>
 );

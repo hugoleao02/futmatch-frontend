@@ -76,15 +76,7 @@ export function usePartidasDetalhesPageHandlers() {
   const carregarDetalhesPartida = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('futmatch_token');
-      console.log('Token na requisição:', token);
-
-      const response = await api.get<PartidaDetalhes>(`/partidas/${matchId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log('Resposta da API:', response.data);
+      const response = await api.get<PartidaDetalhes>(`/partidas/${matchId}`);
       setPartida(response.data);
       setError(null);
     } catch (error: any) {

@@ -14,28 +14,32 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { homeStyles } from '../styles/homeStyles';
 
 interface AppBarSectionProps {
-  anchorElCreateMenu: HTMLElement | null;
   onProfileClick: () => void;
   onLogout: () => void;
-  onOpenCreateMenu: (event: React.MouseEvent<HTMLElement>) => void;
-  onCloseCreateMenu: () => void;
   onCreateNewRoom: () => void;
   onCreateNewSoloMatch: () => void;
 }
 
 export const AppBarSection: React.FC<AppBarSectionProps> = ({
-  anchorElCreateMenu,
   onProfileClick,
   onLogout,
-  onOpenCreateMenu,
-  onCloseCreateMenu,
   onCreateNewRoom,
   onCreateNewSoloMatch,
 }) => {
+  const [anchorElCreateMenu, setAnchorElCreateMenu] = useState<null | HTMLElement>(null);
+
+  const handleOpenCreateMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElCreateMenu(event.currentTarget);
+  };
+
+  const handleCloseCreateMenu = () => {
+    setAnchorElCreateMenu(null);
+  };
+
   return (
     <AppBar position="static" sx={homeStyles.appBar}>
       <Toolbar sx={homeStyles.toolbar}>
@@ -56,7 +60,7 @@ export const AppBarSection: React.FC<AppBarSectionProps> = ({
           <Button
             variant="contained"
             sx={homeStyles.actionButton}
-            onClick={onOpenCreateMenu}
+            onClick={handleOpenCreateMenu}
             startIcon={<AddIcon />}
           >
             Criar
@@ -69,7 +73,7 @@ export const AppBarSection: React.FC<AppBarSectionProps> = ({
           <Menu
             anchorEl={anchorElCreateMenu}
             open={Boolean(anchorElCreateMenu)}
-            onClose={onCloseCreateMenu}
+            onClose={handleCloseCreateMenu}
           >
             <MenuItem onClick={onCreateNewRoom}>
               <GroupsIcon sx={{ mr: 1 }} /> Criar Sala

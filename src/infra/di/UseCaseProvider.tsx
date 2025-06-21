@@ -1,25 +1,33 @@
-import React, { createContext, useContext } from 'react';
-import { AuthRepositoryImpl } from '../../data/repositories/AuthRepositoryImpl';
-import { LoginUseCase } from '../../core/usecases/LoginUseCase';
-import { RegisterUseCase } from '../../core/usecases/RegisterUseCase';
-import type { ILoginUseCase } from '../../core/usecases/interfaces/ILoginUseCase';
-import type { IRegisterUseCase } from '../../core/usecases/interfaces/IRegisterUseCase';
-
-const authRepo = new AuthRepositoryImpl();
-const loginUseCase = new LoginUseCase(authRepo);
-const registerUseCase = new RegisterUseCase(authRepo);
+import React, { createContext, useContext, useMemo } from 'react';
+import type { ILoginUseCase } from '../../domain/usecases/interfaces/ILoginUseCase';
+import type { IRegisterUseCase } from '../../domain/usecases/interfaces/IRegisterUseCase';
+import { Container } from './container';
 
 interface UseCaseContextData {
   loginUseCase: ILoginUseCase;
   registerUseCase: IRegisterUseCase;
 }
 
-const UseCaseContext = createContext<UseCaseContextData>({} as UseCaseContextData);
+const UseCaseContext = createContext<UseCaseContextData | null>(null);
 
-export const useUseCase = () => useContext(UseCaseContext);
+export const useUseCase = () => {
+  const context = useContext(UseCaseContext);
 
-export const UseCaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <UseCaseContext.Provider value={{ loginUseCase, registerUseCase }}>
-    {children}
-  </UseCaseContext.Provider>
-);
+  if (!context) {
+    throw new Error('useUseCase deve ser usado dentro de um UseCaseProvider');
+  }
+
+  return context;
+};
+
+export const UseCaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const useCases = useMemo(() => {
+    const container = Container.getInstance();
+    return {
+      loginUseCase: container.useCases.loginUseCase,
+      registerUseCase: container.useCases.registerUseCase,
+    };
+  }, []);
+
+  return <UseCaseContext.Provider value={useCases}>{children}</UseCaseContext.Provider>;
+};

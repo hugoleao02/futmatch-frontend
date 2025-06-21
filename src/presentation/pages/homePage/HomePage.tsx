@@ -1,6 +1,10 @@
-import { Add as AddIcon } from '@mui/icons-material';
-import { Box, Button, Container, Fab, Tooltip } from '@mui/material';
-import React from 'react';
+import {
+  Add as AddIcon,
+  Groups as GroupsIcon,
+  SportsSoccer as SportsSoccerIcon,
+} from '@mui/icons-material';
+import { Box, Button, Container, Fab, Menu, MenuItem, Tooltip } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import {
   AppBarSection,
   FilterSection,
@@ -24,16 +28,18 @@ export const HomePage: React.FC = () => {
     updateFilter,
     toggleMapView,
     availableMatches,
+    loadData,
   } = useHome();
 
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
   const {
-    anchorElCreateMenu,
     openRecapModal,
     selectedMatchNameForRecap,
     handleLogout,
     handleProfileClick,
-    handleOpenCreateMenu,
-    handleCloseCreateMenu,
     handleCreateNewRoom,
     handleCreateNewSoloMatch,
     handleMatchDetailsClick,
@@ -42,14 +48,21 @@ export const HomePage: React.FC = () => {
     handleCloseRecapModal,
   } = useHomeHandlers();
 
+  const [anchorElFabMenu, setAnchorElFabMenu] = useState<null | HTMLElement>(null);
+
+  const handleOpenFabMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElFabMenu(event.currentTarget);
+  };
+
+  const handleCloseFabMenu = () => {
+    setAnchorElFabMenu(null);
+  };
+
   return (
     <Box sx={homeStyles.container}>
       <AppBarSection
-        anchorElCreateMenu={anchorElCreateMenu}
         onProfileClick={handleProfileClick}
         onLogout={handleLogout}
-        onOpenCreateMenu={handleOpenCreateMenu}
-        onCloseCreateMenu={handleCloseCreateMenu}
         onCreateNewRoom={handleCreateNewRoom}
         onCreateNewSoloMatch={handleCreateNewSoloMatch}
       />
@@ -79,15 +92,34 @@ export const HomePage: React.FC = () => {
       </Container>
 
       <Tooltip title={TOOLTIP_CRIAR} arrow>
-        <Fab color="primary" aria-label="add" sx={homeStyles.fab} onClick={handleOpenCreateMenu}>
+        <Fab color="primary" aria-label="add" sx={homeStyles.fab} onClick={handleOpenFabMenu}>
           <AddIcon sx={{ fontSize: 30 }} />
         </Fab>
       </Tooltip>
 
+      <Menu anchorEl={anchorElFabMenu} open={Boolean(anchorElFabMenu)} onClose={handleCloseFabMenu}>
+        <MenuItem
+          onClick={() => {
+            handleCreateNewRoom();
+            handleCloseFabMenu();
+          }}
+        >
+          <GroupsIcon sx={{ mr: 1 }} /> Criar Sala
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleCreateNewSoloMatch();
+            handleCloseFabMenu();
+          }}
+        >
+          <SportsSoccerIcon sx={{ mr: 1 }} /> Criar Partida Avulsa
+        </MenuItem>
+      </Menu>
+
       <GeradorResumo
         open={openRecapModal}
         onClose={handleCloseRecapModal}
-        matchName={selectedMatchNameForRecap}
+        matchName={selectedMatchNameForRecap || ''}
         onGenerateRecap={generateRecap}
       />
     </Box>

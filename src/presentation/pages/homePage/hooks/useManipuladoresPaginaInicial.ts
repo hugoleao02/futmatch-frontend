@@ -1,69 +1,84 @@
-import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { ROUTES } from '../../../../presentation/routes/routes';
 import { useAuth } from '../../../../shared/hooks';
+import { useModal } from '../../../../shared/hooks/useModal';
+import { useNavigation } from '../../../../shared/hooks/useNavigation';
 
 export const useHomeHandlers = () => {
-  const navigate = useNavigate();
+  const { navigateWithToast } = useNavigation();
   const { logout: authLogout } = useAuth();
-  const [anchorElCreateMenu, setAnchorElCreateMenu] = useState<HTMLElement | null>(null);
-  const [openRecapModal, setOpenRecapModal] = useState(false);
-  const [selectedMatchNameForRecap, setSelectedMatchNameForRecap] = useState('');
+  const {
+    isOpen: isCreateMenuOpen,
+    open: openCreateMenu,
+    close: closeCreateMenu,
+  } = useModal<HTMLElement>();
+  const {
+    isOpen: isRecapModalOpen,
+    data: selectedMatchNameForRecap,
+    open: openRecapModal,
+    close: closeRecapModal,
+  } = useModal<string>();
 
   const handleLogout = useCallback(() => {
     authLogout();
-    toast.success('Logout realizado com sucesso!');
-    navigate(ROUTES.LOGIN);
-  }, [authLogout, navigate]);
+    navigateWithToast(ROUTES.LOGIN, 'Logout realizado com sucesso!', 'success');
+  }, [authLogout, navigateWithToast]);
 
   const handleProfileClick = useCallback(() => {
     toast.info('Funcionalidade de perfil em desenvolvimento');
   }, []);
 
-  const handleOpenCreateMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElCreateMenu(event.currentTarget);
-  }, []);
+  const handleOpenCreateMenu = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      openCreateMenu(event.currentTarget);
+    },
+    [openCreateMenu],
+  );
 
   const handleCloseCreateMenu = useCallback(() => {
-    setAnchorElCreateMenu(null);
-  }, []);
+    closeCreateMenu();
+  }, [closeCreateMenu]);
 
   const handleCreateNewRoom = useCallback(() => {
-    handleCloseCreateMenu();
+    closeCreateMenu();
     toast.info('Funcionalidade de criar sala em desenvolvimento');
-  }, []);
+  }, [closeCreateMenu]);
 
   const handleCreateNewSoloMatch = useCallback(() => {
-    handleCloseCreateMenu();
-    navigate(ROUTES.MATCH.CREATE);
-  }, [navigate]);
+    closeCreateMenu();
+    navigateWithToast(ROUTES.MATCH.CREATE, 'Criando nova partida');
+  }, [closeCreateMenu, navigateWithToast]);
 
   const handleMatchDetailsClick = useCallback(
     (matchId: string) => {
-      navigate(ROUTES.MATCH.DETAILS.replace(':id', matchId));
+      navigateWithToast(
+        ROUTES.MATCH.DETAILS.replace(':id', matchId),
+        'Visualizando detalhes da partida',
+      );
     },
-    [navigate],
+    [navigateWithToast],
   );
 
   const handleRoomDetailsClick = useCallback((roomId: string) => {
     toast.info(`Detalhes da sala ${roomId} em desenvolvimento`);
   }, []);
 
-  const handleOpenRecapModal = useCallback((matchName: string) => {
-    setSelectedMatchNameForRecap(matchName);
-    setOpenRecapModal(true);
-  }, []);
+  const handleOpenRecapModal = useCallback(
+    (matchName: string) => {
+      openRecapModal(matchName);
+    },
+    [openRecapModal],
+  );
 
   const handleCloseRecapModal = useCallback(() => {
-    setOpenRecapModal(false);
-    setSelectedMatchNameForRecap('');
-  }, []);
+    closeRecapModal();
+  }, [closeRecapModal]);
 
   return {
     // Estado
-    anchorElCreateMenu,
-    openRecapModal,
+    anchorElCreateMenu: isCreateMenuOpen,
+    openRecapModal: isRecapModalOpen,
     selectedMatchNameForRecap,
 
     // Handlers
