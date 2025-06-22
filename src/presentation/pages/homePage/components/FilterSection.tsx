@@ -15,6 +15,7 @@ import {
 import React from 'react';
 import type { SearchFilters } from '../../../../domain/usecases/interfaces/IHomeUseCase';
 import { homeStyles } from '../styles/homeStyles';
+import { esporteOptions } from '../../../../domain/enums/Esporte.ts';
 
 interface FilterSectionProps {
   filters: SearchFilters;
@@ -73,9 +74,11 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
             }}
             sx={homeStyles.filterInput}
           >
-            <MenuItem value="Todos">Todos</MenuItem>
-            <MenuItem value="Futebol">Futebol</MenuItem>
-            <MenuItem value="Futsal">Futsal</MenuItem>
+            {esporteOptions.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
 

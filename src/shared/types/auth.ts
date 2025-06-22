@@ -1,5 +1,6 @@
-import type { AuthenticatedUser, UserRole } from '../../core/entities/User';
+
 import type { LoadingState } from './common';
+import type { AuthenticatedUser, UserRole } from '../../domain/entities/User.ts';
 
 // Estados de autenticação
 export type AuthState = 'loading' | 'authenticated' | 'unauthenticated' | 'error';

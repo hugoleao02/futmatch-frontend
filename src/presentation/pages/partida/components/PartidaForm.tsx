@@ -2,6 +2,8 @@ import { Box, Button, CircularProgress, MenuItem, TextField } from '@mui/materia
 import React from 'react';
 import { styles } from '../styles';
 import { Esporte, TipoPartida } from '../../../../domain/enums';
+import { esporteOptions } from '../../../../domain/enums/Esporte.ts';
+import { tipoPartidaOptions } from '../../../../domain/enums/TipoPartida.ts';
 
 interface PartidaFormProps {
   nome: string;
@@ -48,6 +50,7 @@ export const PartidaForm: React.FC<PartidaFormProps> = ({
   onSubmit,
   onBack,
 }) => {
+
   if (loading) {
     return (
       <Box sx={styles.loadingContainer}>
@@ -76,8 +79,11 @@ export const PartidaForm: React.FC<PartidaFormProps> = ({
         sx={styles.textField}
         required
       >
-        <MenuItem value={Esporte.FUTEBOL}>Futebol</MenuItem>
-        <MenuItem value={Esporte.FUTSAL}>Futsal</MenuItem>
+        {esporteOptions.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
       </TextField>
 
       <TextField
@@ -147,8 +153,11 @@ export const PartidaForm: React.FC<PartidaFormProps> = ({
         sx={styles.textField}
         required
       >
-        <MenuItem value={TipoPartida.PUBLICA}>Pública</MenuItem>
-        <MenuItem value={TipoPartida.PRIVADA}>Privada</MenuItem>
+        {tipoPartidaOptions.map((option:{value: TipoPartida; label: string}) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
       </TextField>
 
       <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
