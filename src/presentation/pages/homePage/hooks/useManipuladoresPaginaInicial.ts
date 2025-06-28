@@ -4,7 +4,7 @@ import { useAuth, useModal, useNavigation } from '../../../../shared/hooks';
 import { ROUTES } from '../../../routes/routes.tsx';
 
 export const useHomeHandlers = () => {
-  const { navigateWithToast } = useNavigation();
+  const { navigate } = useNavigation();
   const { logout: authLogout } = useAuth();
   const {
     isOpen: isCreateMenuOpen,
@@ -20,8 +20,8 @@ export const useHomeHandlers = () => {
 
   const handleLogout = useCallback(() => {
     authLogout();
-    navigateWithToast(ROUTES.LOGIN, 'Logout realizado com sucesso!', 'success');
-  }, [authLogout, navigateWithToast]);
+    navigate(ROUTES.LOGIN);
+  }, [authLogout, navigate]);
 
   const handleProfileClick = useCallback(() => {
     toast.info('Funcionalidade de perfil em desenvolvimento');
@@ -40,17 +40,14 @@ export const useHomeHandlers = () => {
 
   const handleCreateNewSoloMatch = useCallback(() => {
     closeCreateMenu();
-    navigateWithToast(ROUTES.MATCH.CREATE, 'Criando nova partida');
-  }, [closeCreateMenu, navigateWithToast]);
+    navigate(ROUTES.MATCH.CREATE);
+  }, [closeCreateMenu, navigate]);
 
   const handleMatchDetailsClick = useCallback(
     (matchId: string) => {
-      navigateWithToast(
-        ROUTES.MATCH.DETAILS.replace(':id', matchId),
-        'Visualizando detalhes da partida',
-      );
+      navigate(ROUTES.MATCH.DETAILS.replace(':id', matchId));
     },
-    [navigateWithToast],
+    [navigate],
   );
 
   const handleOpenRecapModal = useCallback(
