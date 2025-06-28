@@ -80,7 +80,6 @@ export function usePartidasDetalhesPageHandlers() {
       setPartida(response.data);
       setError(null);
     } catch (error: any) {
-      console.error('Erro detalhado:', error);
       setError(error.response?.data?.message || 'Erro ao carregar detalhes da partida');
       toast.error(error.response?.data?.message || 'Erro ao carregar detalhes da partida');
     } finally {

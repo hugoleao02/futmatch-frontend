@@ -1,6 +1,5 @@
 import {
   Add as AddIcon,
-  Groups as GroupsIcon,
   Logout as LogoutIcon,
   SportsSoccer as SportsSoccerIcon,
 } from '@mui/icons-material';
@@ -20,14 +19,12 @@ import { homeStyles } from '../styles/homeStyles';
 interface AppBarSectionProps {
   onProfileClick: () => void;
   onLogout: () => void;
-  onCreateNewRoom: () => void;
   onCreateNewSoloMatch: () => void;
 }
 
 export const AppBarSection: React.FC<AppBarSectionProps> = ({
   onProfileClick,
   onLogout,
-  onCreateNewRoom,
   onCreateNewSoloMatch,
 }) => {
   const [anchorElCreateMenu, setAnchorElCreateMenu] = useState<null | HTMLElement>(null);
@@ -75,9 +72,6 @@ export const AppBarSection: React.FC<AppBarSectionProps> = ({
             open={Boolean(anchorElCreateMenu)}
             onClose={handleCloseCreateMenu}
           >
-            <MenuItem onClick={onCreateNewRoom}>
-              <GroupsIcon sx={{ mr: 1 }} /> Criar Sala
-            </MenuItem>
             <MenuItem onClick={onCreateNewSoloMatch}>
               <SportsSoccerIcon sx={{ mr: 1 }} /> Criar Partida Avulsa
             </MenuItem>

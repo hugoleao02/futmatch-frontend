@@ -5,7 +5,6 @@ export interface NotificationSettings {
   sms: boolean;
   inApp: boolean;
   matchReminders: boolean;
-  roomInvitations: boolean;
   newMessages: boolean;
 }
 
@@ -15,7 +14,6 @@ export interface PrivacySettings {
   showEmail: boolean;
   showLocation: boolean;
   allowFriendRequests: boolean;
-  allowRoomInvitations: boolean;
 }
 
 // Preferências do usuário

@@ -16,12 +16,6 @@ export const ROUTES = {
   CREATE_MATCH: '/matches/create',
   EDIT_MATCH: (id: string) => `/matches/${id}/edit`,
 
-  // Room routes
-  ROOMS: '/rooms',
-  ROOM_DETAILS: (id: string) => `/rooms/${id}`,
-  CREATE_ROOM: '/rooms/create',
-  EDIT_ROOM: (id: string) => `/rooms/${id}/edit`,
-
   // Settings routes
   SETTINGS: '/settings',
   NOTIFICATIONS: '/settings/notifications',
@@ -47,17 +41,10 @@ export const API_ROUTES = {
   USER_PROFILE: '/users/me',
   UPDATE_PROFILE: '/users/me',
   USER_MATCHES: '/users/me/matches',
-  USER_ROOMS: '/users/me/rooms',
 
   // Match endpoints
   MATCHES: '/matches',
   MATCH_BY_ID: (id: string) => `/matches/${id}`,
   JOIN_MATCH: (id: string) => `/matches/${id}/join`,
   LEAVE_MATCH: (id: string) => `/matches/${id}/leave`,
-
-  // Room endpoints
-  ROOMS: '/rooms',
-  ROOM_BY_ID: (id: string) => `/rooms/${id}`,
-  JOIN_ROOM: (id: string) => `/rooms/${id}/join`,
-  LEAVE_ROOM: (id: string) => `/rooms/${id}/leave`,
 } as const;

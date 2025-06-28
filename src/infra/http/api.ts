@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { STORAGE_KEYS } from '../../shared/constants/app';
+import { STORAGE_KEYS } from '../../shared/constants';
 import { localStorage } from '../../shared/utils/storage/LocalStorage';
 
 const api = axios.create({
@@ -26,8 +26,6 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      console.log('Erro de autenticação:', error.response?.status);
-      console.log('Token atual:', localStorage.get(STORAGE_KEYS.token));
       localStorage.remove(STORAGE_KEYS.token);
       window.location.href = '/login';
     }

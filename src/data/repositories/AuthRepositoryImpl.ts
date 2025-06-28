@@ -23,7 +23,13 @@ export class AuthRepositoryImpl implements IAuthRepository {
   }
 
   async register(registerRequest: RegisterRequest): Promise<RegisterResponse> {
-    return this.httpClient.post<RegisterResponse>('/auth/register', registerRequest);
+    const response = await this.httpClient.post<RegisterResponse>(
+      '/auth/register',
+      registerRequest,
+    );
+    const { token } = response;
+    this.#setToken(token);
+    return response;
   }
 
   async logout(): Promise<void> {

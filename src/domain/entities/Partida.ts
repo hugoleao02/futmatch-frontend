@@ -31,12 +31,9 @@ export interface Partida extends BaseEntity {
   regras?: string[];
   observacoes?: string;
   tags?: string[];
-  salaId?: string;
   custo?: number;
   equipamentos?: string[];
   requisitos?: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
   deletedAt?: Date | null;
 }
 
@@ -97,9 +94,7 @@ export interface PartidaResponse {
   tipo: TipoPartida;
   distancia: string;
   status: PartidaStatus;
-  isPartidaSala: boolean;
   criador?: Criador;
   nivel: 'iniciante' | 'intermediario' | 'avancado';
   tags?: string[];
-  salaId?: string;
 }

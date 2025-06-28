@@ -30,12 +30,9 @@ interface ButtonProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
-<Button 
-  variant="primary"
-  size="md"
-  onClick={() => console.log('clicked')}
->
+<Button variant="primary" size="md" onClick={() => {}}>
   Entrar
 </Button>
 ```
@@ -55,6 +52,7 @@ interface InputProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
 <Input
   type="email"
@@ -77,6 +75,7 @@ interface TypographyProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
 <Typography variant="h1" color="primary">
   Bem-vindo ao FutMatch
@@ -96,13 +95,10 @@ interface FormFieldProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
 <FormField label="E-mail" error={errors.email}>
-  <Input
-    type="email"
-    value={email}
-    onChange={setEmail}
-  />
+  <Input type="email" value={email} onChange={setEmail} />
 </FormField>
 ```
 
@@ -117,11 +113,10 @@ interface CardProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
 <Card title="Login">
-  <Form>
-    {/* Form fields */}
-  </Form>
+  <Form>{/* Form fields */}</Form>
   <Card.Footer>
     <Button>Entrar</Button>
   </Card.Footer>
@@ -139,12 +134,9 @@ interface AlertProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
-<Alert
-  type="success"
-  message="Login realizado com sucesso!"
-  onClose={() => setShowAlert(false)}
-/>
+<Alert type="success" message="Login realizado com sucesso!" onClose={() => setShowAlert(false)} />
 ```
 
 ## Componentes Organismos
@@ -159,11 +151,9 @@ interface LoginFormProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
-<LoginForm
-  onSubmit={handleLogin}
-  isLoading={isLoading}
-/>
+<LoginForm onSubmit={handleLogin} isLoading={isLoading} />
 ```
 
 ### RegisterForm
@@ -176,11 +166,9 @@ interface RegisterFormProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
-<RegisterForm
-  onSubmit={handleRegister}
-  isLoading={isLoading}
-/>
+<RegisterForm onSubmit={handleRegister} isLoading={isLoading} />
 ```
 
 ### PartidaCard
@@ -194,12 +182,9 @@ interface MatchCardProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
-<PartidaCard
-  match={match}
-  onJoin={handleJoin}
-  onLeave={handleLeave}
-/>
+<PartidaCard match={match} onJoin={handleJoin} onLeave={handleLeave} />
 ```
 
 ## Templates
@@ -215,11 +200,9 @@ interface AuthLayoutProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
-<AuthLayout
-  title="Login"
-  subtitle="Entre com suas credenciais"
->
+<AuthLayout title="Login" subtitle="Entre com suas credenciais">
   <LoginForm onSubmit={handleLogin} />
 </AuthLayout>
 ```
@@ -234,10 +217,9 @@ interface DashboardLayoutProps {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
-<DashboardLayout
-  sidebar={<Sidebar />}
->
+<DashboardLayout sidebar={<Sidebar />}>
   <DashboardContent />
 </DashboardLayout>
 ```
@@ -255,14 +237,15 @@ interface UseFormProps<T> {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
 const { values, errors, handleChange, handleSubmit } = useForm({
   initialValues: {
     email: '',
-    password: ''
+    password: '',
   },
   validationSchema: loginSchema,
-  onSubmit: handleLogin
+  onSubmit: handleLogin,
 });
 ```
 
@@ -278,6 +261,7 @@ interface UseAuthReturn {
 ```
 
 **Exemplo de Uso:**
+
 ```tsx
 const { user, isAuthenticated, login, logout } = useAuth();
 ```
@@ -289,9 +273,7 @@ const { user, isAuthenticated, login, logout } = useAuth();
 Os componentes utilizam classes do Tailwind CSS para estilização. Exemplo:
 
 ```tsx
-<button className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded">
-  Botão
-</button>
+<button className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded">Botão</button>
 ```
 
 ### Tema
@@ -305,16 +287,16 @@ module.exports = {
       colors: {
         primary: {
           500: '#3B82F6',
-          600: '#2563EB'
+          600: '#2563EB',
         },
         secondary: {
           500: '#6B7280',
-          600: '#4B5563'
-        }
-      }
-    }
-  }
-}
+          600: '#4B5563',
+        },
+      },
+    },
+  },
+};
 ```
 
 ## Acessibilidade
@@ -324,10 +306,7 @@ module.exports = {
 Todos os componentes incluem atributos ARIA apropriados:
 
 ```tsx
-<button
-  aria-label="Fechar"
-  aria-expanded={isOpen}
->
+<button aria-label="Fechar" aria-expanded={isOpen}>
   <Icon name="close" />
 </button>
 ```
@@ -337,11 +316,7 @@ Todos os componentes incluem atributos ARIA apropriados:
 Suporte a navegação por teclado:
 
 ```tsx
-<div
-  role="button"
-  tabIndex={0}
-  onKeyPress={handleKeyPress}
->
+<div role="button" tabIndex={0} onKeyPress={handleKeyPress}>
   Conteúdo
 </div>
 ```
@@ -373,17 +348,17 @@ describe('LoginForm', () => {
   it('should submit form data', async () => {
     const onSubmit = jest.fn();
     render(<LoginForm onSubmit={onSubmit} />);
-    
+
     fireEvent.change(screen.getByLabelText('E-mail'), {
       target: { value: 'test@example.com' }
     });
-    
+
     fireEvent.change(screen.getByLabelText('Senha'), {
       target: { value: 'password123' }
     });
-    
+
     fireEvent.click(screen.getByText('Entrar'));
-    
+
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith({
         email: 'test@example.com',
@@ -421,21 +396,25 @@ function App() {
 ## Boas Práticas
 
 1. **Props Naming**
+
    - Use nomes descritivos
    - Evite abreviações
    - Mantenha consistência
 
 2. **Type Safety**
+
    - Defina interfaces para props
    - Use tipos estritos
    - Evite `any`
 
 3. **Component Composition**
+
    - Prefira composição sobre herança
    - Mantenha componentes pequenos
    - Reutilize lógica com hooks
 
 4. **Error Handling**
+
    - Trate erros adequadamente
    - Forneça feedback ao usuário
    - Log erros apropriadamente
@@ -443,4 +422,4 @@ function App() {
 5. **Documentation**
    - Documente props
    - Inclua exemplos
-   - Mantenha docs atualizados 
+   - Mantenha docs atualizados

@@ -20,13 +20,3 @@ export interface Criador {
   nome: string;
   avatar?: string;
 }
-
-/**
- * Representa um membro de sala.
- */
-export interface MembroSala {
-  id: string;
-  nome: string;
-  avatar?: string;
-  role: 'admin' | 'moderator' | 'member';
-}

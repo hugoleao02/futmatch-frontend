@@ -15,8 +15,6 @@ export interface User extends BaseEntity {
   avatar?: string;
   isEmailVerified?: boolean;
   lastLoginAt?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
   deletedAt?: Date | null;
 }
 

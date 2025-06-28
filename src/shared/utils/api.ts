@@ -88,3 +88,17 @@ export const isClientError = (status: number): boolean => {
 export const isServerError = (status: number): boolean => {
   return status >= 500;
 };
+
+/**
+ * Verifica se existe um token de autenticação válido
+ */
+export const checkToken = (): void => {
+  // Função vazia - logs removidos
+};
+
+/**
+ * Testa a conexão com a API
+ */
+export const testApiConnection = async (): Promise<void> => {
+  // Função vazia - logs removidos
+};

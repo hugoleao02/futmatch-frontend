@@ -1,9 +1,8 @@
 import type { Esporte } from '../enums/Esporte.ts';
 import type { TipoPartida } from '../enums/TipoPartida.ts';
-import type { Participacao } from './Participacao.ts';
 
 export interface PartidaResponse {
-  id: string;
+  id: number;
   nome: string;
   esporte: Esporte;
   latitude: number;
@@ -11,10 +10,7 @@ export interface PartidaResponse {
   dataHora: string;
   totalJogadores: number;
   tipoPartida: TipoPartida;
-  criador: {
-    id: string;
-    nome: string;
-  };
-  participantes: Participacao[];
-  isPartidaSala?: boolean;
+  criadorId: number;
+  criadorNome: string;
+  participantesConfirmados: number;
 }

@@ -1,9 +1,7 @@
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
-import { ROUTES } from '../../../../presentation/routes/routes';
-import { useAuth } from '../../../../shared/hooks';
-import { useModal } from '../../../../shared/hooks/useModal';
-import { useNavigation } from '../../../../shared/hooks/useNavigation';
+import { useAuth, useModal, useNavigation } from '../../../../shared/hooks';
+import { ROUTES } from '../../../routes/routes.tsx';
 
 export const useHomeHandlers = () => {
   const { navigateWithToast } = useNavigation();
@@ -40,11 +38,6 @@ export const useHomeHandlers = () => {
     closeCreateMenu();
   }, [closeCreateMenu]);
 
-  const handleCreateNewRoom = useCallback(() => {
-    closeCreateMenu();
-    toast.info('Funcionalidade de criar sala em desenvolvimento');
-  }, [closeCreateMenu]);
-
   const handleCreateNewSoloMatch = useCallback(() => {
     closeCreateMenu();
     navigateWithToast(ROUTES.MATCH.CREATE, 'Criando nova partida');
@@ -59,10 +52,6 @@ export const useHomeHandlers = () => {
     },
     [navigateWithToast],
   );
-
-  const handleRoomDetailsClick = useCallback((roomId: string) => {
-    toast.info(`Detalhes da sala ${roomId} em desenvolvimento`);
-  }, []);
 
   const handleOpenRecapModal = useCallback(
     (matchName: string) => {
@@ -86,10 +75,8 @@ export const useHomeHandlers = () => {
     handleProfileClick,
     handleOpenCreateMenu,
     handleCloseCreateMenu,
-    handleCreateNewRoom,
     handleCreateNewSoloMatch,
     handleMatchDetailsClick,
-    handleRoomDetailsClick,
     handleOpenRecapModal,
     handleCloseRecapModal,
   };

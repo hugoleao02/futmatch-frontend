@@ -1,17 +1,8 @@
-import {
-  Add as AddIcon,
-  Groups as GroupsIcon,
-  SportsSoccer as SportsSoccerIcon,
-} from '@mui/icons-material';
+import { Add as AddIcon, SportsSoccer as SportsSoccerIcon } from '@mui/icons-material';
 import { Box, Button, Container, Fab, Menu, MenuItem, Tooltip } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import {
-  AppBarSection,
-  FilterSection,
-  GeradorResumo,
-  SecaoPartidas,
-  SecaoSalas,
-} from './components';
+import { checkToken, testApiConnection } from '../../../shared/utils/api';
+import { AppBarSection, FilterSection, GeradorResumo, SecaoPartidas } from './components';
 import { TEXTO_BOTAO_MAPA, TOOLTIP_CRIAR } from './constants';
 import { useHomeHandlers } from './hooks/useManipuladoresPaginaInicial';
 import { useHome } from './hooks/usePaginaInicial';
@@ -19,7 +10,6 @@ import { homeStyles } from './styles/homeStyles';
 
 export const HomePage: React.FC = () => {
   const {
-    rooms,
     loading,
     showMap,
     filters,
@@ -32,6 +22,8 @@ export const HomePage: React.FC = () => {
   } = useHome();
 
   useEffect(() => {
+    checkToken();
+    testApiConnection();
     loadData();
   }, [loadData]);
 
@@ -40,10 +32,8 @@ export const HomePage: React.FC = () => {
     selectedMatchNameForRecap,
     handleLogout,
     handleProfileClick,
-    handleCreateNewRoom,
     handleCreateNewSoloMatch,
     handleMatchDetailsClick,
-    handleRoomDetailsClick,
     handleOpenRecapModal,
     handleCloseRecapModal,
   } = useHomeHandlers();
@@ -63,7 +53,6 @@ export const HomePage: React.FC = () => {
       <AppBarSection
         onProfileClick={handleProfileClick}
         onLogout={handleLogout}
-        onCreateNewRoom={handleCreateNewRoom}
         onCreateNewSoloMatch={handleCreateNewSoloMatch}
       />
 
@@ -74,8 +63,6 @@ export const HomePage: React.FC = () => {
           onUpdateFilter={updateFilter}
           onSearchMatches={searchMatches}
         />
-
-        <SecaoSalas salas={rooms} onRoomDetailsClick={handleRoomDetailsClick} />
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
           <Button variant="outlined" onClick={toggleMapView} sx={homeStyles.mapViewButton}>
@@ -98,14 +85,6 @@ export const HomePage: React.FC = () => {
       </Tooltip>
 
       <Menu anchorEl={anchorElFabMenu} open={Boolean(anchorElFabMenu)} onClose={handleCloseFabMenu}>
-        <MenuItem
-          onClick={() => {
-            handleCreateNewRoom();
-            handleCloseFabMenu();
-          }}
-        >
-          <GroupsIcon sx={{ mr: 1 }} /> Criar Sala
-        </MenuItem>
         <MenuItem
           onClick={() => {
             handleCreateNewSoloMatch();

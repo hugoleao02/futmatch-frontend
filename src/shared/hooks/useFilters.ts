@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
-import type { SearchFilters } from '../../core/usecases/interfaces/IHomeUseCase';
+import type { SearchFilters } from '../../domain/usecases/interfaces/IHomeUseCase';
 
 export const useFilters = (initialFilters: SearchFilters) => {
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);
 
   const updateFilter = useCallback((key: keyof SearchFilters, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev: SearchFilters) => ({ ...prev, [key]: value }));
   }, []);
 
   const resetFilters = useCallback(() => {

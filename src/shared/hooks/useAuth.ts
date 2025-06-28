@@ -5,27 +5,23 @@ import { localStorage } from '../utils/storage/LocalStorage';
 export const useAuth = () => {
   const [token, setToken] = useState<string | null>(() => {
     const storedToken = localStorage.get<string>(STORAGE_KEYS.token);
-    console.log('Token inicial:', storedToken);
     return storedToken;
   });
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    console.log('Token atualizado:', token);
     setIsAuthenticated(!!token);
     setIsLoading(false);
   }, [token]);
 
   const login = (newToken: string) => {
-    console.log('Login com token:', newToken);
     localStorage.set(STORAGE_KEYS.token, newToken);
     setToken(newToken);
     setIsAuthenticated(true);
   };
 
   const logout = () => {
-    console.log('Logout - removendo token');
     localStorage.remove(STORAGE_KEYS.token);
     setToken(null);
     setIsAuthenticated(false);

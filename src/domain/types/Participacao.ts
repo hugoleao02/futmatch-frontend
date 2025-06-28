@@ -1,6 +1,9 @@
 export interface Participacao {
-  id: string;
-  usuarioId: string;
+  id: number;
+  usuarioId: number;
+  usuarioNome: string;
+  partidaId: number;
+  partidaNome: string;
   status: string;
   dataParticipacao: string;
 }

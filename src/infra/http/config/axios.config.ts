@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { STORAGE_KEYS } from '../../../shared/constants';
-import { localStorage } from '../../../shared/utils/storage/LocalStorage';
 
 export const createAxiosInstance = () => {
   const instance = axios.create({
@@ -12,10 +11,12 @@ export const createAxiosInstance = () => {
 
   instance.interceptors.request.use(
     config => {
-      const token = localStorage.get(STORAGE_KEYS.token);
+      const token = window.localStorage.getItem(STORAGE_KEYS.token);
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+
       return config;
     },
     error => Promise.reject(error),

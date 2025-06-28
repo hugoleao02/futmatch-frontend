@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useReducer } from 'react';
-import type { Sala } from '../../../../domain/entities/Sala';
 import type { PartidaResponse } from '../../../../domain/types';
 import type { SearchFilters } from '../../../../domain/usecases/interfaces/IHomeUseCase';
 import { useContainer } from '../../../../infra/di/useContainer';
@@ -17,20 +16,17 @@ const INITIAL_FILTERS: SearchFilters = {
 
 interface HomeState {
   matches: PartidaResponse[];
-  rooms: Sala[];
   showMap: boolean;
   error: string | null;
 }
 
 type HomeAction =
   | { type: 'SET_MATCHES'; payload: PartidaResponse[] }
-  | { type: 'SET_ROOMS'; payload: Sala[] }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'TOGGLE_MAP' };
 
 const initialState: HomeState = {
   matches: [],
-  rooms: [],
   showMap: false,
   error: null,
 };
@@ -39,8 +35,6 @@ const homeReducer = (state: HomeState, action: HomeAction): HomeState => {
   switch (action.type) {
     case 'SET_MATCHES':
       return { ...state, matches: action.payload };
-    case 'SET_ROOMS':
-      return { ...state, rooms: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload };
     case 'TOGGLE_MAP':
@@ -60,12 +54,8 @@ export const useHome = () => {
   const loadData = useCallback(async () => {
     await withLoading(async () => {
       try {
-        const [matchesData, roomsData] = await Promise.all([
-          useCases.homeUseCase.getPartidas(),
-          useCases.homeUseCase.getUserRooms(),
-        ]);
+        const matchesData = await useCases.homeUseCase.getPartidas();
         dispatch({ type: 'SET_MATCHES', payload: matchesData });
-        dispatch({ type: 'SET_ROOMS', payload: roomsData });
       } catch (error) {
         handleError(error, 'Erro ao carregar dados');
         dispatch({ type: 'SET_ERROR', payload: 'Erro ao carregar dados' });
@@ -102,13 +92,12 @@ export const useHome = () => {
   }, []);
 
   const availableMatches = useMemo(() => {
-    return state.matches.filter(match => !match.isPartidaSala);
+    return state.matches;
   }, [state.matches]);
 
   return {
     // Estado
     matches: state.matches,
-    rooms: state.rooms,
     loading: isLoading,
     showMap: state.showMap,
     error: state.error,

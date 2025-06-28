@@ -86,18 +86,6 @@ export const homeStyles = {
     },
   } as SxProps<Theme>,
 
-  roomCard: {
-    borderRadius: THEME.borderRadius.lg,
-    transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-    '&:hover': {
-      transform: 'translateY(-3px)',
-      boxShadow: THEME.shadows.lg,
-    },
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '180px',
-  } as SxProps<Theme>,
-
   matchCard: {
     borderRadius: THEME.borderRadius.lg,
     transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',

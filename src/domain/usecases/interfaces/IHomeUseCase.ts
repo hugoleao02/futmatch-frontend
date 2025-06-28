@@ -1,5 +1,4 @@
 import type { PartidaResponse } from '../../types';
-import type { Sala } from '../../entities/Sala.ts';
 
 export interface SearchFilters {
   location?: string;
@@ -11,6 +10,5 @@ export interface SearchFilters {
 
 export interface IHomeUseCase {
   getPartidas(filters?: SearchFilters): Promise<PartidaResponse[]>;
-  getUserRooms(): Promise<Sala[]>;
   generateMatchRecap(matchName: string, details: string): Promise<string>;
 }
