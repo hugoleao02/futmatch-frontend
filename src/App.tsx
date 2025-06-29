@@ -11,10 +11,21 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        Carregando...
+      </div>
+    );
   }
 
-  return isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.LOGIN} />;
+  return isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.LOGIN} replace />;
 };
 
 // Componente para rotas públicas (quando já está logado)
@@ -22,10 +33,21 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        Carregando...
+      </div>
+    );
   }
 
-  return !isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.HOME} />;
+  return !isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.HOME} replace />;
 };
 
 function App() {
@@ -49,7 +71,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
+          <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
         </Routes>
 
         <ToastContainer

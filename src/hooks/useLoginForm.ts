@@ -1,30 +1,42 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../constants/routes';
+import * as Yup from 'yup';
 import type { LoginRequest } from '../types';
 import { useAuth } from './useAuth';
 
+const loginSchema = Yup.object().shape({
+  email: Yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
+  senha: Yup.string()
+    .min(6, 'A senha deve ter pelo menos 6 caracteres')
+    .required('Senha é obrigatória'),
+});
+
 export const useLoginForm = () => {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const form = useForm<LoginRequest>();
-
-  const onSubmit = async (data: LoginRequest) => {
-    try {
-      setLoading(true);
-      await login(data);
-      navigate(ROUTES.HOME);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const formik = useFormik<LoginRequest>({
+    initialValues: {
+      email: '',
+      senha: '',
+    },
+    validationSchema: loginSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        await login(values);
+        // Aguardar um pouco para garantir que o estado foi atualizado
+        setTimeout(() => {
+          navigate('/home');
+        }, 100);
+      } catch (error) {
+        // Erro já tratado no hook useAuth
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   return {
-    ...form,
-    loading,
-    onSubmit,
+    formik,
   };
 };

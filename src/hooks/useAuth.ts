@@ -13,7 +13,8 @@ export const useAuth = () => {
 
     if (token && userData) {
       try {
-        setUser(JSON.parse(userData));
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
       } catch (_error) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -25,10 +26,18 @@ export const useAuth = () => {
   const login = useCallback(async (data: LoginRequest) => {
     try {
       setLoading(true);
-      const response = await authService.login(data);
+      const response = (await authService.login(data)) as any;
+
+      // Criar objeto user a partir da resposta da API
+      const user: User = {
+        id: response.id,
+        nome: response.nome,
+        email: response.email,
+      };
+
       localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      setUser(response.user);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
       toast.success('Login realizado com sucesso!');
       return response;
     } catch (error: unknown) {
@@ -43,10 +52,18 @@ export const useAuth = () => {
   const register = useCallback(async (data: RegisterRequest) => {
     try {
       setLoading(true);
-      const response = await authService.register(data);
+      const response = (await authService.register(data)) as any;
+
+      // Criar objeto user a partir da resposta da API
+      const user: User = {
+        id: response.id,
+        nome: response.nome,
+        email: response.email,
+      };
+
       localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      setUser(response.user);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
       toast.success('Cadastro realizado com sucesso!');
       return response;
     } catch (error: unknown) {
@@ -64,12 +81,14 @@ export const useAuth = () => {
     toast.success('Logout realizado com sucesso!');
   }, []);
 
+  const isAuthenticated = !!user;
+
   return {
     user,
     loading,
     login,
     register,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated,
   };
 };

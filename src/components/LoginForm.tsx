@@ -4,13 +4,7 @@ import { ROUTES } from '../constants/routes';
 import { useLoginForm } from '../hooks/useLoginForm';
 
 export const LoginForm = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    loading,
-    onSubmit,
-  } = useLoginForm();
+  const { formik } = useLoginForm();
   const navigate = useNavigate();
 
   return (
@@ -27,43 +21,42 @@ export const LoginForm = () => {
         <Typography variant="h4" component="h1" align="center" gutterBottom>
           Login
         </Typography>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={formik.handleSubmit}>
           <TextField
-            {...register('email', {
-              required: 'Email é obrigatório',
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Email inválido',
-              },
-            })}
+            id="email"
+            name="email"
             label="Email"
             type="email"
             fullWidth
             margin="normal"
-            error={!!errors.email}
-            helperText={errors.email?.message}
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
           />
           <TextField
-            {...register('senha', {
-              required: 'Senha é obrigatória',
-              minLength: { value: 6, message: 'Senha deve ter pelo menos 6 caracteres' },
-            })}
+            id="senha"
+            name="senha"
             label="Senha"
             type="password"
             fullWidth
             margin="normal"
-            error={!!errors.senha}
-            helperText={errors.senha?.message}
+            value={formik.values.senha}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.senha && Boolean(formik.errors.senha)}
+            helperText={formik.touched.senha && formik.errors.senha}
           />
           <Button
             type="submit"
             variant="contained"
             fullWidth
             size="large"
-            disabled={loading}
+            disabled={formik.isSubmitting}
             sx={{ mt: 3, mb: 2 }}
           >
-            {loading ? <CircularProgress size={24} /> : 'Entrar'}
+            {formik.isSubmitting ? <CircularProgress size={24} /> : 'Entrar'}
           </Button>
         </form>
         <Box textAlign="center">

@@ -66,7 +66,9 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
-  user: User;
+  id: number;
+  nome: string;
+  email: string;
 }
 
 export interface RegisterRequest {
@@ -77,7 +79,9 @@ export interface RegisterRequest {
 
 export interface RegisterResponse {
   token: string;
-  user: User;
+  id: number;
+  nome: string;
+  email: string;
 }
 
 // Tipos de requisição de partida
