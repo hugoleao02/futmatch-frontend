@@ -1,9 +1,6 @@
 import type { BaseEntity } from '../../shared/types';
 import type { UserPreferences } from './UserPreferences';
 
-/**
- * Papéis possíveis para o usuário.
- */
 export type UserRole = 'admin' | 'moderator' | 'user' | 'guest';
 
 /**

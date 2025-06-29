@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { checkToken, testApiConnection } from '../../../shared/utils/api';
 import { AppBarSection, FilterSection, GeradorResumo, SecaoPartidas } from './components';
 import { TEXTO_BOTAO_MAPA, TOOLTIP_CRIAR } from './constants';
-import { useHomeHandlers } from './hooks/useManipuladoresPaginaInicial';
-import { useHome } from './hooks/usePaginaInicial';
+import { useHomeHandlers } from './hooks/useHomePageHandlers.ts';
+import { useHome } from './hooks/useHomePage.ts';
 import { homeStyles } from './styles/homeStyles';
 
 export const HomePage: React.FC = () => {

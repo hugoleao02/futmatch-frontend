@@ -188,7 +188,7 @@ describe('Login Flow', () => {
 ```typescript
 // test-utils/mocks/AuthRepositoryMock.ts
 import { IAuthRepository } from '@/core/repositories/IAuthRepository';
-import { LoginResponse, RegisterResponse } from '@/core/types/api';
+import { LoginResponse, RegisterResponse } from '@/core/dtos/api';
 
 export class AuthRepositoryMock implements IAuthRepository {
   async login(email: string, password: string): Promise<LoginResponse> {

@@ -1,6 +1,6 @@
 import type { IHttpClient } from '../../domain/repositories/IHttpClient';
 import type { IParticipacaoRepository } from '../../domain/repositories/IParticipacaoRepository';
-import type { Participacao } from '../../domain/types';
+import type { Participacao } from '../../domain/dtos';
 
 export class ParticipacaoRepositoryImpl implements IParticipacaoRepository {
   constructor(private readonly httpClient: IHttpClient) {}

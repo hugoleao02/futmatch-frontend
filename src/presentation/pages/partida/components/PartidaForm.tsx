@@ -1,60 +1,34 @@
-import { Box, Button, CircularProgress, MenuItem, TextField } from '@mui/material';
+import {
+  Box, Button, CircularProgress, IconButton, InputAdornment, MenuItem, TextField, Tooltip, Typography
+} from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import MapIcon from '@mui/icons-material/Map';
 import React from 'react';
 import { styles } from '../styles';
 import { Esporte, TipoPartida } from '../../../../domain/enums';
-import { esporteOptions } from '../../../../domain/enums/Esporte.ts';
-import { tipoPartidaOptions } from '../../../../domain/enums/TipoPartida.ts';
+import { esporteOptions } from '../../../../domain/enums/Esporte';
+import { tipoPartidaOptions } from '../../../../domain/enums/TipoPartida';
+import { useCriarPartida } from '../hooks/useCriarPartida';
 
-interface PartidaFormProps {
-  nome: string;
-  esporte: Esporte;
-  latitude: number;
-  longitude: number;
-  data: string;
-  hora: string;
-  totalJogadores: number;
-  tipoPartida: TipoPartida;
-  loading: boolean;
-  isEdit: boolean;
-  onNomeChange: (value: string) => void;
-  onEsporteChange: (value: Esporte) => void;
-  onLatitudeChange: (value: number) => void;
-  onLongitudeChange: (value: number) => void;
-  onDataChange: (value: string) => void;
-  onHoraChange: (value: string) => void;
-  onTotalJogadoresChange: (value: number) => void;
-  onTipoPartidaChange: (value: TipoPartida) => void;
-  onSubmit: () => void;
-  onBack: () => void;
-}
+export const PartidaForm: React.FC = () => {
+  const {
+    form,
+    formErrors,
+    loading,
+    isEdit,
+    onChange,
+    onUseCurrentLocation,
+    onOpenMapPicker,
+    onSubmit,
+    onBack,
+  } = useCriarPartida();
 
-export const PartidaForm: React.FC<PartidaFormProps> = ({
-  nome,
-  esporte,
-  latitude,
-  longitude,
-  data,
-  hora,
-  totalJogadores,
-  tipoPartida,
-  loading,
-  isEdit,
-  onNomeChange,
-  onEsporteChange,
-  onLatitudeChange,
-  onLongitudeChange,
-  onDataChange,
-  onHoraChange,
-  onTotalJogadoresChange,
-  onTipoPartidaChange,
-  onSubmit,
-  onBack,
-}) => {
-
-  if (loading) {
+  if (loading && !isEdit) {
     return (
       <Box sx={styles.loadingContainer}>
         <CircularProgress />
+        <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>Carregando...</Typography>
       </Box>
     );
   }
@@ -64,73 +38,90 @@ export const PartidaForm: React.FC<PartidaFormProps> = ({
       <TextField
         fullWidth
         label="Nome da Partida"
-        value={nome}
-        onChange={e => onNomeChange(e.target.value)}
+        value={form.nome}
+        onChange={e => onChange('nome', e.target.value)}
         sx={styles.textField}
         required
+        error={!!formErrors.nome}
+        helperText={formErrors.nome}
       />
 
       <TextField
         fullWidth
         select
         label="Esporte"
-        value={esporte}
-        onChange={e => onEsporteChange(e.target.value as Esporte)}
+        value={form.esporte}
+        onChange={e => onChange('esporte', e.target.value as Esporte)}
         sx={styles.textField}
         required
+        error={!!formErrors.esporte}
+        helperText={formErrors.esporte}
       >
-        {esporteOptions.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
+        {esporteOptions.map(option => (
+          <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
         ))}
       </TextField>
 
       <TextField
         fullWidth
-        label="Latitude"
-        type="number"
-        value={latitude}
-        onChange={e => onLatitudeChange(Number(e.target.value))}
+        label="Localização (Endereço, Quadra, Ponto de Referência)"
+        value={form.localizacao}
+        onChange={e => onChange('localizacao', e.target.value)}
         sx={styles.textField}
         required
+        error={!!formErrors.localizacao}
+        helperText={formErrors.localizacao}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <LocationOnIcon color="action" sx={{ mr: 1 }} />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <Box sx={{ display: 'flex' }}>
+              <Tooltip title="Usar localização atual do GPS">
+                <IconButton onClick={onUseCurrentLocation} disabled={loading} color="primary" size="small">
+                  <GpsFixedIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Selecionar no mapa">
+                <IconButton onClick={onOpenMapPicker} disabled={loading} color="primary" size="small" sx={{ ml: 1 }}>
+                  <MapIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          ),
+        }}
       />
-
-      <TextField
-        fullWidth
-        label="Longitude"
-        type="number"
-        value={longitude}
-        onChange={e => onLongitudeChange(Number(e.target.value))}
-        sx={styles.textField}
-        required
-      />
+      <Typography variant="caption" color="text.secondary" sx={{ mt: -2, mb: 1 }}>
+        Forneça um endereço ou utilize as opções de localização ao lado.
+      </Typography>
 
       <Box sx={styles.dateTimeContainer}>
         <TextField
           fullWidth
           label="Data"
           type="date"
-          value={data}
-          onChange={e => onDataChange(e.target.value)}
+          value={form.data}
+          onChange={e => onChange('data', e.target.value)}
           sx={styles.dateTimeField}
-          InputLabelProps={{
-            shrink: true,
-          }}
+          InputLabelProps={{ shrink: true }}
           required
+          error={!!formErrors.data}
+          helperText={formErrors.data}
         />
 
         <TextField
           fullWidth
           label="Horário"
           type="time"
-          value={hora}
-          onChange={e => onHoraChange(e.target.value)}
+          value={form.hora}
+          onChange={e => onChange('hora', e.target.value)}
           sx={styles.dateTimeField}
-          InputLabelProps={{
-            shrink: true,
-          }}
+          InputLabelProps={{ shrink: true }}
           required
+          error={!!formErrors.hora}
+          helperText={formErrors.hora}
         />
       </Box>
 
@@ -138,25 +129,28 @@ export const PartidaForm: React.FC<PartidaFormProps> = ({
         fullWidth
         label="Total de Jogadores"
         type="number"
-        value={totalJogadores}
-        onChange={e => onTotalJogadoresChange(Number(e.target.value))}
+        value={form.totalJogadores}
+        onChange={e => onChange('totalJogadores', Number(e.target.value))}
         sx={styles.textField}
         required
+        error={!!formErrors.totalJogadores}
+        helperText={formErrors.totalJogadores}
+        inputProps={{ min: 2, max: 22 }}
       />
 
       <TextField
         fullWidth
         select
         label="Tipo de Partida"
-        value={tipoPartida}
-        onChange={e => onTipoPartidaChange(e.target.value as TipoPartida)}
+        value={form.tipoPartida}
+        onChange={e => onChange('tipoPartida', e.target.value as TipoPartida)}
         sx={styles.textField}
         required
+        error={!!formErrors.tipoPartida}
+        helperText={formErrors.tipoPartida}
       >
-        {tipoPartidaOptions.map((option:{value: TipoPartida; label: string}) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
+        {tipoPartidaOptions.map(option => (
+          <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
         ))}
       </TextField>
 
@@ -164,8 +158,8 @@ export const PartidaForm: React.FC<PartidaFormProps> = ({
         <Button variant="outlined" onClick={onBack} sx={{ flex: 1 }}>
           Voltar
         </Button>
-        <Button variant="contained" onClick={onSubmit} sx={{ flex: 1 }}>
-          {isEdit ? 'Salvar' : 'Criar'}
+        <Button variant="contained" onClick={onSubmit} sx={{ flex: 1 }} disabled={loading}>
+          {loading ? <CircularProgress size={24} color="inherit" /> : (isEdit ? 'Salvar' : 'Criar')}
         </Button>
       </Box>
     </Box>

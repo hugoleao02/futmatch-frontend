@@ -1,6 +1,6 @@
 import { Grid, Paper } from '@mui/material';
 import React, { memo } from 'react';
-import type { PartidaResponse } from '../../../../domain/types';
+import type { PartidaResponse } from '../../../../domain/dtos';
 import { TEXTO_VAZIO, TITULOS } from '../constants';
 import { homeStyles } from '../styles/homeStyles';
 import { ListaVazia } from './ListaVazia';

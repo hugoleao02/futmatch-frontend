@@ -129,7 +129,7 @@ export interface ValidationSchema {
   [field: string]: ValidationRule;
 }
 
-// Use types from common
+// Use dtos from common
 import type { ValidationResult as CommonValidationResult, FormFieldError } from '../types/common';
 
 export type ValidationError = FormFieldError;

@@ -1,4 +1,4 @@
-import type { PartidaResponse } from '../../types';
+import type { PartidaResponse } from '../../dtos';
 
 export interface SearchFilters {
   location?: string;

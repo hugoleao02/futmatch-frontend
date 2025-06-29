@@ -4,7 +4,7 @@ import type {
   PartidaRequest,
   PartidaResponse,
   PartidaUpdateRequest,
-} from '../types';
+} from '../dtos';
 
 export interface IPartidaRepository {
   listarPartidas(): Promise<PartidaResponse[]>;

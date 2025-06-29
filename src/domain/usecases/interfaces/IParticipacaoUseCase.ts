@@ -1,4 +1,4 @@
-import type { Participacao } from '../../types';
+import type { Participacao } from '../../dtos';
 
 export interface IParticipacaoUseCase {
   participarPartida(partidaId: number): Promise<Participacao>;

@@ -1,5 +1,4 @@
-import type { Esporte } from '../enums/Esporte.ts';
-import type { TipoPartida } from '../enums/TipoPartida.ts';
+import type { TipoPartida,Esporte } from '../enums';
 
 export interface PartidaUpdateRequest {
   nome?: string;

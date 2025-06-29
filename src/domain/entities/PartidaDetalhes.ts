@@ -1,22 +1,7 @@
-import { TipoPartida, Esporte } from '../../../domain/enums';
-
-export interface Participante {
-  id: string;
-  nome: string;
-  avatar: string;
-}
-
-export interface Solicitacao {
-  id: string;
-  userId: string;
-  nome: string;
-  avatar: string;
-}
-
-export interface Time {
-  nome: string;
-  jogadores: Participante[];
-}
+import { Esporte, TipoPartida } from '../enums';
+import type { Solicitacao } from './Solicitacao.ts';
+import type { User } from './User.ts';
+import type { Time } from './Time.ts';
 
 export interface PartidaDetalhes {
   id: string;
@@ -30,7 +15,7 @@ export interface PartidaDetalhes {
   tipoPartida: TipoPartida;
   criadorId: number;
   criadorNome: string;
-  participantes?: Participante[];
+  participantes?: User[];
   solicitacoes?: Solicitacao[];
   times?: Time[] | null;
   isCriador?: boolean;

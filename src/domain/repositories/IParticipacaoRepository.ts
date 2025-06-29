@@ -1,4 +1,4 @@
-import type { Participacao } from '../types';
+import type { Participacao } from '../dtos';
 
 export interface IParticipacaoRepository {
   participarPartida(partidaId: number): Promise<Participacao>;

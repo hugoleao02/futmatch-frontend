@@ -1,7 +1,7 @@
 import { isRequired, isValidEmail, isValidPassword } from '../../shared/utils';
 import { AUTH_ERRORS } from '../constants/errors';
 import type { IAuthRepository } from '../repositories/IAuthRepository';
-import type { RegisterRequest, RegisterResponse } from '../types';
+import type { RegisterRequest, RegisterResponse } from '../dtos';
 import type { IRegisterUseCase } from './interfaces/IRegisterUseCase';
 
 export class RegisterUseCase implements IRegisterUseCase {

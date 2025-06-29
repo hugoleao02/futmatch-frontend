@@ -6,7 +6,7 @@ import type {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
-} from '../../domain/types';
+} from '../../domain/dtos';
 import { STORAGE_KEYS } from '../../shared/constants';
 
 export class AuthRepositoryImpl implements IAuthRepository {

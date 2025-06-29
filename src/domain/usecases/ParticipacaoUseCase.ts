@@ -1,5 +1,5 @@
 import type { IParticipacaoRepository } from '../repositories/IParticipacaoRepository';
-import type { Participacao } from '../types';
+import type { Participacao } from '../dtos';
 import type { IParticipacaoUseCase } from './interfaces/IParticipacaoUseCase';
 
 export class ParticipacaoUseCase implements IParticipacaoUseCase {

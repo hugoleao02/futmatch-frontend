@@ -1,4 +1,4 @@
-import type { LoginRequest, LoginResponse } from '../../types';
+import type { LoginRequest, LoginResponse } from '../../dtos';
 
 export interface ILoginUseCase {
   execute(loginRequest: LoginRequest): Promise<LoginResponse>;

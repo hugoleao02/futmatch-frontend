@@ -11,7 +11,7 @@ import { Box, Button, Card, CardActions, CardContent, Grid, Typography } from '@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TipoPartida } from '../../../../domain/enums';
-import type { PartidaResponse } from '../../../../domain/types';
+import type { PartidaResponse } from '../../../../domain/dtos';
 import { homeStyles } from '../styles/homeStyles';
 
 interface PartidaCardProps {

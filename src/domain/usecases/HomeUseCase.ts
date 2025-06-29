@@ -1,12 +1,12 @@
 import { toast, type ToastOptions } from 'react-toastify';
 import type { IPartidaRepository } from '../repositories/IPartidaRepository';
-import type { PartidaResponse } from '../types';
+import type { PartidaResponse } from '../dtos';
 import type { IHomeUseCase, SearchFilters } from './interfaces/IHomeUseCase';
 
 export class HomeUseCase implements IHomeUseCase {
   constructor(private readonly partidaRepository: IPartidaRepository) {}
 
-  async getMatches(filters?: SearchFilters): Promise<PartidaResponse[]> {
+  async getPartidas(filters?: SearchFilters): Promise<PartidaResponse[]> {
     try {
       const partidas = await this.partidaRepository.listarPartidas();
 
@@ -29,10 +29,6 @@ export class HomeUseCase implements IHomeUseCase {
       toast.error('Erro ao buscar partidas:', error as ToastOptions);
       return [];
     }
-  }
-
-  async getPartidas(filters?: SearchFilters): Promise<PartidaResponse[]> {
-    return this.getMatches(filters);
   }
 
   async generateMatchRecap(matchName: string, details: string): Promise<string> {

@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useReducer } from 'react';
-import type { PartidaResponse } from '../../../../domain/types';
+import type { PartidaResponse } from '../../../../domain/dtos';
 import type { SearchFilters } from '../../../../domain/usecases/interfaces/IHomeUseCase';
 import { useContainer } from '../../../../infra/di/useContainer';
 import { useFilters } from '../../../../shared/hooks';
-import { useErrorHandler } from '../../../../shared/hooks/useErrorHandler';
-import { useLoading } from '../../../../shared/hooks/useLoading';
+import { useErrorHandler } from '../../../../shared/hooks';
+import { useLoading } from '../../../../shared/hooks';
 
 const INITIAL_FILTERS: SearchFilters = {
   location: '',

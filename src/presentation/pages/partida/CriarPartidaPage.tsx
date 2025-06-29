@@ -1,33 +1,11 @@
 import { AppBar, Box, Paper, Toolbar, Typography } from '@mui/material';
 import React from 'react';
-import { PartidaForm } from './components/PartidaForm.tsx';
-import { useCriarPartida } from './hooks/useCriarPartida.ts';
+import { PartidaForm } from './components/PartidaForm';
+import { useCriarPartida } from './hooks/useCriarPartida';
 import { styles } from './styles';
 
 const CriarPartidaPage: React.FC = () => {
-  const {
-    nome,
-    esporte,
-    latitude,
-    longitude,
-    data,
-    hora,
-    totalJogadores,
-    tipoPartida,
-    loading,
-    isEdit,
-    error,
-    handleNomeChange,
-    handleEsporteChange,
-    handleLatitudeChange,
-    handleLongitudeChange,
-    handleDataChange,
-    handleHoraChange,
-    handleTotalJogadoresChange,
-    handleTipoPartidaChange,
-    handleSubmit,
-    handleBack,
-  } = useCriarPartida();
+  const { isEdit, error } = useCriarPartida();
 
   return (
     <Box sx={styles.container}>
@@ -50,28 +28,7 @@ const CriarPartidaPage: React.FC = () => {
           </Typography>
         )}
 
-        <PartidaForm
-          nome={nome}
-          esporte={esporte}
-          latitude={latitude}
-          longitude={longitude}
-          data={data}
-          hora={hora}
-          totalJogadores={totalJogadores}
-          tipoPartida={tipoPartida}
-          loading={loading}
-          isEdit={isEdit}
-          onNomeChange={handleNomeChange}
-          onEsporteChange={handleEsporteChange}
-          onLatitudeChange={handleLatitudeChange}
-          onLongitudeChange={handleLongitudeChange}
-          onDataChange={handleDataChange}
-          onHoraChange={handleHoraChange}
-          onTotalJogadoresChange={handleTotalJogadoresChange}
-          onTipoPartidaChange={handleTipoPartidaChange}
-          onSubmit={handleSubmit}
-          onBack={handleBack}
-        />
+        <PartidaForm />
       </Paper>
     </Box>
   );

@@ -6,7 +6,7 @@ import type {
   PartidaRequest,
   PartidaResponse,
   PartidaUpdateRequest,
-} from '../../domain/types';
+} from '../../domain/dtos';
 
 export class PartidaRepositoryImpl implements IPartidaRepository {
   constructor(private readonly httpClient: IHttpClient) {}

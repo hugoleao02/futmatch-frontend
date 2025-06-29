@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import type { Participacao } from '../../domain/types';
+import type { Participacao } from '../../domain/dtos';
 import { useContainer } from '../../infra/di/useContainer';
 
 export const useParticipacao = () => {
