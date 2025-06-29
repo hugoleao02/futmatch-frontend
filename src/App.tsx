@@ -1,14 +1,57 @@
-import { BrowserRouter } from 'react-router-dom';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ContainerProvider } from './infra/di/ContainerContext';
-import { AppRoutes } from './presentation/routes';
+import { LoginForm } from './components/LoginForm';
+import { ROUTES } from './constants/routes';
+import { useAuth } from './hooks/useAuth';
+import { HomePage } from './pages/HomePage';
+
+// Componente para rotas protegidas
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
+  return isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.LOGIN} />;
+};
+
+// Componente para rotas públicas (quando já está logado)
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
+  return !isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.HOME} />;
+};
 
 function App() {
   return (
-    <BrowserRouter>
-      <ContainerProvider>
-        <AppRoutes />
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route
+            path={ROUTES.LOGIN}
+            element={
+              <PublicRoute>
+                <LoginForm />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path={ROUTES.HOME}
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
+        </Routes>
+
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -19,10 +62,9 @@ function App() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="colored"
         />
-      </ContainerProvider>
-    </BrowserRouter>
+      </div>
+    </Router>
   );
 }
 
