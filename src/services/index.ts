@@ -5,6 +5,9 @@
 // Classe base para todos os serviços
 export { BaseService } from './BaseService';
 
+// Classe para operações assíncronas
+export { AsyncOperation } from './AsyncOperation';
+
 // Cliente HTTP para comunicação com API
 export { HttpClient } from './HttpClient';
 
@@ -32,7 +35,7 @@ export { ParticipacaoService } from './ParticipacaoService';
 export { NotificationService } from './NotificationService';
 
 // Serviços de validação
-export { ValidationService, AuthValidationService } from './ValidationService';
+export { AuthValidationService, ValidationService } from './ValidationService';
 
 // Serviço de tratamento de erros
 export { ErrorService } from './errorService';
