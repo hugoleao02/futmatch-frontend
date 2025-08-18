@@ -1,11 +1,9 @@
 import { devtools } from 'zustand/middleware';
+import { shouldUseDevTools } from '../utils/environment';
 
 // Configuração para desenvolvimento
-export const withDevTools = <T extends object>(
-  store: T,
-  name: string
-) => {
-  if (process.env.NODE_ENV === 'development') {
+export const withDevTools = (store: any, name: string) => {
+  if (shouldUseDevTools()) {
     return devtools(store, { name });
   }
   return store;

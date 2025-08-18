@@ -1,1 +1,1 @@
-export { getErrorMessage, handleApiError } from './errorHandling';
+export * from './environment';

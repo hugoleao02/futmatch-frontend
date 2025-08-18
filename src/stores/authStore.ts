@@ -1,9 +1,10 @@
+import { toast } from 'react-toastify';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { toast } from 'react-toastify';
+import { SUCCESS_MESSAGES } from '../constants/messages';
 import { authService } from '../services/api';
-import type { LoginRequest, RegisterRequest, User } from '../types';
 import { ErrorService } from '../services/errorService';
+import type { LoginRequest, RegisterRequest, User } from '../types';
 
 interface AuthState {
   // Estado
@@ -11,7 +12,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  
+
   // Ações
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
@@ -36,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ loading: true });
           const response = await authService.login(data);
-          
+
           const userData: User = {
             id: response.id,
             nome: response.nome,
@@ -50,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
             loading: false,
           });
 
-          toast.success('Login realizado com sucesso!');
+          toast.success(SUCCESS_MESSAGES.LOGIN);
         } catch (error: unknown) {
           set({ loading: false });
           const errorInfo = ErrorService.classifyError(error);
@@ -63,7 +64,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ loading: true });
           const response = await authService.register(data);
-          
+
           const userData: User = {
             id: response.id,
             nome: response.nome,
@@ -77,7 +78,7 @@ export const useAuthStore = create<AuthState>()(
             loading: false,
           });
 
-          toast.success('Cadastro realizado com sucesso!');
+          toast.success(SUCCESS_MESSAGES.REGISTER);
         } catch (error: unknown) {
           set({ loading: false });
           const errorInfo = ErrorService.classifyError(error);
@@ -89,7 +90,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         authService.logout();
         get().clearAuth();
-        toast.success('Logout realizado com sucesso!');
+        toast.success(SUCCESS_MESSAGES.LOGOUT);
       },
 
       clearAuth: () => {
@@ -103,11 +104,11 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ 
-        user: state.user, 
+      partialize: state => ({
+        user: state.user,
         token: state.token,
-        isAuthenticated: state.isAuthenticated 
+        isAuthenticated: state.isAuthenticated,
       }),
-    }
-  )
+    },
+  ),
 );

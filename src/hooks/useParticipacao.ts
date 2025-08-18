@@ -1,77 +1,74 @@
-import { useCallback, useState } from 'react';
-import { toast } from 'react-toastify';
+import { useCallback } from 'react';
+import { SUCCESS_MESSAGES } from '../constants/messages';
 import { participacaoService } from '../services/api';
 import type { Participacao } from '../types';
+import { useAsyncOperation } from './useAsyncOperation';
 
 export const useParticipacao = () => {
-  const [loading, setLoading] = useState(false);
+  const { executeOperationWithoutParams, loading } = useAsyncOperation();
 
-  const participarPartida = useCallback(async (partidaId: number): Promise<Participacao | null> => {
-    setLoading(true);
-    try {
-      const participacao = await participacaoService.participarPartida(partidaId);
-      toast.success('Participação registrada com sucesso!');
-      return participacao;
-    } catch (_error: unknown) {
-      toast.error('Erro ao participar da partida');
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const participarPartida = useCallback(
+    async (partidaId: number): Promise<Participacao | null> => {
+      try {
+        const participacao = await executeOperationWithoutParams(
+          () => participacaoService.participarPartida(partidaId),
+          SUCCESS_MESSAGES.PARTICIPATION_REGISTERED,
+          'Participar da partida',
+        );
+        return participacao as Participacao;
+      } catch {
+        return null;
+      }
+    },
+    [executeOperationWithoutParams],
+  );
 
-  const cancelarParticipacao = useCallback(async (partidaId: number): Promise<boolean> => {
-    setLoading(true);
-    try {
-      await participacaoService.cancelarParticipacao(partidaId);
-      toast.success('Participação cancelada com sucesso!');
-      return true;
-    } catch (_error) {
-      toast.error('Erro ao cancelar participação');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const cancelarParticipacao = useCallback(
+    async (partidaId: number): Promise<boolean> => {
+      try {
+        await executeOperationWithoutParams(
+          () => participacaoService.cancelarParticipacao(partidaId),
+          SUCCESS_MESSAGES.PARTICIPATION_CANCELLED,
+          'Cancelar participação',
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [executeOperationWithoutParams],
+  );
 
   const aprovarParticipacao = useCallback(
     async (partidaId: number, participanteId: number): Promise<Participacao | null> => {
-      setLoading(true);
       try {
-        const participacao = await participacaoService.aprovarParticipacao(
-          partidaId,
-          participanteId,
+        const participacao = await executeOperationWithoutParams(
+          () => participacaoService.aprovarParticipacao(partidaId, participanteId),
+          SUCCESS_MESSAGES.PARTICIPATION_APPROVED,
+          'Aprovar participação',
         );
-        toast.success('Participação aprovada com sucesso!');
-        return participacao;
-      } catch (_error) {
-        toast.error('Erro ao aprovar participação');
+        return participacao as Participacao;
+      } catch {
         return null;
-      } finally {
-        setLoading(false);
       }
     },
-    [],
+    [executeOperationWithoutParams],
   );
 
   const rejeitarParticipacao = useCallback(
     async (partidaId: number, participanteId: number): Promise<Participacao | null> => {
-      setLoading(true);
       try {
-        const participacao = await participacaoService.rejeitarParticipacao(
-          partidaId,
-          participanteId,
+        const participacao = await executeOperationWithoutParams(
+          () => participacaoService.rejeitarParticipacao(partidaId, participanteId),
+          SUCCESS_MESSAGES.PARTICIPATION_REJECTED,
+          'Rejeitar participação',
         );
-        toast.success('Participação rejeitada com sucesso!');
-        return participacao;
-      } catch (_error) {
-        toast.error('Erro ao rejeitar participação');
+        return participacao as Participacao;
+      } catch {
         return null;
-      } finally {
-        setLoading(false);
       }
     },
-    [],
+    [executeOperationWithoutParams],
   );
 
   return {

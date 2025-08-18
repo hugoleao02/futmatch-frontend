@@ -92,7 +92,7 @@ export const ErrorFallback = ({
         {getErrorDescription()}
       </Typography>
 
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env.DEV && (
         <Alert severity="info" sx={{ mb: 3, maxWidth: 500, textAlign: 'left' }}>
           <Typography variant="body2" component="div">
             <strong>Detalhes técnicos:</strong>

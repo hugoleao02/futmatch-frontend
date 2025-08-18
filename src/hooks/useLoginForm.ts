@@ -1,11 +1,10 @@
 import { useFormik } from 'formik';
-import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import * as Yup from 'yup';
 import type { LoginRequest } from '../types';
 import { useAuth } from './useAuthNew';
 import { useErrorHandler } from './useErrorHandler';
-import { ROUTES } from '../constants/routes';
+import { useNavigation } from './useNavigation';
 
 const loginSchema = Yup.object().shape({
   email: Yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
@@ -17,14 +16,14 @@ const loginSchema = Yup.object().shape({
 export const useLoginForm = () => {
   const { login, isAuthenticated } = useAuth();
   const { handleError } = useErrorHandler();
-  const navigate = useNavigate();
+  const { navigateToHome } = useNavigation();
 
   // Navegar automaticamente quando autenticado
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(ROUTES.HOME);
+      navigateToHome();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigateToHome]);
 
   const formik = useFormik<LoginRequest>({
     initialValues: {

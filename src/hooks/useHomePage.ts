@@ -1,39 +1,39 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useAsyncOperation } from './useAsyncOperation';
 import { useAuth } from './useAuthNew';
-import { useErrorHandler } from './useErrorHandler';
 import { useNavigation } from './useNavigation';
 import { useParticipacao } from './useParticipacao';
 import { usePartidas } from './usePartidas';
-import { useRetry } from './useRetry';
 
 export const useHomePage = () => {
   const { user } = useAuth();
-  const { partidas, loading, listarPartidasFuturas } = usePartidas();
+  const { partidas, listarPartidasFuturas } = usePartidas();
   const { participarPartida } = useParticipacao();
   const { navigateToCreateMatch, handleLogout } = useNavigation();
-  const { handleError } = useErrorHandler();
-  const { executeWithRetry } = useRetry({ maxAttempts: 2, delayMs: 1000 });
+  const { executeOperationWithoutParams, loading } = useAsyncOperation();
   const [page, setPage] = useState(0);
 
   const carregarPartidas = useCallback(async () => {
-    try {
-      await executeWithRetry(() => listarPartidasFuturas(page, 10), 'Carregar partidas');
-    } catch (error) {
-      handleError(error, 'Carregar partidas');
-    }
-  }, [listarPartidasFuturas, page, handleError, executeWithRetry]);
+    await executeOperationWithoutParams(
+      () => listarPartidasFuturas(page, 10),
+      undefined,
+      'Carregar partidas',
+    );
+  }, [listarPartidasFuturas, page, executeOperationWithoutParams]);
 
   useEffect(() => {
     carregarPartidas();
   }, [carregarPartidas]);
 
   const handleParticipar = async (partidaId: number) => {
-    try {
-      await participarPartida(partidaId);
-      carregarPartidas();
-    } catch (error) {
-      handleError(error, 'Participar da partida');
-    }
+    await executeOperationWithoutParams(
+      async () => {
+        await participarPartida(partidaId);
+        carregarPartidas();
+      },
+      undefined,
+      'Participar da partida',
+    );
   };
 
   return {

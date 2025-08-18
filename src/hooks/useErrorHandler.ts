@@ -20,7 +20,7 @@ export const useErrorHandler = () => {
       });
 
       // Log técnico para desenvolvimento
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error('Error handled by useErrorHandler:', {
           context,
           error: ErrorService.getTechnicalDetails(error),
