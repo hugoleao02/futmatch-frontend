@@ -4,6 +4,8 @@ import { SUCCESS_MESSAGES } from '../constants/messages';
 import { ServiceFactory } from '../services/ServiceFactory';
 import { ErrorService } from '../services/errorService';
 import type { IAuthActions, IAuthState, LoginRequest, RegisterRequest } from '../types';
+import { AuthOperations } from '../utils/authOperations';
+import { createEmptyAuthState } from '../utils/authTransformers';
 
 interface AuthStore extends IAuthState, IAuthActions {
   login: (data: LoginRequest) => Promise<void>;
@@ -26,34 +28,17 @@ export const useAuthStore = create<AuthStore>()(
         // Ações
         setLoading: (loading: boolean) => set({ loading }),
 
-        clearAuth: () =>
-          set({
-            user: null,
-            token: null,
-            isAuthenticated: false,
-          }),
+        clearAuth: () => set(createEmptyAuthState()),
 
         login: async (data: LoginRequest) => {
-          set({ loading: true });
+          const authOps = new AuthOperations(authService);
           try {
-            const response = await authService.login(data);
-
-            set({
-              user: {
-                id: response.id,
-                nome: response.nome,
-                email: response.email,
-              },
-              token: response.token,
-              isAuthenticated: true,
-              loading: false,
-            });
+            const response = await authOps.executeLogin(data, loading => set({ loading }));
+            set(authOps.createAuthStateFromResponse(response));
 
             // Mostrar mensagem de sucesso
             console.log(SUCCESS_MESSAGES.LOGIN);
           } catch (error) {
-            set({ loading: false });
-
             // Classificar o erro para logging
             const errorInfo = ErrorService.classifyError(error);
             console.error('Erro no login:', errorInfo);
@@ -63,26 +48,14 @@ export const useAuthStore = create<AuthStore>()(
         },
 
         register: async (data: RegisterRequest) => {
-          set({ loading: true });
+          const authOps = new AuthOperations(authService);
           try {
-            const response = await authService.register(data);
-
-            set({
-              user: {
-                id: response.id,
-                nome: response.nome,
-                email: response.email,
-              },
-              token: response.token,
-              isAuthenticated: true,
-              loading: false,
-            });
+            const response = await authOps.executeRegister(data, loading => set({ loading }));
+            set(authOps.createAuthStateFromResponse(response));
 
             // Mostrar mensagem de sucesso
             console.log(SUCCESS_MESSAGES.REGISTER);
           } catch (error) {
-            set({ loading: false });
-
             // Classificar o erro para logging
             const errorInfo = ErrorService.classifyError(error);
             console.error('Erro no registro:', errorInfo);
@@ -96,11 +69,7 @@ export const useAuthStore = create<AuthStore>()(
           authService.logout();
 
           // Limpar o estado
-          set({
-            user: null,
-            token: null,
-            isAuthenticated: false,
-          });
+          set(createEmptyAuthState());
 
           // Mostrar mensagem de sucesso
           console.log(SUCCESS_MESSAGES.LOGOUT);

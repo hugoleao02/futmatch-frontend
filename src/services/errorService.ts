@@ -1,4 +1,5 @@
 import type { ErrorType } from '../stores/errorStore';
+import type { AuthErrorData, AxiosErrorData, ValidationErrorData } from '../types/errors';
 
 export interface ErrorInfo {
   type: ErrorType;
@@ -35,19 +36,19 @@ export class ErrorService {
   /**
    * Verifica se é um erro do Axios
    */
-  private static isAxiosError(error: unknown): boolean {
+  private static isAxiosError(error: unknown): error is AxiosErrorData {
     return (
       typeof error === 'object' &&
       error !== null &&
       'isAxiosError' in error &&
-      (error as any).isAxiosError === true
+      (error as AxiosErrorData).isAxiosError === true
     );
   }
 
   /**
    * Trata erros do Axios
    */
-  private static handleAxiosError(error: any): ErrorInfo {
+  private static handleAxiosError(error: AxiosErrorData): ErrorInfo {
     const status = error.response?.status;
     const message = error.response?.data?.message || error.message || 'Erro de conexão';
 
@@ -142,28 +143,28 @@ export class ErrorService {
   /**
    * Verifica se é um erro de validação
    */
-  private static isValidationError(error: unknown): boolean {
+  private static isValidationError(error: unknown): error is ValidationErrorData {
     return (
       (typeof error === 'object' &&
         error !== null &&
         'name' in error &&
-        (error as any).name === 'ValidationError') ||
+        (error as ValidationErrorData).name === 'ValidationError') ||
       (typeof error === 'object' &&
         error !== null &&
         'inner' in error &&
-        Array.isArray((error as any).inner))
+        Array.isArray((error as ValidationErrorData).inner))
     );
   }
 
   /**
    * Trata erros de validação
    */
-  private static handleValidationError(error: any): ErrorInfo {
+  private static handleValidationError(error: ValidationErrorData): ErrorInfo {
     let message = 'Dados inválidos';
     let details: string | undefined;
 
     if (error.inner && Array.isArray(error.inner)) {
-      details = error.inner.map((e: any) => e.message).join(', ');
+      details = error.inner.map(e => e.message).join(', ');
     } else if (error.message) {
       details = error.message;
     }
@@ -180,22 +181,22 @@ export class ErrorService {
   /**
    * Verifica se é um erro de autenticação
    */
-  private static isAuthError(error: unknown): boolean {
+  private static isAuthError(error: unknown): error is AuthErrorData {
     return (
       typeof error === 'object' &&
       error !== null &&
       'message' in error &&
-      typeof (error as any).message === 'string' &&
-      ((error as any).message.includes('token') ||
-        (error as any).message.includes('autenticação') ||
-        (error as any).message.includes('login'))
+      typeof (error as AuthErrorData).message === 'string' &&
+      ((error as AuthErrorData).message.includes('token') ||
+        (error as AuthErrorData).message.includes('autenticação') ||
+        (error as AuthErrorData).message.includes('login'))
     );
   }
 
   /**
    * Trata erros de autenticação
    */
-  private static handleAuthError(error: any): ErrorInfo {
+  private static handleAuthError(error: AuthErrorData): ErrorInfo {
     return {
       type: 'AUTH',
       message: 'Erro de autenticação',

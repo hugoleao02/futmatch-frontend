@@ -58,7 +58,7 @@ export const useFormOperations = <T extends FormikValues, R>(
   }, [formik]);
 
   const setFieldValue = useCallback(
-    (field: keyof T, value: any) => {
+    <V>(field: keyof T, value: V) => {
       formik.setFieldValue(field as string, value);
     },
     [formik],

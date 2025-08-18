@@ -1,19 +1,18 @@
 import { useCallback } from 'react';
 import { ServiceFactory } from '../services/ServiceFactory';
 import type { PagePartidaResponse, Partida, PartidaRequest, PartidaUpdateRequest } from '../types';
+import { useCrudOperations } from './useCrudOperations';
 import { useServiceOperations } from './useServiceOperations';
 
 export const usePartidas = () => {
+  const { loading, executeOperation, executeOperationGeneric } = useServiceOperations<Partida>();
   const {
     data: partidas,
-    loading,
-    executeOperation,
-    executeOperationGeneric,
     addItem,
     updateItem,
     removeItem,
     setDataList,
-  } = useServiceOperations<Partida>();
+  } = useCrudOperations<Partida>();
 
   const partidaService = ServiceFactory.getInstance().getPartidaService();
 

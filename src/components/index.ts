@@ -27,4 +27,6 @@ export { AppLayout } from './layout/AppLayout';
 // COMPONENTES DE ROTEAMENTO
 // ============================================================================
 
-export { RouteGuard, ProtectedRouteGuard, PublicRouteGuard } from './routing/RouteGuard';
+export { ProtectedRoute } from './routing/ProtectedRoute';
+export { PublicRoute } from './routing/PublicRoute';
+export { ProtectedRouteGuard, PublicRouteGuard, RouteGuard } from './routing/RouteGuard';

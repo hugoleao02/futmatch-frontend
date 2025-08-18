@@ -1,39 +1,24 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { LoginForm } from './components/LoginForm';
-import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AppLayout } from './components/layout/AppLayout';
-import { ProtectedRouteGuard, PublicRouteGuard, RouteGuard } from './components/routing/RouteGuard';
+import { ProtectedRoute } from './components/routing/ProtectedRoute';
+import { PublicRoute } from './components/routing/PublicRoute';
 import { ROUTES } from './constants';
-import { useAuth } from './hooks/useAuthNew';
+import { useRouting } from './hooks/useRouting';
 import { HomePage } from './pages/HomePage';
 
-// Componente para rotas protegidas
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner fullHeight />;
-  }
-
-  const guard = new ProtectedRouteGuard(isAuthenticated);
-  return <RouteGuard guard={guard}>{children}</RouteGuard>;
-};
-
-// Componente para rotas públicas (quando já está logado)
-const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner fullHeight />;
-  }
-
-  const guard = new PublicRouteGuard(isAuthenticated);
-  return <RouteGuard guard={guard}>{children}</RouteGuard>;
-};
-
 function App() {
-  const [, setActiveTab] = useState(0);
+  const { navigateBasedOnAuth, setActiveTab } = useRouting({
+    defaultRoute: ROUTES.HOME,
+    authRoute: ROUTES.HOME,
+    publicRoute: ROUTES.LOGIN,
+  });
+
+  useEffect(() => {
+    // Redirecionar baseado no estado de autenticação
+    navigateBasedOnAuth();
+  }, [navigateBasedOnAuth]);
 
   return (
     <Router>

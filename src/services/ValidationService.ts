@@ -1,7 +1,8 @@
 import type { IValidator, ValidationResult } from '../types';
+import type { AuthValidationData, UserValidationData } from '../types/validation';
 
-export class ValidationService implements IValidator<any> {
-  validate(data: any): ValidationResult {
+export class ValidationService implements IValidator<UserValidationData> {
+  validate(data: UserValidationData): ValidationResult {
     const errors: string[] = [];
 
     // Validação básica de dados obrigatórios
@@ -38,8 +39,8 @@ export class ValidationService implements IValidator<any> {
 }
 
 // Validador específico para formulários de autenticação
-export class AuthValidationService implements IValidator<any> {
-  validate(data: any): ValidationResult {
+export class AuthValidationService implements IValidator<AuthValidationData> {
+  validate(data: AuthValidationData): ValidationResult {
     const errors: string[] = [];
 
     if (!data.email) {
@@ -54,9 +55,7 @@ export class AuthValidationService implements IValidator<any> {
       errors.push('Senha deve ter pelo menos 6 caracteres');
     }
 
-    if (data.nome && data.nome.trim().length < 2) {
-      errors.push('Nome deve ter pelo menos 2 caracteres');
-    }
+    // AuthValidationData não inclui nome, apenas email e senha
 
     return {
       isValid: errors.length === 0,

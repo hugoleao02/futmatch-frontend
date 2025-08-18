@@ -6,8 +6,9 @@ import type {
   INotificationService,
   IParticipacaoService,
   IPartidaService,
-  IValidator,
 } from '../types';
+import type { IAuthValidator, IUserValidator } from '../types/validation';
+import { SetterUtils } from '../utils/setterUtils';
 
 // Container de injeção de dependências
 export class DependencyContainer {
@@ -15,8 +16,8 @@ export class DependencyContainer {
 
   private serviceFactory: ServiceFactory;
   private notificationService: INotificationService;
-  private validationService: IValidator<any>;
-  private authValidationService: IValidator<any>;
+  private validationService: IUserValidator;
+  private authValidationService: IAuthValidator;
 
   private constructor() {
     this.serviceFactory = ServiceFactory.getInstance();
@@ -49,25 +50,25 @@ export class DependencyContainer {
     return this.notificationService;
   }
 
-  getValidationService(): IValidator<any> {
+  getValidationService(): IUserValidator {
     return this.validationService;
   }
 
-  getAuthValidationService(): IValidator<any> {
+  getAuthValidationService(): IAuthValidator {
     return this.authValidationService;
   }
 
   // Métodos para substituir serviços (útil para testes)
   setNotificationService(service: INotificationService): void {
-    this.notificationService = service;
+    SetterUtils.createSetter(this as any, 'notificationService', service);
   }
 
-  setValidationService(service: IValidator<any>): void {
-    this.validationService = service;
+  setValidationService(service: IUserValidator): void {
+    SetterUtils.createSetter(this as any, 'validationService', service);
   }
 
-  setAuthValidationService(service: IValidator<any>): void {
-    this.authValidationService = service;
+  setAuthValidationService(service: IAuthValidator): void {
+    SetterUtils.createSetter(this as any, 'authValidationService', service);
   }
 }
 

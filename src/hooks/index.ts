@@ -5,7 +5,11 @@
 // Hook para operações assíncronas
 export { useAsyncOperation } from './useAsyncOperation';
 
-// Hook genérico para operações de serviço
+// Hooks específicos para operações de serviço
+export { useApiOperations } from './useApiOperations';
+export { useGenericOperations } from './useGenericOperations';
+
+// Hook genérico para operações de serviço (composição)
 export { useServiceOperations } from './useServiceOperations';
 
 // Hook genérico para formulários
@@ -49,6 +53,9 @@ export { useErrorHandler } from './useErrorHandler';
 
 // Hook de navegação
 export { useNavigation } from './useNavigation';
+
+// Hook de roteamento
+export { useRouting } from './useRouting';
 
 // Hook de armazenamento local
 export { useLocalStorage } from './useLocalStorage';
