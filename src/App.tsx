@@ -1,8 +1,8 @@
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { LoginForm } from './components/LoginForm';
-import { ROUTES } from './constants/routes';
+import { LoadingSpinner } from './components/common';
+import { AppLayout } from './components/layout';
+import { ROUTES } from './constants';
 import { useAuth } from './hooks/useAuth';
 import { HomePage } from './pages/HomePage';
 
@@ -11,18 +11,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        Carregando...
-      </div>
-    );
+    return <LoadingSpinner fullHeight />;
   }
 
   return isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.LOGIN} replace />;
@@ -33,18 +22,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        Carregando...
-      </div>
-    );
+    return <LoadingSpinner fullHeight />;
   }
 
   return !isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.HOME} replace />;
@@ -53,7 +31,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <Router>
-      <div className="App">
+      <AppLayout>
         <Routes>
           <Route
             path={ROUTES.LOGIN}
@@ -73,19 +51,7 @@ function App() {
           />
           <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
         </Routes>
-
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-      </div>
+      </AppLayout>
     </Router>
   );
 }

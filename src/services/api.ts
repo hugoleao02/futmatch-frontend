@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_CONFIG } from '../config/api';
 import type {
   LoginRequest,
   LoginResponse,
@@ -13,8 +14,8 @@ import type {
 
 // Configuração base do axios
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
-  timeout: 10000,
+  baseURL: API_CONFIG.BASE_URL,
+  timeout: API_CONFIG.TIMEOUT,
 });
 
 // Interceptor para adicionar token de autenticação
@@ -32,7 +33,8 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem('user');
+      window.location.href = API_CONFIG.LOGIN_REDIRECT;
     }
     return Promise.reject(error);
   },
