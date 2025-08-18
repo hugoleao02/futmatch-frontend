@@ -6,8 +6,7 @@ import {
   Public as PublicIcon,
 } from '@mui/icons-material';
 import { Box, Button, Card, CardActions, CardContent, Chip, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../constants/routes';
+import { useNavigation } from '../hooks/useNavigation';
 import { partidaCardStyles } from '../styles';
 import type { Partida } from '../types';
 
@@ -17,10 +16,10 @@ interface PartidaCardProps {
 }
 
 export const PartidaCard = ({ partida, onParticipar }: PartidaCardProps) => {
-  const navigate = useNavigate();
+  const { navigateToMatchDetails } = useNavigation();
 
   const handleVerDetalhes = () => {
-    navigate(ROUTES.MATCH.DETAILS.replace(':id', partida.id.toString()));
+    navigateToMatchDetails(partida.id);
   };
 
   const handleParticipar = () => {

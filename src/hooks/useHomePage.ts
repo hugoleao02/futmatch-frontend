@@ -1,24 +1,27 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../constants/routes';
-import { useAuth } from './useAuth';
+import { useAuth } from './useAuthNew';
+import { useErrorHandler } from './useErrorHandler';
+import { useNavigation } from './useNavigation';
 import { useParticipacao } from './useParticipacao';
 import { usePartidas } from './usePartidas';
+import { useRetry } from './useRetry';
 
 export const useHomePage = () => {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { partidas, loading, listarPartidasFuturas } = usePartidas();
   const { participarPartida } = useParticipacao();
+  const { navigateToCreateMatch, handleLogout } = useNavigation();
+  const { handleError } = useErrorHandler();
+  const { executeWithRetry } = useRetry({ maxAttempts: 2, delayMs: 1000 });
   const [page, setPage] = useState(0);
 
   const carregarPartidas = useCallback(async () => {
     try {
-      await listarPartidasFuturas(page, 10);
+      await executeWithRetry(() => listarPartidasFuturas(page, 10), 'Carregar partidas');
     } catch (error) {
-      // erro já tratado no hook
+      handleError(error, 'Carregar partidas');
     }
-  }, [listarPartidasFuturas, page]);
+  }, [listarPartidasFuturas, page, handleError, executeWithRetry]);
 
   useEffect(() => {
     carregarPartidas();
@@ -28,16 +31,9 @@ export const useHomePage = () => {
     try {
       await participarPartida(partidaId);
       carregarPartidas();
-    } catch (error) {}
-  };
-
-  const handleCriarPartida = () => {
-    navigate(ROUTES.MATCH.CREATE);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate(ROUTES.LOGIN);
+    } catch (error) {
+      handleError(error, 'Participar da partida');
+    }
   };
 
   return {
@@ -47,7 +43,7 @@ export const useHomePage = () => {
     page,
     setPage,
     handleParticipar,
-    handleCriarPartida,
+    handleCriarPartida: navigateToCreateMatch,
     handleLogout,
   };
 };

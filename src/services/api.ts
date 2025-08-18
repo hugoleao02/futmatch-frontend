@@ -20,7 +20,11 @@ const api = axios.create({
 
 // Interceptor para adicionar token de autenticação
 api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
+  // Usar o token da store do Zustand
+  const token = localStorage.getItem('auth-storage') 
+    ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token 
+    : null;
+    
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -32,8 +36,8 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Limpar estado de autenticação via store
+      localStorage.removeItem('auth-storage');
       window.location.href = API_CONFIG.LOGIN_REDIRECT;
     }
     return Promise.reject(error);
@@ -53,8 +57,8 @@ export const authService = {
   },
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    // O logout agora é gerenciado pela store do Zustand
+    // Este método pode ser removido se não for usado em outros lugares
   },
 };
 

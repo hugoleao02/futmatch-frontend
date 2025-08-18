@@ -1,6 +1,9 @@
 export { useAuth } from './useAuth';
+export { useErrorHandler } from './useErrorHandler';
 export { useHomePage } from './useHomePage';
 export { useLocalStorage } from './useLocalStorage';
 export { useLoginForm } from './useLoginForm';
+export { useNavigation } from './useNavigation';
 export { useParticipacao } from './useParticipacao';
 export { usePartidas } from './usePartidas';
+export { useRetry } from './useRetry';

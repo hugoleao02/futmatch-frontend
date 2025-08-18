@@ -3,7 +3,7 @@ import { LoginForm } from './components/LoginForm';
 import { LoadingSpinner } from './components/common';
 import { AppLayout } from './components/layout';
 import { ROUTES } from './constants';
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuthNew';
 import { HomePage } from './pages/HomePage';
 
 // Componente para rotas protegidas

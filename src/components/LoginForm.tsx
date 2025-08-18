@@ -1,11 +1,10 @@
 import { Box, Button, CircularProgress, Link, Paper, TextField, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../constants/routes';
+import { useNavigation } from '../hooks/useNavigation';
 import { useLoginForm } from '../hooks/useLoginForm';
 
 export const LoginForm = () => {
   const { formik } = useLoginForm();
-  const navigate = useNavigate();
+  const { navigateToRegister } = useNavigation();
 
   return (
     <Box
@@ -60,7 +59,7 @@ export const LoginForm = () => {
           </Button>
         </form>
         <Box textAlign="center">
-          <Link component="button" variant="body2" onClick={() => navigate(ROUTES.REGISTER)}>
+          <Link component="button" variant="body2" onClick={navigateToRegister}>
             Não tem uma conta? Cadastre-se
           </Link>
         </Box>
