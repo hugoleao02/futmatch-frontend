@@ -1,19 +1,27 @@
+import { Box, CircularProgress } from '@mui/material';
 import React from 'react';
-import { LoadingSpinner } from '../common/LoadingSpinner';
-import { RouteGuard, PublicRouteGuard } from './RouteGuard';
-import { useAuth } from '../../hooks/useAuthNew';
+import { Navigate } from 'react-router-dom';
+import { ROUTES } from '../../constants';
+import { useAutenticacao } from '../../hooks/useAutenticacao';
 
 interface PublicRouteProps {
   children: React.ReactNode;
 }
 
-export const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+export const PublicRoute = ({ children }: PublicRouteProps) => {
+  const { estaAutenticado, carregando } = useAutenticacao();
 
-  if (loading) {
-    return <LoadingSpinner fullHeight />;
+  if (carregando) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
+    );
   }
 
-  const guard = new PublicRouteGuard(isAuthenticated);
-  return <RouteGuard guard={guard}>{children}</RouteGuard>;
+  if (estaAutenticado) {
+    return <Navigate to={ROUTES.HOME} replace />;
+  }
+
+  return <>{children}</>;
 };

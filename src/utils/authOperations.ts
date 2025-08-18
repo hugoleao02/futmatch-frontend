@@ -1,21 +1,24 @@
-import type { LoginRequest, RegisterRequest, LoginResponse, RegisterResponse } from '../types';
-import type { IAuthService } from '../types/interfaces';
-import { createAuthState } from './authTransformers';
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../types';
+import type { IServicoAutenticacao } from '../types/interfaces';
+import { criarEstadoAuth } from './authTransformers';
 
 // Utilitário para operações de autenticação comuns
-export class AuthOperations {
-  constructor(private authService: IAuthService) {}
+export class OperacoesAutenticacao {
+  constructor(private servicoAuth: IServicoAutenticacao) {}
 
   /**
    * Executa operação de login com tratamento de erro padronizado
    */
-  async executeLogin(data: LoginRequest, setLoading: (loading: boolean) => void): Promise<LoginResponse> {
-    setLoading(true);
+  async executarLogin(
+    dados: LoginRequest,
+    definirCarregando: (carregando: boolean) => void,
+  ): Promise<LoginResponse> {
+    definirCarregando(true);
     try {
-      const response = await this.authService.login(data);
-      return response;
+      const resposta = await this.servicoAuth.fazerLogin(dados);
+      return resposta;
     } catch (error) {
-      setLoading(false);
+      definirCarregando(false);
       throw error;
     }
   }
@@ -23,13 +26,16 @@ export class AuthOperations {
   /**
    * Executa operação de registro com tratamento de erro padronizado
    */
-  async executeRegister(data: RegisterRequest, setLoading: (loading: boolean) => void): Promise<RegisterResponse> {
-    setLoading(true);
+  async executarRegistro(
+    dados: RegisterRequest,
+    definirCarregando: (carregando: boolean) => void,
+  ): Promise<RegisterResponse> {
+    definirCarregando(true);
     try {
-      const response = await this.authService.register(data);
-      return response;
+      const resposta = await this.servicoAuth.fazerRegistro(dados);
+      return resposta;
     } catch (error) {
-      setLoading(false);
+      definirCarregando(false);
       throw error;
     }
   }
@@ -37,7 +43,7 @@ export class AuthOperations {
   /**
    * Cria estado de autenticação a partir de qualquer resposta de auth
    */
-  createAuthStateFromResponse(response: LoginResponse | RegisterResponse) {
-    return createAuthState(response);
+  criarEstadoAuthDeResposta(resposta: LoginResponse | RegisterResponse) {
+    return criarEstadoAuth(resposta);
   }
 }

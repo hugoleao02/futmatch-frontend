@@ -3,23 +3,23 @@
 // ============================================================================
 
 // Classe base para todos os serviços
-export { BaseService } from './BaseService';
+export { ServicoBase } from './BaseService';
 
 // Classe para operações assíncronas
-export { AsyncOperation } from './AsyncOperation';
+// export { AsyncOperation } from './AsyncOperation';
 
 // Cliente HTTP para comunicação com API
 export { HttpClient } from './HttpClient';
 
 // Fábrica para criação de instâncias de serviços
-export { ServiceFactory } from './ServiceFactory';
+export { FabricaServicos } from './ServiceFactory';
 
 // ============================================================================
 // SERVIÇOS DE DOMÍNIO
 // ============================================================================
 
 // Serviço de autenticação
-export { AuthService } from './AuthService';
+export { ServicoAutenticacao } from './AuthService';
 
 // Serviço de partidas
 export { PartidaService } from './PartidaService';

@@ -1,10 +1,10 @@
-// Utilitário para métodos setter genéricos
+// Utilitário para métodos setter genéricos com tipagem segura
 export class SetterUtils {
   /**
    * Cria um método setter genérico para qualquer propriedade
    */
   static createSetter<T, K extends keyof T>(target: T, property: K, value: T[K]): void {
-    (target as any)[property] = value;
+    target[property] = value;
   }
 
   /**
@@ -19,7 +19,7 @@ export class SetterUtils {
     if (validator && !validator(value)) {
       throw new Error(`Valor inválido para propriedade ${String(property)}`);
     }
-    (target as any)[property] = value;
+    target[property] = value;
   }
 
   /**
@@ -31,8 +31,8 @@ export class SetterUtils {
     value: T[K],
     onPropertyChange?: (property: K, oldValue: T[K], newValue: T[K]) => void,
   ): void {
-    const oldValue = (target as any)[property];
-    (target as any)[property] = value;
+    const oldValue = target[property];
+    target[property] = value;
     onPropertyChange?.(property, oldValue, value);
   }
 }

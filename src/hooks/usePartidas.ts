@@ -1,96 +1,130 @@
-import { useCallback } from 'react';
-import { ServiceFactory } from '../services/ServiceFactory';
-import type { PagePartidaResponse, Partida, PartidaRequest, PartidaUpdateRequest } from '../types';
-import { useCrudOperations } from './useCrudOperations';
-import { useServiceOperations } from './useServiceOperations';
+import { useCallback, useEffect, useState } from 'react';
+import { obterContainerDependencias } from '../config/dependencyInjection';
+import type { Partida, PartidaRequest, PartidaUpdateRequest } from '../types';
+import { useOperations } from './useOperations';
 
 export const usePartidas = () => {
-  const { loading, executeOperation, executeOperationGeneric } = useServiceOperations<Partida>();
+  const [partidas, definirPartidas] = useState<Partida[]>([]);
+  const [pagina, definirPagina] = useState(0);
+  const [tamanho, definirTamanho] = useState(10);
+
   const {
-    data: partidas,
-    addItem,
-    updateItem,
-    removeItem,
-    setDataList,
-  } = useCrudOperations<Partida>();
+    loading,
+    execute,
+    executarOperacaoGenerica,
+    dados,
+    adicionarItem,
+    atualizarItem,
+    removerItem,
+    definirListaDados,
+    obterItemPorId,
+  } = useOperations<Partida>();
 
-  const partidaService = ServiceFactory.getInstance().getPartidaService();
+  const servicoPartida = obterContainerDependencias().getServicoPartida();
 
-  const listarPartidas = useCallback(async () => {
-    const data = await executeOperationGeneric<Partida[]>(
-      partidaService.listarPartidas,
-      'Carregar partidas',
-    );
-    setDataList(data);
-    return data;
-  }, [executeOperationGeneric, setDataList]);
+  // Carregar partidas na inicialização
+  useEffect(() => {
+    const carregarPartidas = async () => {
+      try {
+        const dadosPartidas = await servicoPartida.listarPartidas();
+        definirPartidas(dadosPartidas);
+        definirListaDados(dadosPartidas);
+      } catch (erro) {
+        console.error('Erro ao carregar partidas:', erro);
+      }
+    };
+
+    carregarPartidas();
+  }, [servicoPartida, definirListaDados]);
 
   const listarPartidasFuturas = useCallback(
-    async (page = 0, size = 10) => {
-      const data = await executeOperationGeneric<PagePartidaResponse>(
-        () => partidaService.listarPartidasFuturas(page, size),
-        'Carregar partidas futuras',
-      );
-      setDataList(data.content);
-      return data;
+    async (numeroPagina: number = pagina, tamanhoPagina: number = tamanho) => {
+      try {
+        const resposta = await servicoPartida.listarPartidasFuturas(numeroPagina, tamanhoPagina);
+        definirPartidas(resposta.content || []);
+        definirListaDados(resposta.content || []);
+        definirPagina(numeroPagina);
+        definirTamanho(tamanhoPagina);
+        return resposta;
+      } catch (erro) {
+        console.error('Erro ao listar partidas futuras:', erro);
+        throw erro;
+      }
     },
-    [executeOperationGeneric, setDataList],
+    [servicoPartida, pagina, tamanho, definirListaDados],
   );
 
   const buscarPartidaPorId = useCallback(
-    async (id: number) => {
-      return executeOperation(
-        () => partidaService.buscarPartidaPorId(id),
-        'Carregar detalhes da partida',
-      );
+    async (id: number): Promise<Partida | null> => {
+      try {
+        const partida = await servicoPartida.buscarPartidaPorId(id);
+        return partida;
+      } catch (erro) {
+        console.error('Erro ao buscar partida por ID:', erro);
+        throw erro;
+      }
     },
-    [executeOperation],
+    [servicoPartida],
   );
 
   const criarPartida = useCallback(
-    async (data: PartidaRequest) => {
-      const novaPartida = await executeOperation(
-        () => partidaService.criarPartida(data),
-        'Criar partida',
-      );
-      addItem(novaPartida);
-      return novaPartida;
+    async (dadosPartida: PartidaRequest): Promise<Partida> => {
+      try {
+        const novaPartida = await servicoPartida.criarPartida(dadosPartida);
+        adicionarItem(novaPartida);
+        return novaPartida;
+      } catch (erro) {
+        console.error('Erro ao criar partida:', erro);
+        throw erro;
+      }
     },
-    [executeOperation, addItem],
+    [servicoPartida, adicionarItem],
   );
 
   const atualizarPartida = useCallback(
-    async (id: number, data: PartidaUpdateRequest) => {
-      const partidaAtualizada = await executeOperation(
-        () => partidaService.atualizarPartida(id, data),
-        'Atualizar partida',
-      );
-      updateItem(id, () => partidaAtualizada);
-      return partidaAtualizada;
+    async (id: number, dadosAtualizacao: PartidaUpdateRequest): Promise<Partida> => {
+      try {
+        const partidaAtualizada = await servicoPartida.atualizarPartida(id, dadosAtualizacao);
+        atualizarItem(id, () => partidaAtualizada);
+        return partidaAtualizada;
+      } catch (erro) {
+        console.error('Erro ao atualizar partida:', erro);
+        throw erro;
+      }
     },
-    [executeOperation, updateItem],
+    [servicoPartida, atualizarItem],
   );
 
   const deletarPartida = useCallback(
-    async (id: number) => {
-      await executeOperationGeneric<void>(
-        () => partidaService.deletarPartida(id),
-        'Deletar partida',
-      );
-      removeItem(id);
+    async (id: number): Promise<void> => {
+      try {
+        await servicoPartida.deletarPartida(id);
+        removerItem(id);
+      } catch (erro) {
+        console.error('Erro ao deletar partida:', erro);
+        throw erro;
+      }
     },
-    [executeOperationGeneric, removeItem],
+    [servicoPartida, removerItem],
   );
 
   return {
     partidas,
-    loading,
-    listarPartidas,
+    pagina,
+    tamanho,
+    carregando: loading,
+    executar: execute,
+    executarOperacaoGenerica,
+    dados,
+    adicionarItem,
+    atualizarItem,
+    removerItem,
+    definirListaDados,
+    obterItemPorId,
     listarPartidasFuturas,
     buscarPartidaPorId,
     criarPartida,
     atualizarPartida,
     deletarPartida,
-    setPartidas: setDataList,
   };
 };

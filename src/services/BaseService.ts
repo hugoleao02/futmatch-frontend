@@ -1,35 +1,35 @@
-import type { IApiClient } from '../types';
+import type { IClienteApi } from '../types';
 
-export abstract class BaseService {
-  protected httpClient: IApiClient;
+export abstract class ServicoBase {
+  protected clienteHttp: IClienteApi;
 
-  constructor(httpClient: IApiClient) {
-    this.httpClient = httpClient;
+  constructor(clienteHttp: IClienteApi) {
+    this.clienteHttp = clienteHttp;
   }
 
-  protected async handleRequest<T>(
-    request: () => Promise<T>,
-    errorContext: string = 'Operação'
+  protected async lidarComRequisicao<T>(
+    requisicao: () => Promise<T>,
+    contextoErro: string = 'Operação',
   ): Promise<T> {
     try {
-      return await request();
+      return await requisicao();
     } catch (error) {
-      console.error(`Erro em ${errorContext}:`, error);
+      console.error(`Erro em ${contextoErro}:`, error);
       throw error;
     }
   }
 
-  protected createUrl(path: string, params?: Record<string, string | number>): string {
-    if (!params) return path;
-    
-    const queryParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        queryParams.append(key, String(value));
+  protected criarUrl(caminho: string, parametros?: Record<string, string | number>): string {
+    if (!parametros) return caminho;
+
+    const parametrosQuery = new URLSearchParams();
+    Object.entries(parametros).forEach(([chave, valor]) => {
+      if (valor !== undefined && valor !== null) {
+        parametrosQuery.append(chave, String(valor));
       }
     });
-    
-    const queryString = queryParams.toString();
-    return queryString ? `${path}?${queryString}` : path;
+
+    const stringQuery = parametrosQuery.toString();
+    return stringQuery ? `${caminho}?${stringQuery}` : caminho;
   }
 }

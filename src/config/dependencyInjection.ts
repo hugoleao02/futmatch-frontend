@@ -1,78 +1,77 @@
 import { NotificationService } from '../services/NotificationService';
-import { ServiceFactory } from '../services/ServiceFactory';
+import { FabricaServicos } from '../services/ServiceFactory';
 import { AuthValidationService, ValidationService } from '../services/ValidationService';
 import type {
-  IAuthService,
   INotificationService,
-  IParticipacaoService,
-  IPartidaService,
+  IServicoAutenticacao,
+  IServicoParticipacao,
+  IServicoPartida,
 } from '../types';
 import type { IAuthValidator, IUserValidator } from '../types/validation';
-import { SetterUtils } from '../utils/setterUtils';
 
 // Container de injeção de dependências
-export class DependencyContainer {
-  private static instance: DependencyContainer;
+export class ContainerDependencias {
+  private static instancia: ContainerDependencias;
 
-  private serviceFactory: ServiceFactory;
-  private notificationService: INotificationService;
-  private validationService: IUserValidator;
-  private authValidationService: IAuthValidator;
+  private fabricaServicos: FabricaServicos;
+  private servicoNotificacao: INotificationService;
+  private servicoValidacao: IUserValidator;
+  private servicoValidacaoAuth: IAuthValidator;
 
   private constructor() {
-    this.serviceFactory = ServiceFactory.getInstance();
-    this.notificationService = new NotificationService();
-    this.validationService = new ValidationService();
-    this.authValidationService = new AuthValidationService();
+    this.fabricaServicos = FabricaServicos.getInstance();
+    this.servicoNotificacao = new NotificationService();
+    this.servicoValidacao = new ValidationService();
+    this.servicoValidacaoAuth = new AuthValidationService();
   }
 
-  static getInstance(): DependencyContainer {
-    if (!DependencyContainer.instance) {
-      DependencyContainer.instance = new DependencyContainer();
+  static getInstance(): ContainerDependencias {
+    if (!ContainerDependencias.instancia) {
+      ContainerDependencias.instancia = new ContainerDependencias();
     }
-    return DependencyContainer.instance;
+    return ContainerDependencias.instancia;
   }
 
   // Getters para serviços
-  getAuthService(): IAuthService {
-    return this.serviceFactory.getAuthService();
+  getServicoAuth(): IServicoAutenticacao {
+    return this.fabricaServicos.getServicoAuth();
   }
 
-  getPartidaService(): IPartidaService {
-    return this.serviceFactory.getPartidaService();
+  getServicoPartida(): IServicoPartida {
+    return this.fabricaServicos.getServicoPartida();
   }
 
-  getParticipacaoService(): IParticipacaoService {
-    return this.serviceFactory.getParticipacaoService();
+  getServicoParticipacao(): IServicoParticipacao {
+    return this.fabricaServicos.getServicoParticipacao();
   }
 
-  getNotificationService(): INotificationService {
-    return this.notificationService;
+  getServicoNotificacao(): INotificationService {
+    return this.servicoNotificacao;
   }
 
-  getValidationService(): IUserValidator {
-    return this.validationService;
+  getServicoValidacao(): IUserValidator {
+    return this.servicoValidacao;
   }
 
-  getAuthValidationService(): IAuthValidator {
-    return this.authValidationService;
+  getServicoValidacaoAuth(): IAuthValidator {
+    return this.servicoValidacaoAuth;
   }
 
   // Métodos para substituir serviços (útil para testes)
-  setNotificationService(service: INotificationService): void {
-    SetterUtils.createSetter(this as any, 'notificationService', service);
+  setServicoNotificacao(servico: INotificationService): void {
+    this.servicoNotificacao = servico;
   }
 
-  setValidationService(service: IUserValidator): void {
-    SetterUtils.createSetter(this as any, 'validationService', service);
+  setServicoValidacao(servico: IUserValidator): void {
+    this.servicoValidacao = servico;
   }
 
-  setAuthValidationService(service: IAuthValidator): void {
-    SetterUtils.createSetter(this as any, 'authValidationService', service);
+  setServicoValidacaoAuth(servico: IAuthValidator): void {
+    this.servicoValidacaoAuth = servico;
   }
 }
 
 // Função helper para obter o container
-export const getDependencyContainer = (): DependencyContainer => {
-  return DependencyContainer.getInstance();
+export const obterContainerDependencias = (): ContainerDependencias => {
+  return ContainerDependencias.getInstance();
 };

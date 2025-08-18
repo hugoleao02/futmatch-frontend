@@ -1,40 +1,47 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { SUCCESS_MESSAGES } from '../constants/messages';
-import { ServiceFactory } from '../services/ServiceFactory';
+import { FabricaServicos } from '../services/ServiceFactory';
 import { ErrorService } from '../services/errorService';
-import type { IAuthActions, IAuthState, LoginRequest, RegisterRequest } from '../types';
-import { AuthOperations } from '../utils/authOperations';
-import { createEmptyAuthState } from '../utils/authTransformers';
+import type {
+  IAcoesAutenticacao,
+  IEstadoAutenticacao,
+  LoginRequest,
+  RegisterRequest,
+} from '../types';
+import { OperacoesAutenticacao } from '../utils/authOperations';
+import { criarEstadoAuthVazio } from '../utils/authTransformers';
 
-interface AuthStore extends IAuthState, IAuthActions {
-  login: (data: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
-  logout: () => void;
+interface AuthStore extends IEstadoAutenticacao, IAcoesAutenticacao {
+  fazerLogin: (dados: LoginRequest) => Promise<void>;
+  fazerRegistro: (dados: RegisterRequest) => Promise<void>;
+  fazerLogout: () => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
   persist(
     set => {
-      const authService = ServiceFactory.getInstance().getAuthService();
+      const servicoAuth = FabricaServicos.getInstance().getServicoAuth();
 
       return {
         // Estado inicial
-        user: null,
+        usuario: null,
         token: null,
-        isAuthenticated: false,
-        loading: false,
+        estaAutenticado: false,
+        carregando: false,
 
         // Ações
-        setLoading: (loading: boolean) => set({ loading }),
+        definirCarregando: (carregando: boolean) => set({ carregando }),
 
-        clearAuth: () => set(createEmptyAuthState()),
+        limparAutenticacao: () => set(criarEstadoAuthVazio()),
 
-        login: async (data: LoginRequest) => {
-          const authOps = new AuthOperations(authService);
+        fazerLogin: async (dados: LoginRequest) => {
+          const authOps = new OperacoesAutenticacao(servicoAuth);
           try {
-            const response = await authOps.executeLogin(data, loading => set({ loading }));
-            set(authOps.createAuthStateFromResponse(response));
+            const response = await authOps.executarLogin(dados, (carregando: boolean) =>
+              set({ carregando }),
+            );
+            set(authOps.criarEstadoAuthDeResposta(response));
 
             // Mostrar mensagem de sucesso
             console.log(SUCCESS_MESSAGES.LOGIN);
@@ -47,11 +54,13 @@ export const useAuthStore = create<AuthStore>()(
           }
         },
 
-        register: async (data: RegisterRequest) => {
-          const authOps = new AuthOperations(authService);
+        fazerRegistro: async (dados: RegisterRequest) => {
+          const authOps = new OperacoesAutenticacao(servicoAuth);
           try {
-            const response = await authOps.executeRegister(data, loading => set({ loading }));
-            set(authOps.createAuthStateFromResponse(response));
+            const response = await authOps.executarRegistro(dados, (carregando: boolean) =>
+              set({ carregando }),
+            );
+            set(authOps.criarEstadoAuthDeResposta(response));
 
             // Mostrar mensagem de sucesso
             console.log(SUCCESS_MESSAGES.REGISTER);
@@ -64,12 +73,12 @@ export const useAuthStore = create<AuthStore>()(
           }
         },
 
-        logout: () => {
+        fazerLogout: () => {
           // Chamar o serviço de logout se necessário
-          authService.logout();
+          servicoAuth.fazerLogout();
 
           // Limpar o estado
-          set(createEmptyAuthState());
+          set(criarEstadoAuthVazio());
 
           // Mostrar mensagem de sucesso
           console.log(SUCCESS_MESSAGES.LOGOUT);

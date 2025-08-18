@@ -9,24 +9,25 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { PartidaCard } from '../components/PartidaCard';
 import { useHomePage } from '../hooks/useHomePage';
+import { useAuthStore } from '../stores/authStore';
 import { homePageStyles } from '../styles';
 import type { Partida } from '../types';
 
 export const HomePage = () => {
-  const {
-    user,
-    partidas,
-    loading,
-    page,
-    setPage,
-    handleParticipar,
-    handleCriarPartida,
-    handleLogout,
-  } = useHomePage();
+  const navigate = useNavigate();
+  const { usuario, fazerLogout } = useAuthStore();
+  const { partidas, carregando, lidarComVerPartidas, lidarComCriarPartida, lidarComParticipar } =
+    useHomePage();
 
-  if (loading && partidas.length === 0) {
+  const lidarComLogout = () => {
+    fazerLogout();
+    navigate('/login');
+  };
+
+  if (carregando && partidas.length === 0) {
     return (
       <Box sx={homePageStyles.loadingContainer}>
         <CircularProgress />
@@ -42,9 +43,9 @@ export const HomePage = () => {
             FutMatch
           </Typography>
           <Typography variant="body2" sx={{ mr: 2 }}>
-            Olá, {user?.nome}
+            Olá, {usuario?.nome}
           </Typography>
-          <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
+          <Button color="inherit" onClick={lidarComLogout} startIcon={<LogoutIcon />}>
             Sair
           </Button>
         </Toolbar>
@@ -55,7 +56,7 @@ export const HomePage = () => {
           <Typography variant="h4" component="h1">
             Partidas Disponíveis
           </Typography>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCriarPartida}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={lidarComCriarPartida}>
             Criar Partida
           </Button>
         </Box>
@@ -67,7 +68,7 @@ export const HomePage = () => {
             </Typography>
             <Button
               variant="outlined"
-              onClick={handleCriarPartida}
+              onClick={lidarComCriarPartida}
               sx={homePageStyles.emptyStateButton}
             >
               Criar a primeira partida
@@ -76,21 +77,13 @@ export const HomePage = () => {
         ) : (
           <Box sx={homePageStyles.gridContainer}>
             {partidas.map((partida: Partida) => (
-              <PartidaCard key={partida.id} partida={partida} onParticipar={handleParticipar} />
+              <PartidaCard key={partida.id} partida={partida} onParticipar={lidarComParticipar} />
             ))}
-          </Box>
-        )}
-
-        {partidas.length > 0 && (
-          <Box sx={homePageStyles.loadMoreContainer}>
-            <Button variant="outlined" onClick={() => setPage(page + 1)} disabled={loading}>
-              {loading ? <CircularProgress size={20} /> : 'Carregar Mais'}
-            </Button>
           </Box>
         )}
       </Container>
 
-      <Fab color="primary" aria-label="add" sx={homePageStyles.fab} onClick={handleCriarPartida}>
+      <Fab color="primary" aria-label="add" sx={homePageStyles.fab} onClick={lidarComCriarPartida}>
         <AddIcon />
       </Fab>
     </>

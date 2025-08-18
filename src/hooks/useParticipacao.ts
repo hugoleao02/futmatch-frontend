@@ -1,75 +1,72 @@
 import { useCallback } from 'react';
-import { ServiceFactory } from '../services/ServiceFactory';
+import { obterContainerDependencias } from '../config/dependencyInjection';
 import type { Participacao } from '../types';
-import { useServiceOperations } from './useServiceOperations';
+import { useOperations } from './useOperations';
 
 export const useParticipacao = () => {
-  const { loading, executeOperation, executeOperationGeneric } =
-    useServiceOperations<Participacao>();
-  const participacaoService = ServiceFactory.getInstance().getParticipacaoService();
+  const { executarOperacaoGenerica, loading } = useOperations<Participacao>();
+  const servicoParticipacao = obterContainerDependencias().getServicoParticipacao();
 
   const participarPartida = useCallback(
-    async (partidaId: number): Promise<Participacao | null> => {
+    async (partidaId: number) => {
       try {
-        const participacao = await executeOperation(
-          () => participacaoService.participarPartida(partidaId),
-          'Participar da partida',
-        );
+        const participacao = await servicoParticipacao.participarPartida(partidaId);
         return participacao;
-      } catch {
-        return null;
+      } catch (erro) {
+        console.error('Erro ao participar da partida:', erro);
+        throw erro;
       }
     },
-    [executeOperation],
+    [servicoParticipacao],
   );
 
   const cancelarParticipacao = useCallback(
-    async (partidaId: number): Promise<boolean> => {
+    async (partidaId: number) => {
       try {
-        await executeOperationGeneric<void>(
-          () => participacaoService.cancelarParticipacao(partidaId),
-          'Cancelar participação',
-        );
-        return true;
-      } catch {
-        return false;
+        await servicoParticipacao.cancelarParticipacao(partidaId);
+      } catch (erro) {
+        console.error('Erro ao cancelar participação:', erro);
+        throw erro;
       }
     },
-    [executeOperationGeneric],
+    [servicoParticipacao],
   );
 
   const aprovarParticipacao = useCallback(
-    async (partidaId: number, participanteId: number): Promise<Participacao | null> => {
+    async (partidaId: number, participanteId: number) => {
       try {
-        const participacao = await executeOperation(
-          () => participacaoService.aprovarParticipacao(partidaId, participanteId),
-          'Aprovar participação',
+        const participacao = await servicoParticipacao.aprovarParticipacao(
+          partidaId,
+          participanteId,
         );
         return participacao;
-      } catch {
-        return null;
+      } catch (erro) {
+        console.error('Erro ao aprovar participação:', erro);
+        throw erro;
       }
     },
-    [executeOperation],
+    [servicoParticipacao],
   );
 
   const rejeitarParticipacao = useCallback(
-    async (partidaId: number, participanteId: number): Promise<Participacao | null> => {
+    async (partidaId: number, participanteId: number) => {
       try {
-        const participacao = await executeOperation(
-          () => participacaoService.rejeitarParticipacao(partidaId, participanteId),
-          'Rejeitar participação',
+        const participacao = await servicoParticipacao.rejeitarParticipacao(
+          partidaId,
+          participanteId,
         );
         return participacao;
-      } catch {
-        return null;
+      } catch (erro) {
+        console.error('Erro ao rejeitar participação:', erro);
+        throw erro;
       }
     },
-    [executeOperation],
+    [servicoParticipacao],
   );
 
   return {
-    loading,
+    carregando: loading,
+    executarOperacaoGenerica,
     participarPartida,
     cancelarParticipacao,
     aprovarParticipacao,

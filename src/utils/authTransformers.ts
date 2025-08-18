@@ -2,30 +2,30 @@ import type { LoginResponse, RegisterResponse, User } from '../types';
 import { DataTransformers } from './dataTransformers';
 
 // Transformador para dados de autenticação
-export const createUserFromAuthResponse = (response: LoginResponse | RegisterResponse): User => ({
-  id: response.id,
-  nome: response.nome,
-  email: response.email,
+export const criarUsuarioDeRespostaAuth = (resposta: LoginResponse | RegisterResponse): User => ({
+  id: resposta.id,
+  nome: resposta.nome,
+  email: resposta.email,
 });
 
 // Transformador para estado de autenticação
-export const createAuthState = (response: LoginResponse | RegisterResponse) => ({
-  user: createUserFromAuthResponse(response),
-  token: response.token,
-  isAuthenticated: true,
-  loading: false,
+export const criarEstadoAuth = (resposta: LoginResponse | RegisterResponse) => ({
+  usuario: criarUsuarioDeRespostaAuth(resposta),
+  token: resposta.token,
+  estaAutenticado: true,
+  carregando: false,
 });
 
 // Estado limpo de autenticação
-export const createEmptyAuthState = () => ({
-  user: null,
+export const criarEstadoAuthVazio = () => ({
+  usuario: null,
   token: null,
-  isAuthenticated: false,
-  loading: false,
+  estaAutenticado: false,
+  carregando: false,
 });
 
 // Transformadores compostos usando o utilitário genérico
-export const transformAuthResponse = DataTransformers.composeTransformers(
-  createUserFromAuthResponse,
-  (user: User) => ({ user, isAuthenticated: true, loading: false })
+export const transformarRespostaAuth = DataTransformers.composeTransformers(
+  criarUsuarioDeRespostaAuth,
+  (usuario: User) => ({ usuario, estaAutenticado: true, carregando: false }),
 );

@@ -5,20 +5,20 @@ import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './components/routing/ProtectedRoute';
 import { PublicRoute } from './components/routing/PublicRoute';
 import { ROUTES } from './constants';
-import { useRouting } from './hooks/useRouting';
+import { useRoteamento } from './hooks/useRoteamento';
 import { HomePage } from './pages/HomePage';
 
 function App() {
-  const { navigateBasedOnAuth, setActiveTab } = useRouting({
-    defaultRoute: ROUTES.HOME,
-    authRoute: ROUTES.HOME,
-    publicRoute: ROUTES.LOGIN,
+  const { navegarBaseadoNaAutenticacao, definirAbaAtiva } = useRoteamento({
+    rotaPadrao: ROUTES.HOME,
+    rotaAutenticada: ROUTES.HOME,
+    rotaPublica: ROUTES.LOGIN,
   });
 
   useEffect(() => {
     // Redirecionar baseado no estado de autenticação
-    navigateBasedOnAuth();
-  }, [navigateBasedOnAuth]);
+    navegarBaseadoNaAutenticacao();
+  }, [navegarBaseadoNaAutenticacao]);
 
   return (
     <Router>
@@ -28,7 +28,7 @@ function App() {
             path={ROUTES.LOGIN}
             element={
               <PublicRoute>
-                <LoginForm setActiveTab={() => setActiveTab(1)} />
+                <LoginForm definirAbaAtiva={() => definirAbaAtiva(1)} />
               </PublicRoute>
             }
           />

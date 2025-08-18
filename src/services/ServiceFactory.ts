@@ -1,60 +1,65 @@
-import type { IApiClient, IAuthService, IParticipacaoService, IPartidaService } from '../types';
-import { AuthService } from './AuthService';
+import type {
+  IClienteApi,
+  IServicoAutenticacao,
+  IServicoParticipacao,
+  IServicoPartida,
+} from '../types';
+import { ServicoAutenticacao } from './AuthService';
 import { HttpClient } from './HttpClient';
 import { ParticipacaoService } from './ParticipacaoService';
 import { PartidaService } from './PartidaService';
 
-export class ServiceFactory {
-  private static instance: ServiceFactory;
-  private httpClient: IApiClient;
-  private authService: IAuthService;
-  private partidaService: IPartidaService;
-  private participacaoService: IParticipacaoService;
+export class FabricaServicos {
+  private static instancia: FabricaServicos;
+  private clienteHttp: IClienteApi;
+  private servicoAuth: IServicoAutenticacao;
+  private servicoPartida: IServicoPartida;
+  private servicoParticipacao: IServicoParticipacao;
 
   private constructor() {
-    this.httpClient = new HttpClient();
-    this.authService = new AuthService(this.httpClient);
-    this.partidaService = new PartidaService(this.httpClient);
-    this.participacaoService = new ParticipacaoService(this.httpClient);
+    this.clienteHttp = new HttpClient();
+    this.servicoAuth = new ServicoAutenticacao(this.clienteHttp);
+    this.servicoPartida = new PartidaService(this.clienteHttp);
+    this.servicoParticipacao = new ParticipacaoService(this.clienteHttp);
   }
 
-  static getInstance(): ServiceFactory {
-    if (!ServiceFactory.instance) {
-      ServiceFactory.instance = new ServiceFactory();
+  static getInstance(): FabricaServicos {
+    if (!FabricaServicos.instancia) {
+      FabricaServicos.instancia = new FabricaServicos();
     }
-    return ServiceFactory.instance;
+    return FabricaServicos.instancia;
   }
 
-  getAuthService(): IAuthService {
-    return this.authService;
+  getServicoAuth(): IServicoAutenticacao {
+    return this.servicoAuth;
   }
 
-  getPartidaService(): IPartidaService {
-    return this.partidaService;
+  getServicoPartida(): IServicoPartida {
+    return this.servicoPartida;
   }
 
-  getParticipacaoService(): IParticipacaoService {
-    return this.participacaoService;
+  getServicoParticipacao(): IServicoParticipacao {
+    return this.servicoParticipacao;
   }
 
-  getHttpClient(): IApiClient {
-    return this.httpClient;
+  getClienteHttp(): IClienteApi {
+    return this.clienteHttp;
   }
 
   // Método para substituir serviços (útil para testes)
-  setAuthService(service: IAuthService): void {
-    this.authService = service;
+  setServicoAuth(servico: IServicoAutenticacao): void {
+    this.servicoAuth = servico;
   }
 
-  setPartidaService(service: IPartidaService): void {
-    this.partidaService = service;
+  setServicoPartida(servico: IServicoPartida): void {
+    this.servicoPartida = servico;
   }
 
-  setParticipacaoService(service: IParticipacaoService): void {
-    this.participacaoService = service;
+  setServicoParticipacao(servico: IServicoParticipacao): void {
+    this.servicoParticipacao = servico;
   }
 
-  setHttpClient(client: IApiClient): void {
-    this.httpClient = client;
+  setClienteHttp(cliente: IClienteApi): void {
+    this.clienteHttp = cliente;
   }
 }

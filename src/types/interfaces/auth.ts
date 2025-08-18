@@ -1,45 +1,45 @@
-import type { User } from '../user';
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../auth';
+import type { User } from '../user';
 
 // Interfaces para autenticação
-export interface IAuthenticator {
-  login(credentials: LoginCredentials): Promise<AuthResult>;
-  register(userData: UserRegistration): Promise<AuthResult>;
-  logout(): void;
-  validateToken(token: string): Promise<boolean>;
+export interface IAutenticador {
+  fazerLogin(credenciais: CredenciaisLogin): Promise<ResultadoAutenticacao>;
+  fazerRegistro(dadosUsuario: RegistroUsuario): Promise<ResultadoAutenticacao>;
+  fazerLogout(): void;
+  validarToken(token: string): Promise<boolean>;
 }
 
-export interface IAuthState {
-  user: User | null;
+export interface IEstadoAutenticacao {
+  usuario: User | null;
   token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
+  estaAutenticado: boolean;
+  carregando: boolean;
 }
 
-export interface IAuthActions {
-  setLoading(loading: boolean): void;
-  clearAuth(): void;
+export interface IAcoesAutenticacao {
+  definirCarregando(carregando: boolean): void;
+  limparAutenticacao(): void;
 }
 
-export interface IAuthService {
-  login(data: LoginRequest): Promise<LoginResponse>;
-  register(data: RegisterRequest): Promise<RegisterResponse>;
-  logout(): void;
+export interface IServicoAutenticacao {
+  fazerLogin(dados: LoginRequest): Promise<LoginResponse>;
+  fazerRegistro(dados: RegisterRequest): Promise<RegisterResponse>;
+  fazerLogout(): void;
 }
 
 // Tipos auxiliares para autenticação
-export interface LoginCredentials {
+export interface CredenciaisLogin {
   email: string;
   senha: string;
 }
 
-export interface UserRegistration {
+export interface RegistroUsuario {
   nome: string;
   email: string;
   senha: string;
 }
 
-export interface AuthResult {
-  user: User;
+export interface ResultadoAutenticacao {
+  usuario: User;
   token: string;
 }

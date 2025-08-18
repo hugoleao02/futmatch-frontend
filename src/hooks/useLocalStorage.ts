@@ -1,37 +1,37 @@
 import { useCallback, useState } from 'react';
 
-export function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(() => {
+export function useLocalStorage<T>(chave: string, valorInicial: T) {
+  const [valorArmazenado, definirValorArmazenado] = useState<T>(() => {
     try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.error(`Erro ao ler localStorage key "${key}":`, error);
-      return initialValue;
+      const item = window.localStorage.getItem(chave);
+      return item ? JSON.parse(item) : valorInicial;
+    } catch (erro) {
+      console.error(`Erro ao ler localStorage chave "${chave}":`, erro);
+      return valorInicial;
     }
   });
 
-  const setValue = useCallback(
-    (value: T | ((val: T) => T)) => {
+  const definirValor = useCallback(
+    (valor: T | ((val: T) => T)) => {
       try {
-        const valueToStore = value instanceof Function ? value(storedValue) : value;
-        setStoredValue(valueToStore);
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      } catch (error) {
-        console.error(`Erro ao definir localStorage key "${key}":`, error);
+        const valorParaArmazenar = valor instanceof Function ? valor(valorArmazenado) : valor;
+        definirValorArmazenado(valorParaArmazenar);
+        window.localStorage.setItem(chave, JSON.stringify(valorParaArmazenar));
+      } catch (erro) {
+        console.error(`Erro ao definir localStorage chave "${chave}":`, erro);
       }
     },
-    [key, storedValue],
+    [chave, valorArmazenado],
   );
 
-  const removeValue = useCallback(() => {
+  const removerValor = useCallback(() => {
     try {
-      setStoredValue(initialValue);
-      window.localStorage.removeItem(key);
-    } catch (error) {
-      console.error(`Erro ao remover localStorage key "${key}":`, error);
+      definirValorArmazenado(valorInicial);
+      window.localStorage.removeItem(chave);
+    } catch (erro) {
+      console.error(`Erro ao remover localStorage chave "${chave}":`, erro);
     }
-  }, [key, initialValue]);
+  }, [chave, valorInicial]);
 
-  return [storedValue, setValue, removeValue] as const;
+  return [valorArmazenado, definirValor, removerValor] as const;
 }

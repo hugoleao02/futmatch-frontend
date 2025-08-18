@@ -1,33 +1,33 @@
 import type {
-  IApiClient,
-  IAuthService,
+  IClienteApi,
+  IServicoAutenticacao,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
 } from '../types';
-import { BaseService } from './BaseService';
+import { ServicoBase } from './BaseService';
 
-export class AuthService extends BaseService implements IAuthService {
-  constructor(httpClient: IApiClient) {
-    super(httpClient);
+export class ServicoAutenticacao extends ServicoBase implements IServicoAutenticacao {
+  constructor(clienteHttp: IClienteApi) {
+    super(clienteHttp);
   }
 
-  async login(data: LoginRequest): Promise<LoginResponse> {
-    return this.handleRequest(
-      () => this.httpClient.post<LoginResponse>('/auth/login', data),
+  async fazerLogin(dados: LoginRequest): Promise<LoginResponse> {
+    return this.lidarComRequisicao(
+      () => this.clienteHttp.post<LoginResponse>('/auth/login', dados),
       'Login',
     );
   }
 
-  async register(data: RegisterRequest): Promise<RegisterResponse> {
-    return this.handleRequest(
-      () => this.httpClient.post<RegisterResponse>('/auth/register', data),
+  async fazerRegistro(dados: RegisterRequest): Promise<RegisterResponse> {
+    return this.lidarComRequisicao(
+      () => this.clienteHttp.post<RegisterResponse>('/auth/register', dados),
       'Registro',
     );
   }
 
-  logout(): void {
+  fazerLogout(): void {
     // O logout agora é gerenciado pela store do Zustand
     // Este método pode ser removido se não for usado em outros lugares
   }
