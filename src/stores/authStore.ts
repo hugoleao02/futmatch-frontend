@@ -1,114 +1,112 @@
-import { toast } from 'react-toastify';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { SUCCESS_MESSAGES } from '../constants/messages';
-import { authService } from '../services/api';
+import { ServiceFactory } from '../services/ServiceFactory';
 import { ErrorService } from '../services/errorService';
-import type { LoginRequest, RegisterRequest, User } from '../types';
+import type { IAuthActions, IAuthState, LoginRequest, RegisterRequest } from '../types';
 
-interface AuthState {
-  // Estado
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-
-  // Ações
+interface AuthStore extends IAuthState, IAuthActions {
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
-  setLoading: (loading: boolean) => void;
-  clearAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<AuthStore>()(
   persist(
-    (set, get) => ({
-      // Estado inicial
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      loading: false,
+    set => {
+      const authService = ServiceFactory.getInstance().getAuthService();
 
-      // Ações
-      setLoading: (loading: boolean) => set({ loading }),
+      return {
+        // Estado inicial
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        loading: false,
 
-      login: async (data: LoginRequest) => {
-        try {
-          set({ loading: true });
-          const response = await authService.login(data);
+        // Ações
+        setLoading: (loading: boolean) => set({ loading }),
 
-          const userData: User = {
-            id: response.id,
-            nome: response.nome,
-            email: response.email,
-          };
-
+        clearAuth: () =>
           set({
-            user: userData,
-            token: response.token,
-            isAuthenticated: true,
-            loading: false,
+            user: null,
+            token: null,
+            isAuthenticated: false,
+          }),
+
+        login: async (data: LoginRequest) => {
+          set({ loading: true });
+          try {
+            const response = await authService.login(data);
+
+            set({
+              user: {
+                id: response.id,
+                nome: response.nome,
+                email: response.email,
+              },
+              token: response.token,
+              isAuthenticated: true,
+              loading: false,
+            });
+
+            // Mostrar mensagem de sucesso
+            console.log(SUCCESS_MESSAGES.LOGIN);
+          } catch (error) {
+            set({ loading: false });
+
+            // Classificar o erro para logging
+            const errorInfo = ErrorService.classifyError(error);
+            console.error('Erro no login:', errorInfo);
+
+            throw error;
+          }
+        },
+
+        register: async (data: RegisterRequest) => {
+          set({ loading: true });
+          try {
+            const response = await authService.register(data);
+
+            set({
+              user: {
+                id: response.id,
+                nome: response.nome,
+                email: response.email,
+              },
+              token: response.token,
+              isAuthenticated: true,
+              loading: false,
+            });
+
+            // Mostrar mensagem de sucesso
+            console.log(SUCCESS_MESSAGES.REGISTER);
+          } catch (error) {
+            set({ loading: false });
+
+            // Classificar o erro para logging
+            const errorInfo = ErrorService.classifyError(error);
+            console.error('Erro no registro:', errorInfo);
+
+            throw error;
+          }
+        },
+
+        logout: () => {
+          // Chamar o serviço de logout se necessário
+          authService.logout();
+
+          // Limpar o estado
+          set({
+            user: null,
+            token: null,
+            isAuthenticated: false,
           });
 
-          toast.success(SUCCESS_MESSAGES.LOGIN);
-        } catch (error: unknown) {
-          set({ loading: false });
-          const errorInfo = ErrorService.classifyError(error);
-          // O erro será tratado pelo componente que chama este método
-          throw error;
-        }
-      },
-
-      register: async (data: RegisterRequest) => {
-        try {
-          set({ loading: true });
-          const response = await authService.register(data);
-
-          const userData: User = {
-            id: response.id,
-            nome: response.nome,
-            email: response.email,
-          };
-
-          set({
-            user: userData,
-            token: response.token,
-            isAuthenticated: true,
-            loading: false,
-          });
-
-          toast.success(SUCCESS_MESSAGES.REGISTER);
-        } catch (error: unknown) {
-          set({ loading: false });
-          const errorInfo = ErrorService.classifyError(error);
-          // O erro será tratado pelo componente que chama este método
-          throw error;
-        }
-      },
-
-      logout: () => {
-        authService.logout();
-        get().clearAuth();
-        toast.success(SUCCESS_MESSAGES.LOGOUT);
-      },
-
-      clearAuth: () => {
-        set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-          loading: false,
-        });
-      },
-    }),
-    {
-      name: 'auth-storage',
-      partialize: state => ({
-        user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
-      }),
+          // Mostrar mensagem de sucesso
+          console.log(SUCCESS_MESSAGES.LOGOUT);
+        },
+      };
     },
+    { name: 'auth-storage' },
   ),
 );

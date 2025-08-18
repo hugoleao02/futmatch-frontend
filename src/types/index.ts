@@ -1,128 +1,168 @@
-// Tipos de usuário
-export interface User {
-  id: number;
-  nome: string;
-  email: string;
-  avatar?: string;
-}
+// ============================================================================
+// TIPOS PRINCIPAIS - Re-exportados dos arquivos específicos
+// ============================================================================
 
-// Tipos de partida
-export interface Partida {
-  id: number;
-  nome: string;
-  esporte: string;
-  latitude: number;
-  longitude: number;
-  dataHora: string;
-  totalJogadores: number;
-  tipoPartida: 'PUBLICA' | 'PRIVADA';
-  criadorId: number;
-  criadorNome: string;
-  participantesConfirmados: number;
-  participantes?: Participante[];
-  solicitacoes?: Solicitacao[];
-  times?: Time[];
-  isCriador?: boolean;
-  isParticipando?: boolean;
-  hasSolicitado?: boolean;
-}
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from './auth';
+import type { Participacao } from './participacao';
+import type { PagePartidaResponse, Partida, PartidaRequest, PartidaUpdateRequest } from './partida';
+import type { User } from './user';
 
-// Tipos de participação
-export interface Participacao {
-  id: number;
-  usuarioId: number;
-  usuarioNome: string;
-  partidaId: number;
-  partidaNome: string;
-  status: string;
-  dataParticipacao: string;
-}
-
-export interface Participante {
-  id: number;
-  nome: string;
-  avatar?: string;
-}
-
-// Tipos de solicitação
-export interface Solicitacao {
-  id: number;
-  nome: string;
-  avatar?: string;
-}
-
-// Tipos de time
-export interface Time {
-  id: number;
-  nome: string;
-  jogadores: Participante[];
-}
+// Tipos de API
+export type * from './api';
 
 // Tipos de autenticação
-export interface LoginRequest {
+export type * from './auth';
+
+// Tipos de participação
+export type * from './participacao';
+
+// Tipos de partida
+export type * from './partida';
+
+// Tipos de usuário
+export type * from './user';
+
+// ============================================================================
+// INTERFACES - Definidas localmente
+// ============================================================================
+
+// Interfaces para autenticação
+export interface IAuthenticator {
+  login(credentials: LoginCredentials): Promise<AuthResult>;
+  register(userData: UserRegistration): Promise<AuthResult>;
+  logout(): void;
+  validateToken(token: string): Promise<boolean>;
+}
+
+export interface IAuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+}
+
+export interface IAuthActions {
+  setLoading(loading: boolean): void;
+  clearAuth(): void;
+}
+
+// Interfaces para operações assíncronas
+export interface IAsyncOperation<T, P = void> {
+  execute(
+    operation: (params: P) => Promise<T>,
+    params: P,
+    customSuccessMessage?: string,
+    customErrorContext?: string,
+  ): Promise<T>;
+  executeOperationWithoutParams(
+    operation: () => Promise<T>,
+    customSuccessMessage?: string,
+    customErrorContext?: string,
+  ): Promise<T>;
+  loading: boolean;
+}
+
+// Interfaces para serviços de API
+export interface IApiClient {
+  get<T>(url: string): Promise<T>;
+  post<T>(url: string, data?: any): Promise<T>;
+  put<T>(url: string, data?: any): Promise<T>;
+  delete(url: string): Promise<void>;
+}
+
+export interface IAuthService {
+  login(data: LoginRequest): Promise<LoginResponse>;
+  register(data: RegisterRequest): Promise<RegisterResponse>;
+  logout(): void;
+}
+
+export interface IPartidaService {
+  listarPartidas(): Promise<Partida[]>;
+  listarPartidasFuturas(page?: number, size?: number): Promise<PagePartidaResponse>;
+  buscarPartidaPorId(id: number): Promise<Partida>;
+  criarPartida(data: PartidaRequest): Promise<Partida>;
+  atualizarPartida(id: number, data: PartidaUpdateRequest): Promise<Partida>;
+  deletarPartida(id: number): Promise<void>;
+}
+
+export interface IParticipacaoService {
+  participarPartida(partidaId: number): Promise<Participacao>;
+  cancelarParticipacao(partidaId: number): Promise<void>;
+  aprovarParticipacao(partidaId: number, participanteId: number): Promise<Participacao>;
+  rejeitarParticipacao(partidaId: number, participanteId: number): Promise<Participacao>;
+}
+
+// Interfaces para tratamento de erros
+export interface IErrorHandler {
+  handleError(error: unknown, context: string): void;
+  classifyError(error: unknown): ErrorInfo;
+}
+
+// Interfaces para notificações
+export interface INotificationService {
+  showSuccess(message: string): void;
+  showError(message: string): void;
+  showInfo(message: string): void;
+  showWarning(message: string): void;
+}
+
+// Interfaces para armazenamento
+export interface IStorageService {
+  get<T>(key: string): T | null;
+  set<T>(key: string, value: T): void;
+  remove(key: string): void;
+  clear(): void;
+}
+
+// Interfaces para validação
+export interface IValidator<T> {
+  validate(data: T): ValidationResult;
+}
+
+// Interfaces para roteamento
+export interface IRouteGuard {
+  canActivate(): boolean;
+  redirectTo(): string;
+}
+
+// Interfaces para componentes
+export interface IComponentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+// Interfaces para hooks
+export interface IHookResult<T> {
+  data: T;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => void;
+}
+
+// Tipos auxiliares
+export interface LoginCredentials {
   email: string;
   senha: string;
 }
 
-export interface LoginResponse {
-  token: string;
-  id: number;
-  nome: string;
-  email: string;
-}
-
-export interface RegisterRequest {
+export interface UserRegistration {
   nome: string;
   email: string;
   senha: string;
 }
 
-export interface RegisterResponse {
+export interface AuthResult {
+  user: User;
   token: string;
-  id: number;
-  nome: string;
-  email: string;
 }
 
-// Tipos de requisição de partida
-export interface PartidaRequest {
-  nome: string;
-  esporte: string;
-  latitude: number;
-  longitude: number;
-  dataHora: string;
-  totalJogadores: number;
-  tipoPartida: 'PUBLICA' | 'PRIVADA';
-}
-
-export interface PartidaUpdateRequest {
-  nome?: string;
-  esporte?: string;
-  latitude?: number;
-  longitude?: number;
-  dataHora?: string;
-  totalJogadores?: number;
-  tipoPartida?: 'PUBLICA' | 'PRIVADA';
-}
-
-// Tipos de paginação
-export interface PagePartidaResponse {
-  content: Partida[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
-
-// Tipos de erro
-export interface ApiError {
+export interface ErrorInfo {
   message: string;
   status: number;
+  type: string;
 }
 
-// Re-exportar todos os tipos
-export type * from './api';
-export type * from './auth';
-export type * from './participacao';
-export type * from './partida';
-export type * from './user';
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}

@@ -1,83 +1,86 @@
-import { useCallback, useState } from 'react';
-import { SUCCESS_MESSAGES } from '../constants/messages';
-import { partidaService } from '../services/api';
-import type { Partida, PartidaRequest, PartidaUpdateRequest } from '../types';
-import { useAsyncOperation } from './useAsyncOperation';
+import { useCallback } from 'react';
+import { ServiceFactory } from '../services/ServiceFactory';
+import type { PagePartidaResponse, Partida, PartidaRequest, PartidaUpdateRequest } from '../types';
+import { useServiceOperations } from './useServiceOperations';
 
 export const usePartidas = () => {
-  const [partidas, setPartidas] = useState<Partida[]>([]);
-  const { executeOperationWithoutParams, loading } = useAsyncOperation();
+  const {
+    data: partidas,
+    loading,
+    executeOperation,
+    executeOperationGeneric,
+    addItem,
+    updateItem,
+    removeItem,
+    setDataList,
+  } = useServiceOperations<Partida>();
+
+  const partidaService = ServiceFactory.getInstance().getPartidaService();
 
   const listarPartidas = useCallback(async () => {
-    const data = (await executeOperationWithoutParams(
+    const data = await executeOperationGeneric<Partida[]>(
       partidaService.listarPartidas,
-      undefined,
       'Carregar partidas',
-    )) as Partida[];
-    setPartidas(data);
+    );
+    setDataList(data);
     return data;
-  }, [executeOperationWithoutParams]);
+  }, [executeOperationGeneric, setDataList]);
 
   const listarPartidasFuturas = useCallback(
     async (page = 0, size = 10) => {
-      const data = (await executeOperationWithoutParams(
+      const data = await executeOperationGeneric<PagePartidaResponse>(
         () => partidaService.listarPartidasFuturas(page, size),
-        undefined,
         'Carregar partidas futuras',
-      )) as any;
-      setPartidas(data.content);
+      );
+      setDataList(data.content);
       return data;
     },
-    [executeOperationWithoutParams],
+    [executeOperationGeneric, setDataList],
   );
 
   const buscarPartidaPorId = useCallback(
     async (id: number) => {
-      return executeOperationWithoutParams(
+      return executeOperation(
         () => partidaService.buscarPartidaPorId(id),
-        undefined,
         'Carregar detalhes da partida',
       );
     },
-    [executeOperationWithoutParams],
+    [executeOperation],
   );
 
   const criarPartida = useCallback(
     async (data: PartidaRequest) => {
-      const novaPartida = (await executeOperationWithoutParams(
+      const novaPartida = await executeOperation(
         () => partidaService.criarPartida(data),
-        SUCCESS_MESSAGES.PARTIDA_CREATED,
         'Criar partida',
-      )) as Partida;
-      setPartidas(prev => [...prev, novaPartida]);
+      );
+      addItem(novaPartida);
       return novaPartida;
     },
-    [executeOperationWithoutParams],
+    [executeOperation, addItem],
   );
 
   const atualizarPartida = useCallback(
     async (id: number, data: PartidaUpdateRequest) => {
-      const partidaAtualizada = (await executeOperationWithoutParams(
+      const partidaAtualizada = await executeOperation(
         () => partidaService.atualizarPartida(id, data),
-        SUCCESS_MESSAGES.PARTIDA_UPDATED,
         'Atualizar partida',
-      )) as Partida;
-      setPartidas(prev => prev.map(p => (p.id === id ? partidaAtualizada : p)));
+      );
+      updateItem(id, () => partidaAtualizada);
       return partidaAtualizada;
     },
-    [executeOperationWithoutParams],
+    [executeOperation, updateItem],
   );
 
   const deletarPartida = useCallback(
     async (id: number) => {
-      await executeOperationWithoutParams(
+      await executeOperationGeneric<void>(
         () => partidaService.deletarPartida(id),
-        SUCCESS_MESSAGES.PARTIDA_DELETED,
         'Deletar partida',
       );
-      setPartidas(prev => prev.filter(p => p.id !== id));
+      removeItem(id);
     },
-    [executeOperationWithoutParams],
+    [executeOperationGeneric, removeItem],
   );
 
   return {
@@ -89,5 +92,6 @@ export const usePartidas = () => {
     criarPartida,
     atualizarPartida,
     deletarPartida,
+    setPartidas: setDataList,
   };
 };

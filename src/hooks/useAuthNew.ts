@@ -1,29 +1,25 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '../stores';
-import { useAsyncOperation } from './useAsyncOperation';
+import { useServiceOperations } from './useServiceOperations';
 
 export const useAuth = () => {
   const { user, token, isAuthenticated, login, register, logout } = useAuthStore();
-  const { executeOperationWithoutParams, loading } = useAsyncOperation();
+  const { executeOperationGeneric, loading } = useServiceOperations();
 
   // Verificar token na inicialização
   useEffect(() => {
     const initializeAuth = async () => {
       if (token && user) {
         // Token existe, verificar se ainda é válido
-        await executeOperationWithoutParams(
-          async () => {
-            // Aqui você pode adicionar uma chamada para validar o token
-            // Por enquanto, vamos assumir que se existe, é válido
-          },
-          undefined,
-          'Validar token',
-        );
+        await executeOperationGeneric(async () => {
+          // Aqui você pode adicionar uma chamada para validar o token
+          // Por enquanto, vamos assumir que se existe, é válido
+        }, 'Validar token');
       }
     };
 
     initializeAuth();
-  }, [token, user, executeOperationWithoutParams]);
+  }, [token, user, executeOperationGeneric]);
 
   return {
     user,

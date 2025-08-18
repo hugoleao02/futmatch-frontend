@@ -1,39 +1,52 @@
-import { useCallback, useState } from 'react';
-import { useAsyncOperation } from './useAsyncOperation';
+import { useCallback } from 'react';
+import { useServiceOperations } from './useServiceOperations';
 
 export interface CrudOperationsConfig<T> {
   onItemCreated?: (item: T) => void;
   onItemUpdated?: (item: T) => void;
   onItemDeleted?: (id: number) => void;
-  successMessages?: {
-    create?: string;
-    update?: string;
-    delete?: string;
-  };
 }
 
 export const useCrudOperations = <T extends { id: number }, CreateData, UpdateData>(
   config: CrudOperationsConfig<T> = {},
 ) => {
-  const [items, setItems] = useState<T[]>([]);
-  const { executeOperationWithoutParams, loading } = useAsyncOperation<any>();
+  const {
+    data: items,
+    loading,
+    executeOperation,
+    executeOperationGeneric,
+    addItem,
+    updateItem,
+    removeItem,
+    setDataList,
+    getItemById,
+  } = useServiceOperations<T>({
+    onSuccess: (data, operation) => {
+      if (operation === 'Criar item') {
+        config.onItemCreated?.(data);
+      } else if (operation === 'Atualizar item') {
+        config.onItemUpdated?.(data);
+      } else if (operation === 'Deletar item') {
+        config.onItemDeleted?.(data.id);
+      }
+    },
+  });
 
-  const { onItemCreated, onItemUpdated, onItemDeleted, successMessages = {} } = config;
+  const { onItemCreated, onItemUpdated, onItemDeleted } = config;
 
   const create = useCallback(
     async (data: CreateData, service: (data: CreateData) => Promise<T>): Promise<T> => {
-      const result = await executeOperationWithoutParams(
-        () => service(data),
-        successMessages.create || 'Item criado com sucesso!',
-        'Criar item',
-      );
+      const result = await executeOperation(() => service(data), 'Criar item', {
+        updateData: true,
+        transform: (response: T) => response,
+      });
 
-      setItems(prev => [...prev, result]);
+      addItem(result);
       onItemCreated?.(result);
 
       return result;
     },
-    [executeOperationWithoutParams, onItemCreated, successMessages.create],
+    [executeOperation, addItem, onItemCreated],
   );
 
   const update = useCallback(
@@ -42,43 +55,26 @@ export const useCrudOperations = <T extends { id: number }, CreateData, UpdateDa
       data: UpdateData,
       service: (id: number, data: UpdateData) => Promise<T>,
     ): Promise<T> => {
-      const result = await executeOperationWithoutParams(
-        () => service(id, data),
-        successMessages.update || 'Item atualizado com sucesso!',
-        'Atualizar item',
-      );
+      const result = await executeOperation(() => service(id, data), 'Atualizar item', {
+        updateData: true,
+        transform: (response: T) => response,
+      });
 
-      setItems(prev => prev.map(item => (item.id === id ? result : item)));
+      updateItem(id, () => result);
       onItemUpdated?.(result);
 
       return result;
     },
-    [executeOperationWithoutParams, onItemUpdated, successMessages.update],
+    [executeOperation, updateItem, onItemUpdated],
   );
 
   const remove = useCallback(
     async (id: number, service: (id: number) => Promise<void>): Promise<void> => {
-      (await executeOperationWithoutParams(
-        () => service(id),
-        successMessages.delete || 'Item deletado com sucesso!',
-        'Deletar item',
-      )) as any;
-
-      setItems(prev => prev.filter(item => item.id !== id));
+      await executeOperationGeneric<void>(() => service(id), 'Deletar item');
+      removeItem(id);
       onItemDeleted?.(id);
     },
-    [executeOperationWithoutParams, onItemDeleted, successMessages.delete],
-  );
-
-  const setItemsList = useCallback((newItems: T[]) => {
-    setItems(newItems);
-  }, []);
-
-  const getItemById = useCallback(
-    (id: number): T | undefined => {
-      return items.find(item => item.id === id);
-    },
-    [items],
+    [executeOperationGeneric, removeItem, onItemDeleted],
   );
 
   return {
@@ -87,7 +83,7 @@ export const useCrudOperations = <T extends { id: number }, CreateData, UpdateDa
     create,
     update,
     remove,
-    setItemsList,
+    setItemsList: setDataList,
     getItemById,
   };
 };

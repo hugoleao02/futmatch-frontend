@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { LoginForm } from './components/LoginForm';
-import { LoadingSpinner } from './components/common';
-import { AppLayout } from './components/layout';
+import { LoadingSpinner } from './components/common/LoadingSpinner';
+import { AppLayout } from './components/layout/AppLayout';
+import { ProtectedRouteGuard, PublicRouteGuard, RouteGuard } from './components/routing/RouteGuard';
 import { ROUTES } from './constants';
 import { useAuth } from './hooks/useAuthNew';
 import { HomePage } from './pages/HomePage';
@@ -14,7 +16,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <LoadingSpinner fullHeight />;
   }
 
-  return isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.LOGIN} replace />;
+  const guard = new ProtectedRouteGuard(isAuthenticated);
+  return <RouteGuard guard={guard}>{children}</RouteGuard>;
 };
 
 // Componente para rotas públicas (quando já está logado)
@@ -25,10 +28,13 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
     return <LoadingSpinner fullHeight />;
   }
 
-  return !isAuthenticated ? <>{children}</> : <Navigate to={ROUTES.HOME} replace />;
+  const guard = new PublicRouteGuard(isAuthenticated);
+  return <RouteGuard guard={guard}>{children}</RouteGuard>;
 };
 
 function App() {
+  const [, setActiveTab] = useState(0);
+
   return (
     <Router>
       <AppLayout>
@@ -37,7 +43,7 @@ function App() {
             path={ROUTES.LOGIN}
             element={
               <PublicRoute>
-                <LoginForm />
+                <LoginForm setActiveTab={() => setActiveTab(1)} />
               </PublicRoute>
             }
           />

@@ -1,6 +1,5 @@
-import { create } from 'zustand';
 import { toast } from 'react-toastify';
-import type { ApiError } from '../types';
+import { create } from 'zustand';
 
 export type ErrorType = 'AUTH' | 'NETWORK' | 'VALIDATION' | 'SERVER' | 'UNKNOWN';
 
@@ -18,14 +17,14 @@ interface ErrorStoreState {
   errors: ErrorState[];
   currentError: ErrorState | null;
   isLoading: boolean;
-  
+
   // Ações
   addError: (error: Omit<ErrorState, 'id' | 'timestamp' | 'handled'>) => void;
   clearError: (errorId: string) => void;
   clearAllErrors: () => void;
   markAsHandled: (errorId: string) => void;
   setLoading: (loading: boolean) => void;
-  
+
   // Utilitários
   hasErrors: () => boolean;
   getUnhandledErrors: () => ErrorState[];
@@ -38,7 +37,7 @@ export const useErrorStore = create<ErrorStoreState>((set, get) => ({
   isLoading: false,
 
   // Ações
-  addError: (errorData) => {
+  addError: errorData => {
     const newError: ErrorState = {
       ...errorData,
       id: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -46,7 +45,7 @@ export const useErrorStore = create<ErrorStoreState>((set, get) => ({
       handled: false,
     };
 
-    set((state) => ({
+    set(state => ({
       errors: [...state.errors, newError],
       currentError: newError,
     }));
@@ -59,9 +58,9 @@ export const useErrorStore = create<ErrorStoreState>((set, get) => ({
     });
   },
 
-  clearError: (errorId) => {
-    set((state) => ({
-      errors: state.errors.filter((error) => error.id !== errorId),
+  clearError: errorId => {
+    set(state => ({
+      errors: state.errors.filter(error => error.id !== errorId),
       currentError: state.currentError?.id === errorId ? null : state.currentError,
     }));
   },
@@ -73,15 +72,15 @@ export const useErrorStore = create<ErrorStoreState>((set, get) => ({
     });
   },
 
-  markAsHandled: (errorId) => {
-    set((state) => ({
-      errors: state.errors.map((error) =>
-        error.id === errorId ? { ...error, handled: true } : error
+  markAsHandled: errorId => {
+    set(state => ({
+      errors: state.errors.map(error =>
+        error.id === errorId ? { ...error, handled: true } : error,
       ),
     }));
   },
 
-  setLoading: (loading) => {
+  setLoading: loading => {
     set({ isLoading: loading });
   },
 
@@ -91,7 +90,7 @@ export const useErrorStore = create<ErrorStoreState>((set, get) => ({
   },
 
   getUnhandledErrors: () => {
-    return get().errors.filter((error) => !error.handled);
+    return get().errors.filter(error => !error.handled);
   },
 }));
 

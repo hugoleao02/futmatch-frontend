@@ -25,7 +25,7 @@ export const useRetry = (config: RetryConfig = {}) => {
   const { isRetryable } = useErrorHandler();
 
   const executeWithRetry = useCallback(
-    async <T>(operation: () => Promise<T>, context?: string): Promise<T> => {
+    async <T>(operation: () => Promise<T>): Promise<T> => {
       let lastError: unknown;
       let attempts = 0;
 

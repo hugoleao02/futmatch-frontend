@@ -1,34 +1,33 @@
 import { useCallback } from 'react';
-import { SUCCESS_MESSAGES } from '../constants/messages';
-import { participacaoService } from '../services/api';
+import { ServiceFactory } from '../services/ServiceFactory';
 import type { Participacao } from '../types';
-import { useAsyncOperation } from './useAsyncOperation';
+import { useServiceOperations } from './useServiceOperations';
 
 export const useParticipacao = () => {
-  const { executeOperationWithoutParams, loading } = useAsyncOperation();
+  const { loading, executeOperation, executeOperationGeneric } =
+    useServiceOperations<Participacao>();
+  const participacaoService = ServiceFactory.getInstance().getParticipacaoService();
 
   const participarPartida = useCallback(
     async (partidaId: number): Promise<Participacao | null> => {
       try {
-        const participacao = await executeOperationWithoutParams(
+        const participacao = await executeOperation(
           () => participacaoService.participarPartida(partidaId),
-          SUCCESS_MESSAGES.PARTICIPATION_REGISTERED,
           'Participar da partida',
         );
-        return participacao as Participacao;
+        return participacao;
       } catch {
         return null;
       }
     },
-    [executeOperationWithoutParams],
+    [executeOperation],
   );
 
   const cancelarParticipacao = useCallback(
     async (partidaId: number): Promise<boolean> => {
       try {
-        await executeOperationWithoutParams(
+        await executeOperationGeneric<void>(
           () => participacaoService.cancelarParticipacao(partidaId),
-          SUCCESS_MESSAGES.PARTICIPATION_CANCELLED,
           'Cancelar participação',
         );
         return true;
@@ -36,39 +35,37 @@ export const useParticipacao = () => {
         return false;
       }
     },
-    [executeOperationWithoutParams],
+    [executeOperationGeneric],
   );
 
   const aprovarParticipacao = useCallback(
     async (partidaId: number, participanteId: number): Promise<Participacao | null> => {
       try {
-        const participacao = await executeOperationWithoutParams(
+        const participacao = await executeOperation(
           () => participacaoService.aprovarParticipacao(partidaId, participanteId),
-          SUCCESS_MESSAGES.PARTICIPATION_APPROVED,
           'Aprovar participação',
         );
-        return participacao as Participacao;
+        return participacao;
       } catch {
         return null;
       }
     },
-    [executeOperationWithoutParams],
+    [executeOperation],
   );
 
   const rejeitarParticipacao = useCallback(
     async (partidaId: number, participanteId: number): Promise<Participacao | null> => {
       try {
-        const participacao = await executeOperationWithoutParams(
+        const participacao = await executeOperation(
           () => participacaoService.rejeitarParticipacao(partidaId, participanteId),
-          SUCCESS_MESSAGES.PARTICIPATION_REJECTED,
           'Rejeitar participação',
         );
-        return participacao as Participacao;
+        return participacao;
       } catch {
         return null;
       }
     },
-    [executeOperationWithoutParams],
+    [executeOperation],
   );
 
   return {

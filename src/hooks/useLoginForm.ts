@@ -1,9 +1,9 @@
-import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import * as Yup from 'yup';
-import type { LoginRequest } from '../types';
+import type { LoginRequest, LoginResponse } from '../types';
 import { useAuth } from './useAuthNew';
 import { useErrorHandler } from './useErrorHandler';
+import { useFormOperations } from './useFormOperations';
 import { useNavigation } from './useNavigation';
 
 const loginSchema = Yup.object().shape({
@@ -25,25 +25,23 @@ export const useLoginForm = () => {
     }
   }, [isAuthenticated, navigateToHome]);
 
-  const formik = useFormik<LoginRequest>({
+  const formOperations = useFormOperations<LoginRequest, LoginResponse>({
     initialValues: {
       email: '',
       senha: '',
     },
     validationSchema: loginSchema,
-    onSubmit: async (values, { setSubmitting }) => {
-      try {
-        await login(values);
-        // A navegação será automática via useEffect
-      } catch (error) {
-        handleError(error, 'Login');
-      } finally {
-        setSubmitting(false);
-      }
+    onSubmit: async values => {
+      await login(values);
+      return {} as LoginResponse; // O login é tratado pelo store
     },
+    onError: error => {
+      handleError(error, 'Login');
+    },
+    errorContext: 'Login',
   });
 
   return {
-    formik,
+    formik: formOperations.formik,
   };
 };
