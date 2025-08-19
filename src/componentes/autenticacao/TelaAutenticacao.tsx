@@ -1,6 +1,7 @@
-import { Container, Paper } from '@mui/material';
+import { Paper } from '@mui/material';
 import { useState } from 'react';
 
+import { Container } from '../../shared/components';
 import { FormularioSection } from './FormularioSection';
 import { useFormulariosAutenticacao } from './hooks';
 import { MarcaSection } from './MarcaSection';

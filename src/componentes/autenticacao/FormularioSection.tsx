@@ -1,4 +1,5 @@
-import { Box, Tab, Tabs } from '@mui/material';
+import { Tab, Tabs } from '@mui/material';
+import { Box } from '../../shared/components';
 import type { ConfiguracaoFormulario } from '../../shared/types';
 import { formColumnStyles, tabStyles } from './styles/TelaAutenticacao.styles';
 

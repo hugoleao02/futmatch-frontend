@@ -1,5 +1,5 @@
-import { Box, Button, CircularProgress, Link, TextField, Typography } from '@mui/material';
-import { CampoSenha } from '../../shared/components';
+import { Box, CircularProgress, Link } from '@mui/material';
+import { Button, CampoSenha, TextField, Typography } from '../../shared/components';
 import type { FormularioLoginProps } from '../../shared/types';
 import {
   forgotPasswordStyles,
@@ -12,20 +12,20 @@ import {
 export const FormularioLogin = ({ formik, estaEnviando }: FormularioLoginProps) => {
   return (
     <Box component="form" onSubmit={formik.handleSubmit} sx={formStyles}>
-      <Typography variant="h4" component="h2" sx={titleStyles}>
+      <Typography variant="h4" weight="semibold" color="primary" align="center" sx={titleStyles}>
         Bem-vindo de volta!
       </Typography>
 
       <TextField
         label="Seu e-mail ou nome de usuário"
-        variant="outlined"
-        fullWidth
         name="email"
         value={formik.values.email}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         error={formik.touched.email && Boolean(formik.errors.email)}
-        helperText={formik.touched.email && formik.errors.email}
+        helperText={
+          formik.touched.email && formik.errors.email ? String(formik.errors.email) : undefined
+        }
         required
         sx={textFieldStyles}
       />
@@ -50,10 +50,10 @@ export const FormularioLogin = ({ formik, estaEnviando }: FormularioLoginProps) 
 
       <Button
         type="submit"
-        variant="contained"
-        fullWidth
+        variant="primary"
         size="large"
-        disabled={estaEnviando}
+        loading={estaEnviando}
+        fullWidth
         sx={submitButtonStyles}
       >
         {estaEnviando ? <CircularProgress size={28} color="inherit" /> : 'Entrar'}

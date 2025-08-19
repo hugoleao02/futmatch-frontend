@@ -1,14 +1,5 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  CircularProgress,
-  FormControlLabel,
-  Link,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { CampoSenha } from '../../shared/components';
+import { Box, Checkbox, CircularProgress, FormControlLabel, Link } from '@mui/material';
+import { Button, CampoSenha, TextField, Typography } from '../../shared/components';
 import type { FormularioCadastroProps } from '../../shared/types';
 import {
   formStyles,
@@ -22,35 +13,35 @@ import {
 export const FormularioRegistro = ({ formik, estaEnviando }: FormularioCadastroProps) => {
   return (
     <Box component="form" onSubmit={formik.handleSubmit} sx={formStyles}>
-      <Typography variant="h4" component="h2" sx={titleStyles}>
+      <Typography variant="h4" weight="semibold" color="primary" align="center" sx={titleStyles}>
         Crie sua conta
       </Typography>
 
       <TextField
         label="Seu nome ou apelido (visível para outros)"
-        variant="outlined"
-        fullWidth
         name="nome"
         value={formik.values.nome}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         error={formik.touched.nome && Boolean(formik.errors.nome)}
-        helperText={formik.touched.nome && formik.errors.nome}
+        helperText={
+          formik.touched.nome && formik.errors.nome ? String(formik.errors.nome) : undefined
+        }
         required
         sx={textFieldStyles}
       />
 
       <TextField
         label="Seu melhor e-mail"
-        variant="outlined"
-        fullWidth
         type="email"
         name="email"
         value={formik.values.email}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         error={formik.touched.email && Boolean(formik.errors.email)}
-        helperText={formik.touched.email && formik.errors.email}
+        helperText={
+          formik.touched.email && formik.errors.email ? String(formik.errors.email) : undefined
+        }
         required
         sx={textFieldStyles}
       />
@@ -71,15 +62,17 @@ export const FormularioRegistro = ({ formik, estaEnviando }: FormularioCadastroP
 
       <TextField
         label="Confirme sua senha"
-        variant="outlined"
-        fullWidth
         type="password"
         name="confirmarSenha"
         value={formik.values.confirmarSenha}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         error={formik.touched.confirmarSenha && Boolean(formik.errors.confirmarSenha)}
-        helperText={formik.touched.confirmarSenha && formik.errors.confirmarSenha}
+        helperText={
+          formik.touched.confirmarSenha && formik.errors.confirmarSenha
+            ? String(formik.errors.confirmarSenha)
+            : undefined
+        }
         required
         sx={textFieldStyles}
       />
@@ -109,10 +102,10 @@ export const FormularioRegistro = ({ formik, estaEnviando }: FormularioCadastroP
 
       <Button
         type="submit"
-        variant="contained"
-        fullWidth
+        variant="primary"
         size="large"
-        disabled={estaEnviando}
+        loading={estaEnviando}
+        fullWidth
         sx={submitButtonStyles}
       >
         {estaEnviando ? <CircularProgress size={28} color="inherit" /> : 'Cadastrar'}

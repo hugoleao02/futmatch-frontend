@@ -1,13 +1,14 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography } from '../../shared/components';
 import { brandColumnStyles } from './styles/TelaAutenticacao.styles';
 
 export const MarcaSection = () => (
   <Box sx={brandColumnStyles}>
     <Typography
       variant="h3"
-      component="h1"
+      weight="bold"
+      color="primary"
+      align="center"
       sx={{
-        fontWeight: 'bold',
         mb: 2,
         lineHeight: 1.2,
         textShadow: '3px 3px 6px rgba(0,0,0,0.6)',
@@ -18,6 +19,9 @@ export const MarcaSection = () => (
     </Typography>
     <Typography
       variant="h6"
+      weight="normal"
+      color="text"
+      align="center"
       sx={{
         opacity: 0.95,
         textShadow: '1px 1px 3px rgba(0,0,0,0.5)',
