@@ -1,16 +1,6 @@
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-  Link,
-  TextField,
-  Typography,
-} from '@mui/material';
-import type { FormikProps } from 'formik';
-import { useState } from 'react';
+import { Box, Button, CircularProgress, Link, TextField, Typography } from '@mui/material';
+import { CampoSenha } from '../../shared/components';
+import type { FormularioLoginProps } from '../../shared/types';
 import {
   forgotPasswordStyles,
   formStyles,
@@ -19,20 +9,7 @@ import {
   titleStyles,
 } from './styles/FormularioLogin.styles';
 
-type LoginValues = { email: string; senha: string };
-
-interface FormularioLoginProps {
-  formik: FormikProps<LoginValues>;
-  estaEnviando: boolean;
-}
-
 export const FormularioLogin = ({ formik, estaEnviando }: FormularioLoginProps) => {
-  const [showPassword, setShowPassword] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
     <Box component="form" onSubmit={formik.handleSubmit} sx={formStyles}>
       <Typography variant="h4" component="h2" sx={titleStyles}>
@@ -53,37 +30,18 @@ export const FormularioLogin = ({ formik, estaEnviando }: FormularioLoginProps) 
         sx={textFieldStyles}
       />
 
-      <TextField
-        label="Sua senha"
-        variant="outlined"
-        fullWidth
+      <CampoSenha
         name="senha"
-        type={showPassword ? 'text' : 'password'}
+        label="Sua senha"
         value={formik.values.senha}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        error={formik.touched.senha && Boolean(formik.errors.senha)}
-        helperText={formik.touched.senha && formik.errors.senha}
+        error={Boolean(formik.touched.senha && formik.errors.senha)}
+        helperText={
+          formik.touched.senha && formik.errors.senha ? String(formik.errors.senha) : undefined
+        }
         required
         sx={textFieldStyles}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={togglePasswordVisibility}
-                edge="end"
-                sx={{ color: 'text.secondary' }}
-              >
-                {showPassword ? (
-                  <VisibilityOff sx={{ fontSize: '1.5rem' }} />
-                ) : (
-                  <Visibility sx={{ fontSize: '1.5rem' }} />
-                )}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
       />
 
       <Link href="#" variant="body1" sx={forgotPasswordStyles}>

@@ -1,18 +1,15 @@
-import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Button,
   Checkbox,
   CircularProgress,
   FormControlLabel,
-  IconButton,
-  InputAdornment,
   Link,
   TextField,
   Typography,
 } from '@mui/material';
-import type { FormikProps } from 'formik';
-import { useState } from 'react';
+import { CampoSenha } from '../../shared/components';
+import type { FormularioCadastroProps } from '../../shared/types';
 import {
   formStyles,
   linkStyles,
@@ -22,26 +19,7 @@ import {
   titleStyles,
 } from './styles/FormularioRegistro.styles';
 
-type CadastroValues = {
-  nome: string;
-  email: string;
-  senha: string;
-  confirmarSenha: string;
-  aceitarTermos: boolean;
-};
-
-interface FormularioRegistroProps {
-  formik: FormikProps<CadastroValues>;
-  estaEnviando: boolean;
-}
-
-export const FormularioRegistro = ({ formik, estaEnviando }: FormularioRegistroProps) => {
-  const [showPassword, setShowPassword] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
+export const FormularioRegistro = ({ formik, estaEnviando }: FormularioCadastroProps) => {
   return (
     <Box component="form" onSubmit={formik.handleSubmit} sx={formStyles}>
       <Typography variant="h4" component="h2" sx={titleStyles}>
@@ -77,37 +55,18 @@ export const FormularioRegistro = ({ formik, estaEnviando }: FormularioRegistroP
         sx={textFieldStyles}
       />
 
-      <TextField
-        label="Crie uma senha"
-        variant="outlined"
-        fullWidth
+      <CampoSenha
         name="senha"
-        type={showPassword ? 'text' : 'password'}
+        label="Crie uma senha"
         value={formik.values.senha}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        error={formik.touched.senha && Boolean(formik.errors.senha)}
-        helperText={formik.touched.senha && formik.errors.senha}
+        error={Boolean(formik.touched.senha && formik.errors.senha)}
+        helperText={
+          formik.touched.senha && formik.errors.senha ? String(formik.errors.senha) : undefined
+        }
         required
         sx={textFieldStyles}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={togglePasswordVisibility}
-                edge="end"
-                sx={{ color: 'text.secondary' }}
-              >
-                {showPassword ? (
-                  <VisibilityOff sx={{ fontSize: '1.5rem' }} />
-                ) : (
-                  <Visibility sx={{ fontSize: '1.5rem' }} />
-                )}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
       />
 
       <TextField

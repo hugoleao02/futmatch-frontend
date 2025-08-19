@@ -1,1 +1,2 @@
-export * from './Logo';
+export { CampoSenha } from './CampoSenha';
+export { Logo } from './Logo';

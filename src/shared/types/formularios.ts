@@ -1,5 +1,5 @@
-import type { ComponentType } from 'react';
 import type { FormikProps } from 'formik';
+import type { ComponentType } from 'react';
 
 // Interface base para todos os formulários
 export interface FormularioBaseProps {
@@ -7,12 +7,22 @@ export interface FormularioBaseProps {
   estaEnviando: boolean;
 }
 
-// Configuração de um formulário
-export interface ConfiguracaoFormulario {
+// Interface específica para formulários de login
+export interface FormularioLoginProps extends FormularioBaseProps {
+  formik: FormikProps<LoginValues>;
+}
+
+// Interface específica para formulários de cadastro
+export interface FormularioCadastroProps extends FormularioBaseProps {
+  formik: FormikProps<CadastroValues>;
+}
+
+// Configuração de um formulário com props específicas
+export interface ConfiguracaoFormulario<T = FormularioBaseProps> {
   id: number;
   label: string;
-  component: ComponentType<FormularioBaseProps>;
-  props: FormularioBaseProps;
+  component: ComponentType<T>;
+  props: T;
 }
 
 // Tipo para valores de login
@@ -27,4 +37,5 @@ export type CadastroValues = {
   email: string;
   senha: string;
   confirmarSenha: string;
+  aceitarTermos: boolean;
 };
