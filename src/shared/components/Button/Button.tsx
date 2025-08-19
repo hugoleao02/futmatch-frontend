@@ -1,4 +1,5 @@
-import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
+import type { ButtonProps as MuiButtonProps } from '@mui/material';
+import { Button as MuiButton } from '@mui/material';
 import { forwardRef } from 'react';
 
 export interface ButtonProps extends Omit<MuiButtonProps, 'variant' | 'size'> {
@@ -9,14 +10,10 @@ export interface ButtonProps extends Omit<MuiButtonProps, 'variant' | 'size'> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ 
-    variant = 'primary', 
-    size = 'medium', 
-    loading = false, 
-    children, 
-    disabled,
-    ...props 
-  }, ref) => {
+  (
+    { variant = 'primary', size = 'medium', loading = false, children, disabled, ...props },
+    ref,
+  ) => {
     const getVariantProps = () => {
       switch (variant) {
         case 'primary':
@@ -68,7 +65,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {loading ? 'Carregando...' : children}
       </MuiButton>
     );
-  }
+  },
 );
 
 Button.displayName = 'Button';

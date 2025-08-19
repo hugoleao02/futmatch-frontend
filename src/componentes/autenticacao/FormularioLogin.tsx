@@ -27,6 +27,7 @@ export const FormularioLogin = ({ formik, estaEnviando }: FormularioLoginProps) 
           formik.touched.email && formik.errors.email ? String(formik.errors.email) : undefined
         }
         required
+        autoComplete="username"
         sx={textFieldStyles}
       />
 
@@ -41,6 +42,7 @@ export const FormularioLogin = ({ formik, estaEnviando }: FormularioLoginProps) 
           formik.touched.senha && formik.errors.senha ? String(formik.errors.senha) : undefined
         }
         required
+        autoComplete="current-password"
         sx={textFieldStyles}
       />
 

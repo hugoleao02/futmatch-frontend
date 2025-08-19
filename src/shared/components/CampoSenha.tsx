@@ -12,6 +12,7 @@ interface CampoSenhaProps {
   helperText?: string;
   required?: boolean;
   sx?: any;
+  autoComplete?: 'current-password' | 'new-password';
 }
 
 export const CampoSenha = ({
@@ -24,6 +25,7 @@ export const CampoSenha = ({
   helperText,
   required = false,
   sx,
+  autoComplete = 'current-password',
 }: CampoSenhaProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -44,6 +46,7 @@ export const CampoSenha = ({
       error={error}
       helperText={helperText}
       required={required}
+      autoComplete={autoComplete}
       sx={sx}
       InputProps={{
         endAdornment: (

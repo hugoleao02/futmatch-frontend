@@ -4,7 +4,14 @@ import { defineConfig } from 'vite';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  css: {
-    postcss: './postcss.config.cjs',
+  server: {
+    port: 5173,
+    host: true,
+  },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
+  define: {
+    __DEV__: false,
   },
 });

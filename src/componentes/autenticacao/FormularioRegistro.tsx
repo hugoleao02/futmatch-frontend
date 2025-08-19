@@ -43,6 +43,7 @@ export const FormularioRegistro = ({ formik, estaEnviando }: FormularioCadastroP
           formik.touched.email && formik.errors.email ? String(formik.errors.email) : undefined
         }
         required
+        autoComplete="username"
         sx={textFieldStyles}
       />
 
@@ -57,6 +58,7 @@ export const FormularioRegistro = ({ formik, estaEnviando }: FormularioCadastroP
           formik.touched.senha && formik.errors.senha ? String(formik.errors.senha) : undefined
         }
         required
+        autoComplete="new-password"
         sx={textFieldStyles}
       />
 
@@ -74,6 +76,7 @@ export const FormularioRegistro = ({ formik, estaEnviando }: FormularioCadastroP
             : undefined
         }
         required
+        autoComplete="new-password"
         sx={textFieldStyles}
       />
 
