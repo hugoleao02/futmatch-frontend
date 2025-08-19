@@ -1,9 +1,7 @@
 import { Box, Container, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { FormularioLogin } from './FormularioLogin';
-import { FormularioRegistro } from './FormularioRegistro';
-import { useFormularioCadastro, useFormularioLogin } from './hooks';
+import { useConfiguracaoFormularios } from './hooks';
 import {
   brandColumnStyles,
   containerStyles,
@@ -14,13 +12,14 @@ import {
 
 export const TelaAutenticacao = () => {
   const [activeTab, setActiveTab] = useState(0);
-
-  const { formik: formikLogin, estaEnviando: estaEnviandoLogin } = useFormularioLogin();
-  const { formik: formikCadastro, estaEnviando: estaEnviandoCadastro } = useFormularioCadastro();
+  const formularios = useConfiguracaoFormularios();
 
   const handleTabChange = (_event: unknown, newValue: number) => {
     setActiveTab(newValue);
   };
+
+  const formularioAtivo = formularios.find(f => f.id === activeTab);
+  const FormularioComponent = formularioAtivo?.component;
 
   return (
     <Container maxWidth={false} sx={containerStyles}>
@@ -65,15 +64,16 @@ export const TelaAutenticacao = () => {
               },
             }}
           >
-            <Tab label="Login" sx={tabStyles(activeTab, 0)} />
-            <Tab label="Cadastro" sx={tabStyles(activeTab, 1)} />
+            {formularios.map(formulario => (
+              <Tab
+                key={formulario.id}
+                label={formulario.label}
+                sx={tabStyles(activeTab, formulario.id)}
+              />
+            ))}
           </Tabs>
 
-          {activeTab === 0 ? (
-            <FormularioLogin formik={formikLogin} estaEnviando={estaEnviandoLogin} />
-          ) : (
-            <FormularioRegistro formik={formikCadastro} estaEnviando={estaEnviandoCadastro} />
-          )}
+          {FormularioComponent && <FormularioComponent {...formularioAtivo.props} />}
         </Box>
       </Paper>
     </Container>
