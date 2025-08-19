@@ -1,63 +1,65 @@
-export const containerStyles = {
+import type { SxProps, Theme } from '@mui/material';
+import { THEME } from '../../../constants';
+
+export const containerStyles: SxProps<Theme> = {
   minHeight: '100vh',
+  minWidth: '100vw',
+  background: 'linear-gradient(135deg, #0D47A1 0%, #1A237E 50%, #212121 100%)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  py: 4,
-  px: 2,
-  background: 'linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #388E3C 100%)',
-} as const;
+  p: { xs: 2, sm: 3, lg: 4 },
+  fontFamily: 'Inter, sans-serif',
+};
 
-export const paperStyles = {
+export const paperStyles: SxProps<Theme> = {
+  borderRadius: THEME.borderRadius.xl,
   display: 'flex',
-  borderRadius: 4,
-  overflow: 'hidden',
-  boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-  maxWidth: 1200,
+  flexDirection: { xs: 'column', lg: 'row' },
   width: '100%',
-  minHeight: 600,
-} as const;
-
-export const brandColumnStyles = {
-  flex: 1,
-  background: 'linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%)',
-  color: 'white',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  textAlign: 'center',
-  p: 6,
-  position: 'relative',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background:
-      'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-    opacity: 0.3,
+  maxWidth: '1100px',
+  overflow: 'hidden',
+  transition: 'transform 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'scale(1.005)',
   },
-} as const;
+};
 
-export const formColumnStyles = {
-  flex: 1,
+export const brandColumnStyles: SxProps<Theme> = {
+  width: { xs: '100%', lg: '50%' },
+  p: { xs: 4, sm: 6 },
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  textAlign: 'center',
+  background: `linear-gradient(45deg, ${THEME.colors.primary.main} 0%, #0D47A1 50%, #FFB300 100%)`,
+  color: 'white',
+  borderRadius: { lg: `${THEME.borderRadius.xl} 0 0 ${THEME.borderRadius.xl}` },
+};
+
+export const formColumnStyles: SxProps<Theme> = {
+  width: { xs: '100%', lg: '50%' },
+  p: { xs: 4, sm: 6, md: 8 },
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  p: 6,
-  backgroundColor: 'background.paper',
-} as const;
+  height: { xs: 600, sm: 700, md: 760 },
+};
 
-export const tabStyles = (activeTab: number, tabIndex: number) => ({
-  fontWeight: activeTab === tabIndex ? 'bold' : 'normal',
-  color: activeTab === tabIndex ? 'primary.main' : 'text.secondary',
-  fontSize: '1.1rem',
-  py: 2,
-  px: 4,
+export const tabStyles = (activeTab: number, tabIndex: number): SxProps<Theme> => ({
+  fontSize: { xs: THEME.typography.fontSize.lg, sm: THEME.typography.fontSize.xl },
+  fontWeight: THEME.typography.fontWeight.bold,
+  textTransform: 'none',
+  color: activeTab === tabIndex ? THEME.colors.primary.main : THEME.colors.text.secondary,
+  '&.Mui-selected': {
+    color: THEME.colors.primary.main,
+  },
+  borderRadius: '10px 10px 0 0',
+  transition: 'all 0.3s ease-in-out',
+  '&:hover': {
+    backgroundColor: '#E8F5E9',
+    transform: 'scale(1.03)',
+  },
 });
-
-

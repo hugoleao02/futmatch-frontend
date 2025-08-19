@@ -1,43 +1,27 @@
-export const formStyles = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 3,
-  width: '100%',
-  maxWidth: 400,
-} as const;
+import type { SxProps, Theme } from '@mui/material';
+import { THEME } from '../../../constants';
 
-export const titleStyles = {
-  textAlign: 'center',
-  mb: 3,
-  fontWeight: 'bold',
-  color: 'primary.main',
-} as const;
+// Re-export estilos base
+export {
+  baseCheckboxStyles as checkboxStyles,
+  baseFormStyles as formStyles,
+  baseSubmitButtonStyles as submitButtonStyles,
+  baseTextFieldStyles as textFieldStyles,
+  baseTitleStyles as titleStyles,
+} from '../../../styles';
 
-export const textFieldStyles = {
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
-  },
-} as const;
-
-export const submitButtonStyles = {
-  mt: 2,
-  py: 1.5,
-  borderRadius: 2,
-  fontWeight: 'bold',
-  fontSize: '1.1rem',
-} as const;
-
-export const loginLinkStyles = {
-  textAlign: 'center',
-  mt: 2,
-} as const;
-
-export const linkStyles = {
-  color: 'primary.main',
+export const linkStyles: SxProps<Theme> = {
+  color: THEME.colors.primary.main,
   textDecoration: 'none',
+  fontWeight: THEME.typography.fontWeight.bold,
   '&:hover': {
     textDecoration: 'underline',
+    color: THEME.colors.primary.dark,
   },
-} as const;
+};
 
-
+export const loginLinkStyles: SxProps<Theme> = {
+  color: THEME.colors.text.secondary,
+  textAlign: 'center',
+  mt: 3,
+};
