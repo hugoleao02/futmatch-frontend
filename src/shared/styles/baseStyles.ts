@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/material';
-import { THEME } from '../constants';
+import { THEME } from './theme';
 
 // Estilos base para campos de texto
 export const baseTextFieldStyles: SxProps<Theme> = {

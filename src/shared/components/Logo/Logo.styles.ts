@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/material';
-import { THEME } from '../../../constants';
+import { THEME } from '../../styles/theme';
 
 export const logoStyles = (size: 'small' | 'large'): SxProps<Theme> => {
   const dimensions = size === 'large' ? { xs: 80, sm: 100 } : { xs: 48, sm: 58 };

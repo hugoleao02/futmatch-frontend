@@ -1,7 +1,8 @@
 import { Box, Container, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { useConfiguracaoFormularios } from './hooks';
+import type { ConfiguracaoFormulario } from '../../shared/types';
+import { useFormulariosAutenticacao } from './hooks';
 import {
   brandColumnStyles,
   containerStyles,
@@ -12,13 +13,13 @@ import {
 
 export const TelaAutenticacao = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const formularios = useConfiguracaoFormularios();
+  const formularios = useFormulariosAutenticacao();
 
   const handleTabChange = (_event: unknown, newValue: number) => {
     setActiveTab(newValue);
   };
 
-  const formularioAtivo = formularios.find(f => f.id === activeTab);
+  const formularioAtivo = formularios.find((f: ConfiguracaoFormulario) => f.id === activeTab);
   const FormularioComponent = formularioAtivo?.component;
 
   return (
@@ -64,7 +65,7 @@ export const TelaAutenticacao = () => {
               },
             }}
           >
-            {formularios.map(formulario => (
+            {formularios.map((formulario: ConfiguracaoFormulario) => (
               <Tab
                 key={formulario.id}
                 label={formulario.label}

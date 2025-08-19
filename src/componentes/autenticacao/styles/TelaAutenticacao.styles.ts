@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/material';
-import { THEME } from '../../../constants';
+import { THEME } from '../../../shared';
 
 export const containerStyles: SxProps<Theme> = {
   minHeight: '100vh',

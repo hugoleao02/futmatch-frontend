@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import LogoImg from '../../../assets/logo.png';
+import LogoImg from '../../assets/logo.png';
 import { logoStyles } from './Logo.styles';
 
 interface LogoProps {
@@ -7,12 +7,5 @@ interface LogoProps {
 }
 
 export function Logo({ size = 'large' }: LogoProps) {
-  return (
-    <Box
-      component="img"
-      src={LogoImg}
-      alt="Logo FutMatch"
-      sx={logoStyles(size)}
-    />
-  );
+  return <Box component="img" src={LogoImg} alt="Logo FutMatch" sx={logoStyles(size)} />;
 }

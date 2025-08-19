@@ -1,5 +1,5 @@
-import type { FormikProps } from 'formik';
 import type { ComponentType } from 'react';
+import type { FormikProps } from 'formik';
 
 // Interface base para todos os formulários
 export interface FormularioBaseProps {

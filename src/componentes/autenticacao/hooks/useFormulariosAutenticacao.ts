@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import type { ConfiguracaoFormulario } from '../../../shared/types';
 import { FormularioLogin } from '../FormularioLogin';
 import { FormularioRegistro } from '../FormularioRegistro';
 import { useFormularioCadastro, useFormularioLogin } from './index';
+import type { ConfiguracaoFormulario } from '../../../shared';
 
-export const useConfiguracaoFormularios = (): ConfiguracaoFormulario[] => {
+export const useFormulariosAutenticacao = (): ConfiguracaoFormulario[] => {
   const { formik: formikLogin, estaEnviando: estaEnviandoLogin } = useFormularioLogin();
   const { formik: formikCadastro, estaEnviando: estaEnviandoCadastro } = useFormularioCadastro();
 
