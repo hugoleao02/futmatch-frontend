@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/material';
-import { THEME } from '../../../shared';
+import { THEME } from '../../../shared/styles/theme';
 
 // Re-export estilos base
 export {
@@ -8,7 +8,7 @@ export {
   baseSubmitButtonStyles as submitButtonStyles,
   baseTextFieldStyles as textFieldStyles,
   baseTitleStyles as titleStyles,
-} from '../../../shared';
+} from '../../../shared/styles/baseStyles';
 
 export const linkStyles: SxProps<Theme> = {
   color: THEME.colors.primary.main,
