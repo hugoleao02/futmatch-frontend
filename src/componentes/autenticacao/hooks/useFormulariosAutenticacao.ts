@@ -1,28 +1,27 @@
-import { useMemo } from 'react';
+import { useConfiguracaoFormularios } from '../../../shared/hooks';
+import type { ConfiguracaoFormulario } from '../../../shared/types';
 import { FormularioLogin } from '../FormularioLogin';
 import { FormularioRegistro } from '../FormularioRegistro';
 import { useFormularioCadastro, useFormularioLogin } from './index';
-import type { ConfiguracaoFormulario } from '../../../shared';
 
 export const useFormulariosAutenticacao = (): ConfiguracaoFormulario[] => {
   const { formik: formikLogin, estaEnviando: estaEnviandoLogin } = useFormularioLogin();
   const { formik: formikCadastro, estaEnviando: estaEnviandoCadastro } = useFormularioCadastro();
 
-  return useMemo(
-    () => [
-      {
-        id: 0,
-        label: 'Login',
-        component: FormularioLogin,
-        props: { formik: formikLogin, estaEnviando: estaEnviandoLogin },
-      },
-      {
-        id: 1,
-        label: 'Cadastro',
-        component: FormularioRegistro,
-        props: { formik: formikCadastro, estaEnviando: estaEnviandoCadastro },
-      },
-    ],
-    [formikLogin, estaEnviandoLogin, formikCadastro, estaEnviandoCadastro],
-  );
+  const configuracao: ConfiguracaoFormulario[] = [
+    {
+      id: 0,
+      label: 'Login',
+      component: FormularioLogin,
+      props: { formik: formikLogin, estaEnviando: estaEnviandoLogin },
+    },
+    {
+      id: 1,
+      label: 'Cadastro',
+      component: FormularioRegistro,
+      props: { formik: formikCadastro, estaEnviando: estaEnviandoCadastro },
+    },
+  ];
+
+  return useConfiguracaoFormularios(configuracao);
 };
