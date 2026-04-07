@@ -6,6 +6,8 @@ export type { RegisterResponse } from './RegisterResponse';
 
 //partida
 export type { Participacao } from '../entities/Participacao.ts';
+export type { ParticipanteInfo } from './PartidaDetalhesResponse';
+export type { PartidaDetalhesResponse } from './PartidaDetalhesResponse';
 export type { PartidaRequest } from './PartidaRequest';
 export type { PartidaResponse } from './PartidaResponse';
 export type { PartidaUpdateRequest } from './PartidaUpdateRequest';

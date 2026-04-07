@@ -25,33 +25,32 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
+import { TipoPartida } from '../../../domain/enums/TipoPartida';
+import { usePartidaDetalhes } from './hooks/usePartidaDetalhes';
+import { usePartidaDetalhesAcoes } from './hooks/usePartidaDetalhesAcoes';
 import { CancelDialog } from './components';
 import { Header } from './components';
 import { SortTeamsModal } from './components';
-import { usePartidasDetalhesPageHandlers } from './hooks/usePartidasDetalhesPageHandlers.ts';
-import { styles } from './styles.ts';
-import { TipoPartida } from '../../../domain/enums';
+import { styles } from './styles';
 
 export function PartidaDetalhesPage() {
+  const { partida, loading, error, refresh } = usePartidaDetalhes();
+
   const {
     formatarDataHora,
-    handleOpenSortModal,
-    handleCloseSortModal,
-    handleOpenCancelDialog,
-    handleCloseCancelDialog,
-    handleConfirmarCancelamento,
+    sortModalOpen,
+    cancelDialogOpen,
     openSortModal,
+    closeSortModal,
     openCancelDialog,
-    partida,
-    loading,
-    error,
+    closeCancelDialog,
     handleConfirmarPresenca,
     handleCancelarPresenca,
     handleSolicitarAcesso,
     handleAceitarSolicitacao,
     handleRecusarSolicitacao,
     handleSortearTimes,
-  } = usePartidasDetalhesPageHandlers();
+  } = usePartidaDetalhesAcoes(refresh);
 
   if (loading) {
     return (
@@ -72,9 +71,9 @@ export function PartidaDetalhesPage() {
   return (
     <Box sx={styles.container}>
       <Header
-        isCriador={partida.isCriador ?? false}
-        partidaId={partida.id}
-        onCancelarPartida={handleOpenCancelDialog}
+        isCriador={partida.isCriador}
+        partidaId={String(partida.id)}
+        onCancelarPartida={openCancelDialog}
       />
 
       <Box sx={styles.contentContainer}>
@@ -85,7 +84,7 @@ export function PartidaDetalhesPage() {
 
           <Box sx={styles.chipContainer}>
             <Chip
-              label={partida.tipoPartida === TipoPartida.PUBLICA ? 'Pública' : 'Privada'}
+              label={partida.tipoPartida === TipoPartida.PUBLICA ? 'PublICA' : 'Privada'}
               icon={partida.tipoPartida === TipoPartida.PUBLICA ? <PublicIcon /> : <LockIcon />}
               color={partida.tipoPartida === TipoPartida.PUBLICA ? 'primary' : 'error'}
               sx={styles.chip}
@@ -102,21 +101,18 @@ export function PartidaDetalhesPage() {
             <Box sx={styles.infoItem}>
               <LocationOnIcon color="action" sx={{ mr: 1 }} />
               <Typography variant="body1">
-                {partida?.latitude}, {partida?.longitude}
+                {partida.latitude?.toFixed(4)}, {partida.longitude?.toFixed(4)}
               </Typography>
             </Box>
             <Box sx={styles.infoItem}>
               <CalendarTodayIcon color="action" sx={{ mr: 1 }} />
-              <Typography variant="body1">
-                {partida?.dataHora ? formatarDataHora(partida.dataHora) : ''}
-              </Typography>
+              <Typography variant="body1">{formatarDataHora(partida.dataHora)}</Typography>
             </Box>
             <Box sx={{ ...styles.infoItem, gridColumn: { xs: '1', sm: '1 / -1' } }}>
               <GroupIcon color="action" sx={{ mr: 1 }} />
               <Typography variant="body1">
-                Vagas: {partida?.participantesConfirmados || 0}/{partida?.totalJogadores || 0} (
-                {(partida?.totalJogadores || 0) - (partida?.participantesConfirmados || 0)}{' '}
-                restantes)
+                Vagas: {partida.participantesConfirmados}/{partida.totalJogadores} (
+                {partida.totalJogadores - partida.participantesConfirmados} restantes)
               </Typography>
             </Box>
           </Box>
@@ -124,13 +120,13 @@ export function PartidaDetalhesPage() {
           <Divider sx={{ my: 3 }} />
 
           <Typography variant="h5" sx={styles.matchTitle}>
-            Participantes ({partida?.participantesConfirmados || 0}/{partida?.totalJogadores || 0})
+            Participantes ({partida.participantesConfirmados}/{partida.totalJogadores})
           </Typography>
           <List sx={styles.participantsList}>
-            {partida?.participantes?.map(jogador => (
+            {partida.participantes.map(jogador => (
               <ListItem key={jogador.id} sx={styles.participantItem}>
                 <ListItemAvatar>
-                  <Avatar src={jogador.avatar} alt={jogador.nome} />
+                  <Avatar src={jogador.fotoPerfilUrl ?? undefined} alt={jogador.nome} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={<Typography sx={{ fontWeight: 'medium' }}>{jogador.nome}</Typography>}
@@ -139,20 +135,20 @@ export function PartidaDetalhesPage() {
             ))}
           </List>
 
-          {!partida?.isCriador && (
+          {!partida.isCriador && (
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-              {partida?.isParticipando ? (
+              {partida.isParticipando ? (
                 <Button
                   variant="outlined"
                   color="error"
                   size="large"
-                  onClick={handleCancelarPresenca}
+                  onClick={() => handleCancelarPresenca(partida.id)}
                   startIcon={<CancelIcon />}
                   sx={styles.actionButton}
                 >
-                  Cancelar Presença
+                  Cancelar PreseNça
                 </Button>
-              ) : partida?.hasSolicitado ? (
+              ) : partida.hasSolicitado ? (
                 <Button
                   variant="outlined"
                   color="info"
@@ -160,26 +156,26 @@ export function PartidaDetalhesPage() {
                   disabled
                   sx={styles.actionButton}
                 >
-                  Solicitação Enviada
+                  SoliCitação Enviada
                 </Button>
-              ) : partida?.participantesConfirmados < partida?.totalJogadores ? (
-                partida?.tipoPartida === TipoPartida.PUBLICA ? (
+              ) : partida.participantesConfirmados < partida.totalJogadores ? (
+                partida.tipoPartida === TipoPartida.PUBLICA ? (
                   <Button
                     variant="contained"
                     color="primary"
                     size="large"
-                    onClick={handleConfirmarPresenca}
+                    onClick={() => handleConfirmarPresenca(partida.id)}
                     startIcon={<CheckCircleIcon />}
                     sx={styles.actionButton}
                   >
-                    Confirmar Presença
+                    Confirmar PreseNça
                   </Button>
                 ) : (
                   <Button
                     variant="contained"
                     color="primary"
                     size="large"
-                    onClick={handleSolicitarAcesso}
+                    onClick={() => handleSolicitarAcesso(partida.id)}
                     startIcon={<PersonAddIcon />}
                     sx={styles.actionButton}
                   >
@@ -206,13 +202,13 @@ export function PartidaDetalhesPage() {
                 Gerenciar Partida
               </Typography>
 
-              {partida?.solicitacoes && partida.solicitacoes.length > 0 && (
+              {partida.solicitacoes.length > 0 && (
                 <Box sx={{ mb: 3 }}>
                   <Typography
                     variant="h6"
                     sx={{ fontWeight: 'medium', mb: 1, color: 'text.secondary' }}
                   >
-                    Solicitações de Acesso ({partida.solicitacoes.length})
+                    SolicitaçOes de Acesso ({partida.solicitacoes.length})
                   </Typography>
                   <List sx={styles.requestsList}>
                     {partida.solicitacoes.map(solicitacao => (
@@ -225,7 +221,7 @@ export function PartidaDetalhesPage() {
                         }}
                       >
                         <ListItemAvatar>
-                          <Avatar src={solicitacao.avatar} alt={solicitacao.nome} />
+                          <Avatar src={solicitacao.fotoPerfilUrl ?? undefined} alt={solicitacao.nome} />
                         </ListItemAvatar>
                         <ListItemText
                           primary={
@@ -239,7 +235,7 @@ export function PartidaDetalhesPage() {
                             edge="end"
                             aria-label="accept"
                             color="success"
-                            onClick={() => handleAceitarSolicitacao(solicitacao.id)}
+                            onClick={() => handleAceitarSolicitacao(partida.id, solicitacao.id)}
                           >
                             <CheckCircleIcon />
                           </IconButton>
@@ -247,7 +243,7 @@ export function PartidaDetalhesPage() {
                             edge="end"
                             aria-label="decline"
                             color="error"
-                            onClick={() => handleRecusarSolicitacao(solicitacao.id)}
+                            onClick={() => handleRecusarSolicitacao(partida.id, solicitacao.id)}
                           >
                             <CancelIcon />
                           </IconButton>
@@ -262,58 +258,16 @@ export function PartidaDetalhesPage() {
                 variant="contained"
                 color="secondary"
                 size="large"
-                onClick={handleOpenSortModal}
+                onClick={() => {
+                  openSortModal();
+                  handleSortearTimes();
+                }}
                 startIcon={<ShuffleIcon />}
-                disabled={
-                  !partida?.participantes ||
-                  partida.participantes.length < 4 ||
-                  partida.times !== null
-                }
+                disabled={!partida.participantes || partida.participantes.length < 4}
                 sx={styles.actionButton}
               >
                 Sortear Times
               </Button>
-
-              {partida?.times && (
-                <Box sx={styles.teamsContainer}>
-                  <Typography
-                    variant="h5"
-                    sx={{ fontWeight: 'bold', mb: 2, color: '#333', textAlign: 'center' }}
-                  >
-                    Times Sorteados!
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: 'grid',
-                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                      gap: 2,
-                    }}
-                  >
-                    {partida.times.map((time, index) => (
-                      <Box key={index}>
-                        <Paper elevation={1} sx={styles.teamPaper}>
-                          <Typography
-                            variant="h6"
-                            sx={{ fontWeight: 'bold', color: '#333', mb: 1 }}
-                          >
-                            {time.nome}
-                          </Typography>
-                          <List dense>
-                            {time.jogadores.map(jogador => (
-                              <ListItem key={jogador.id}>
-                                <ListItemAvatar>
-                                  <Avatar src={jogador.avatar} />
-                                </ListItemAvatar>
-                                <ListItemText primary={jogador.nome} />
-                              </ListItem>
-                            ))}
-                          </List>
-                        </Paper>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-              )}
             </Box>
           )}
 
@@ -323,23 +277,23 @@ export function PartidaDetalhesPage() {
           </Typography>
           <Paper elevation={1} sx={styles.chatContainer}>
             <Typography variant="body2" color="text.secondary">
-              [Placeholder: Área de Chat ao vivo com Participantes]
+              [Placeholder: ARea de Chat ao vivo com Participantes]
             </Typography>
           </Paper>
         </Paper>
       </Box>
 
       <SortTeamsModal
-        open={openSortModal}
-        onClose={handleCloseSortModal}
-        onSort={handleSortearTimes}
-        maxTeams={Math.floor((partida.participantes?.length || 0) / 2)}
+        open={sortModalOpen}
+        onClose={closeSortModal}
+        onSort={() => handleSortearTimes()}
+        maxTeams={Math.floor(partida.participantes.length / 2)}
       />
 
       <CancelDialog
-        open={openCancelDialog}
-        onClose={handleCloseCancelDialog}
-        onConfirm={handleConfirmarCancelamento}
+        open={cancelDialogOpen}
+        onClose={closeCancelDialog}
+        onConfirm={openCancelDialog}
       />
     </Box>
   );

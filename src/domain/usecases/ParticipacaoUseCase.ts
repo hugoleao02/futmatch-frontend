@@ -1,16 +1,20 @@
 import type { IParticipacaoRepository } from '../repositories/IParticipacaoRepository';
+import type { IPartidaRepository } from '../repositories/IPartidaRepository';
 import type { Participacao } from '../dtos';
 import type { IParticipacaoUseCase } from './interfaces/IParticipacaoUseCase';
 
 export class ParticipacaoUseCase implements IParticipacaoUseCase {
-  constructor(private readonly participacaoRepository: IParticipacaoRepository) {}
+  constructor(
+    private readonly partidaRepository: IPartidaRepository,
+    private readonly participacaoRepository: IParticipacaoRepository,
+  ) {}
 
   async participarPartida(partidaId: number): Promise<Participacao> {
-    return this.participacaoRepository.participarPartida(partidaId);
+    return this.partidaRepository.participarPartida(partidaId);
   }
 
   async cancelarParticipacao(partidaId: number): Promise<void> {
-    return this.participacaoRepository.cancelarParticipacao(partidaId);
+    return this.partidaRepository.cancelarParticipacao(partidaId);
   }
 
   async aprovarParticipacao(partidaId: number, participanteId: number): Promise<Participacao> {

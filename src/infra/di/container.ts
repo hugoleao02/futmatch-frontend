@@ -20,19 +20,20 @@ export class Container implements ContainerType {
     this.httpClient = new AxiosHttpClient();
     const storage = new LocalStorage();
 
-    // Inicializa repositórios
     this.repositories = {
       authRepository: new AuthRepositoryImpl(this.httpClient, storage),
       partidaRepository: new PartidaRepositoryImpl(this.httpClient),
       participacaoRepository: new ParticipacaoRepositoryImpl(this.httpClient),
     };
 
-    // Inicializa use cases
     this.useCases = {
       loginUseCase: new LoginUseCase(this.repositories.authRepository),
       registerUseCase: new RegisterUseCase(this.repositories.authRepository),
       homeUseCase: new HomeUseCase(this.repositories.partidaRepository),
-      participacaoUseCase: new ParticipacaoUseCase(this.repositories.participacaoRepository),
+      participacaoUseCase: new ParticipacaoUseCase(
+        this.repositories.partidaRepository,
+        this.repositories.participacaoRepository,
+      ),
     };
   }
 
@@ -45,13 +46,5 @@ export class Container implements ContainerType {
 
   getHttpClient(): IHttpClient {
     return this.httpClient;
-  }
-
-  getRepositories(): ContainerType['repositories'] {
-    return this.repositories;
-  }
-
-  getUseCases(): ContainerType['useCases'] {
-    return this.useCases;
   }
 }

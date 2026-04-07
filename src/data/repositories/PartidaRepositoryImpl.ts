@@ -3,6 +3,7 @@ import type { IPartidaRepository } from '../../domain/repositories/IPartidaRepos
 import type {
   PagePartidaResponse,
   Participacao,
+  PartidaDetalhesResponse,
   PartidaRequest,
   PartidaResponse,
   PartidaUpdateRequest,
@@ -25,6 +26,10 @@ export class PartidaRepositoryImpl implements IPartidaRepository {
 
   async buscarPartidaPorId(id: number): Promise<PartidaResponse> {
     return this.httpClient.get<PartidaResponse>(`/partidas/${id}`);
+  }
+
+  async buscarDetalhesPartida(id: number): Promise<PartidaDetalhesResponse> {
+    return this.httpClient.get<PartidaDetalhesResponse>(`/partidas/${id}/detalhes`);
   }
 
   async criarPartida(request: PartidaRequest): Promise<PartidaResponse> {
