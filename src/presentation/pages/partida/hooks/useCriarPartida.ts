@@ -4,10 +4,12 @@ import { toast } from 'react-toastify';
 import { Esporte, TipoPartida } from '../../../../domain/enums';
 import type { PartidaRequest, PartidaUpdateRequest } from '../../../../domain/dtos';
 import { useContainer } from '../../../../infra/di/useContainer';
+import { useLocation as useLocationHook } from './useLocation';
 
 interface PartidaFormState {
   nome: string;
   esporte: Esporte;
+  endereco: string;
   latitude: number | '';
   longitude: number | '';
   data: string;
@@ -19,6 +21,7 @@ interface PartidaFormState {
 const initialFormState: PartidaFormState = {
   nome: '',
   esporte: Esporte.FUTEBOL,
+  endereco: '',
   latitude: '',
   longitude: '',
   data: '',
@@ -32,6 +35,7 @@ export const useCriarPartida = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id: partidaIdParam } = useParams<{ id: string }>();
+  const locationHook = useLocationHook();
 
   const partidaId = partidaIdParam || new URLSearchParams(location.search).get('id');
   const isEdit = Boolean(partidaId);
@@ -48,12 +52,16 @@ export const useCriarPartida = () => {
         try {
           const response = await repositories.partidaRepository.buscarPartidaPorId(Number(partidaId));
           const dt = new Date(response.dataHora);
+          const lat = response.latitude ?? '';
+          const lng = response.longitude ?? '';
+
           setForm(prev => ({
             ...prev,
             nome: response.nome,
             esporte: response.esporte as Esporte,
-            latitude: response.latitude ?? '',
-            longitude: response.longitude ?? '',
+            endereco: response.endereco ?? '',
+            latitude: lat as number | '',
+            longitude: lng as number | '',
             data: dt.toISOString().split('T')[0] ?? '',
             hora: dt.toTimeString().slice(0, 5),
             totalJogadores: response.totalJogadores,
@@ -149,6 +157,16 @@ export const useCriarPartida = () => {
     }
   }, [form, isEdit, partidaId, navigate, validate, repositories.partidaRepository]);
 
+  const onPlaceSelect = useCallback((place: import('../../../../infra/services/geocoding').PlaceSuggestion) => {
+    locationHook.onPlaceSelect(place);
+    setForm(prev => ({
+      ...prev,
+      latitude: place.latitude,
+      longitude: place.longitude,
+      endereco: place.display_name,
+    }));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   return {
     form,
     formErrors,
@@ -158,5 +176,14 @@ export const useCriarPartida = () => {
     onChange,
     onSubmit: handleSubmit,
     onBack: () => navigate(-1),
+    location: {
+      address: locationHook.address,
+      latitude: locationHook.latitude,
+      longitude: locationHook.longitude,
+      fetchingAddress: locationHook.fetchingAddress,
+      useCurrentLocation: locationHook.useCurrentLocation,
+      onPlaceSelect,
+      onClearLocation: locationHook.onClearLocation,
+    },
   };
 };

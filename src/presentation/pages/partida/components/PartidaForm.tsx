@@ -1,15 +1,14 @@
 import {
-  Box, Button, CircularProgress, IconButton, InputAdornment, MenuItem, TextField, Tooltip, Typography
+  Box, Button, CircularProgress, InputAdornment, MenuItem, TextField, Typography
 } from '@mui/material';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import MapIcon from '@mui/icons-material/Map';
 import React from 'react';
 import { styles } from '../styles';
 import { Esporte, TipoPartida } from '../../../../domain/enums';
 import { esporteOptions } from '../../../../domain/enums/Esporte';
 import { tipoPartidaOptions } from '../../../../domain/enums/TipoPartida';
 import { useCriarPartida } from '../hooks/useCriarPartida';
+import { AddressAutocomplete } from './AddressAutocomplete';
 
 export const PartidaForm: React.FC = () => {
   const {
@@ -18,8 +17,7 @@ export const PartidaForm: React.FC = () => {
     loading,
     isEdit,
     onChange,
-    onUseCurrentLocation,
-    onOpenMapPicker,
+    location,
     onSubmit,
     onBack,
   } = useCriarPartida();
@@ -62,40 +60,17 @@ export const PartidaForm: React.FC = () => {
         ))}
       </TextField>
 
-      <TextField
-        fullWidth
-        label="Localização (Endereço, Quadra, Ponto de Referência)"
-        value={form.localizacao}
-        onChange={e => onChange('localizacao', e.target.value)}
-        sx={styles.textField}
-        required
-        error={!!formErrors.localizacao}
-        helperText={formErrors.localizacao}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <LocationOnIcon color="action" sx={{ mr: 1 }} />
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <Box sx={{ display: 'flex' }}>
-              <Tooltip title="Usar localização atual do GPS">
-                <IconButton onClick={onUseCurrentLocation} disabled={loading} color="primary" size="small">
-                  <GpsFixedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Selecionar no mapa">
-                <IconButton onClick={onOpenMapPicker} disabled={loading} color="primary" size="small" sx={{ ml: 1 }}>
-                  <MapIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          ),
-        }}
+      <LocationField
+        address={location.address}
+        latitude={location.latitude}
+        fetchingAddress={location.fetchingAddress}
+        loading={loading}
+        error={!!formErrors.latitude}
+        helperText={formErrors.latitude}
+        onPlaceSelect={location.onPlaceSelect}
+        onClear={location.onClearLocation}
+        onUseCurrentLocation={location.useCurrentLocation}
       />
-      <Typography variant="caption" color="text.secondary" sx={{ mt: -2, mb: 1 }}>
-        Forneça um endereço ou utilize as opções de localização ao lado.
-      </Typography>
 
       <Box sx={styles.dateTimeContainer}>
         <TextField
@@ -165,3 +140,50 @@ export const PartidaForm: React.FC = () => {
     </Box>
   );
 };
+
+/* ---- Sub-componente: campo de localização com autocomplete + GPS ---- */
+
+const LocationField: React.FC<{
+  address: string;
+  latitude: number | '';
+  fetchingAddress: boolean;
+  loading: boolean;
+  error?: boolean;
+  helperText?: string;
+  onPlaceSelect: import('../../../../infra/services/geocoding').PlaceSuggestion extends infer P
+    ? (p: P) => void
+    : never;
+  onClear: () => void;
+  onUseCurrentLocation: () => void;
+}> = ({ address, fetchingAddress, loading, error, helperText, onPlaceSelect, onClear, onUseCurrentLocation }) => (
+  <Box sx={styles.textField}>
+    <AddressAutocomplete
+      value={address}
+      onChange={onPlaceSelect}
+      onClear={onClear}
+      error={error}
+      helperText={helperText}
+      loading={fetchingAddress || loading}
+    />
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+      <Button
+        size="small"
+        startIcon={<GpsFixedIcon />}
+        onClick={onUseCurrentLocation}
+        disabled={loading || fetchingAddress}
+        variant="outlined"
+        sx={{
+          color: '#1B5E20',
+          borderColor: '#1B5E20',
+          fontSize: '0.75rem',
+          '&:hover': {
+            borderColor: '#2E7D32',
+            bgcolor: '#f1f8e9',
+          },
+        }}
+      >
+        Usar minha localização atual
+      </Button>
+    </Box>
+  </Box>
+);
