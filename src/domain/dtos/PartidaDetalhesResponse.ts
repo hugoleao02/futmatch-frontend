@@ -11,6 +11,7 @@ export interface PartidaDetalhesResponse {
   esporte: string;
   latitude: number | null;
   longitude: number | null;
+  nomeLocal?: string | null;
   dataHora: string;
   totalJogadores: number;
   tipoPartida: string;

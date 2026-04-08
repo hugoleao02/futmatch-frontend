@@ -12,6 +12,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TipoPartida } from '../../../../domain/enums';
 import type { PartidaResponse } from '../../../../domain/dtos';
+import { formatPartidaLocalizacao } from '../../../../shared/utils/formatPartidaLocalizacao';
 import { homeStyles } from '../styles/homeStyles';
 
 interface PartidaCardProps {
@@ -73,15 +74,13 @@ export const PartidaCard: React.FC<PartidaCardProps> = ({ partida, onMatchDetail
             <strong>{partida.totalJogadores - currentPlayers} restantes</strong>)
           </Typography>
 
-          {/* Se quiser mostrar localização, pode exibir latitude/longitude */}
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontWeight: 'medium' }}>
             <LocationOnIcon sx={homeStyles.icon} />
-            {`Lat: ${partida.latitude}, Lon: ${partida.longitude}`}
+            {formatPartidaLocalizacao(partida.nomeLocal, partida.latitude, partida.longitude)}
           </Typography>
         </CardContent>
 
         <CardActions sx={homeStyles.cardActions}>
-          {/* Se não tiver status, pode remover ou ajustar essa lógica */}
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
               size="small"
@@ -94,7 +93,7 @@ export const PartidaCard: React.FC<PartidaCardProps> = ({ partida, onMatchDetail
             <Button
               size="small"
               sx={homeStyles.detailsButton}
-              onClick={() => onMatchDetailsClick(partida.id)}
+              onClick={() => onMatchDetailsClick(String(partida.id))}
             >
               Ver Detalhes
             </Button>

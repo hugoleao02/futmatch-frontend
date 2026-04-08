@@ -11,9 +11,11 @@ interface CancelDialogProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  /** Desabilita ações enquanto a exclusão está em andamento */
+  confirming?: boolean;
 }
 
-export function CancelDialog({ open, onClose, onConfirm }: CancelDialogProps) {
+export function CancelDialog({ open, onClose, onConfirm, confirming = false }: CancelDialogProps) {
   return (
     <Dialog
       open={open}
@@ -29,10 +31,16 @@ export function CancelDialog({ open, onClose, onConfirm }: CancelDialogProps) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} sx={{ color: 'text.secondary' }}>
+        <Button onClick={onClose} sx={{ color: 'text.secondary' }} disabled={confirming}>
           Não
         </Button>
-        <Button onClick={onConfirm} autoFocus color="error" variant="contained">
+        <Button
+          onClick={onConfirm}
+          autoFocus
+          color="error"
+          variant="contained"
+          disabled={confirming}
+        >
           Sim, Cancelar
         </Button>
       </DialogActions>

@@ -31,6 +31,7 @@ import { usePartidaDetalhesAcoes } from './hooks/usePartidaDetalhesAcoes';
 import { CancelDialog } from './components';
 import { Header } from './components';
 import { SortTeamsModal } from './components';
+import { formatPartidaLocalizacao } from '../../../shared/utils/formatPartidaLocalizacao';
 import { styles } from './styles';
 
 export function PartidaDetalhesPage() {
@@ -50,6 +51,8 @@ export function PartidaDetalhesPage() {
     handleAceitarSolicitacao,
     handleRecusarSolicitacao,
     handleSortearTimes,
+    handleExcluirPartida,
+    excluindoPartida,
   } = usePartidaDetalhesAcoes(refresh);
 
   if (loading) {
@@ -101,7 +104,7 @@ export function PartidaDetalhesPage() {
             <Box sx={styles.infoItem}>
               <LocationOnIcon color="action" sx={{ mr: 1 }} />
               <Typography variant="body1">
-                {partida.latitude?.toFixed(4)}, {partida.longitude?.toFixed(4)}
+                {formatPartidaLocalizacao(partida.nomeLocal, partida.latitude, partida.longitude)}
               </Typography>
             </Box>
             <Box sx={styles.infoItem}>
@@ -293,7 +296,8 @@ export function PartidaDetalhesPage() {
       <CancelDialog
         open={cancelDialogOpen}
         onClose={closeCancelDialog}
-        onConfirm={openCancelDialog}
+        onConfirm={() => void handleExcluirPartida(partida.id)}
+        confirming={excluindoPartida}
       />
     </Box>
   );

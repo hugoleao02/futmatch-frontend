@@ -1,14 +1,17 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import type { Participacao } from '../../../../domain/dtos';
 import { useContainer } from '../../../../infra/di/useContainer';
+import { ROUTES } from '../../../routes/routes';
 
 export function usePartidaDetalhesAcoes(onRefresh: () => void) {
-  const { useCases } = useContainer();
+  const { useCases, repositories } = useContainer();
+  const navigate = useNavigate();
   const [sortModalOpen, setSortModalOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [excluindoPartida, setExcluindoPartida] = useState(false);
 
   function formatarDataHora(dataHora: string) {
     const data = new Date(dataHora);
@@ -67,6 +70,23 @@ export function usePartidaDetalhesAcoes(onRefresh: () => void) {
     setSortModalOpen(false);
   }, []);
 
+  const handleExcluirPartida = useCallback(
+    async (partidaId: number) => {
+      setExcluindoPartida(true);
+      try {
+        await repositories.partidaRepository.deletarPartida(partidaId);
+        setCancelDialogOpen(false);
+        toast.success('Partida excluída com sucesso');
+        navigate(ROUTES.HOME);
+      } catch {
+        toast.error('Erro ao excluir partida');
+      } finally {
+        setExcluindoPartida(false);
+      }
+    },
+    [repositories.partidaRepository, navigate],
+  );
+
   return {
     formatarDataHora,
     sortModalOpen,
@@ -81,5 +101,7 @@ export function usePartidaDetalhesAcoes(onRefresh: () => void) {
     handleAceitarSolicitacao,
     handleRecusarSolicitacao,
     handleSortearTimes,
+    handleExcluirPartida,
+    excluindoPartida,
   };
 }

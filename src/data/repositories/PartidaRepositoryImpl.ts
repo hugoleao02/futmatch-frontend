@@ -29,7 +29,15 @@ export class PartidaRepositoryImpl implements IPartidaRepository {
   }
 
   async buscarDetalhesPartida(id: number): Promise<PartidaDetalhesResponse> {
-    return this.httpClient.get<PartidaDetalhesResponse>(`/partidas/${id}/detalhes`);
+    const data = await this.httpClient.get<
+      PartidaDetalhesResponse & { criador?: boolean; participando?: boolean }
+    >(`/partidas/${id}/detalhes`);
+    // Fallback: Jackson antigo serializava isCriador/isParticipando como criador/participando
+    return {
+      ...data,
+      isCriador: data.isCriador ?? data.criador ?? false,
+      isParticipando: data.isParticipando ?? data.participando ?? false,
+    };
   }
 
   async criarPartida(request: PartidaRequest): Promise<PartidaResponse> {

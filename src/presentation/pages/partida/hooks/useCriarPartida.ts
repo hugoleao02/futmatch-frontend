@@ -59,7 +59,7 @@ export const useCriarPartida = () => {
             ...prev,
             nome: response.nome,
             esporte: response.esporte as Esporte,
-            endereco: response.endereco ?? '',
+            endereco: response.nomeLocal ?? '',
             latitude: lat as number | '',
             longitude: lng as number | '',
             data: dt.toISOString().split('T')[0] ?? '',
@@ -111,11 +111,17 @@ export const useCriarPartida = () => {
         throw new Error('A data e hora devem ser futuras');
       }
 
+      const enderecoDoFormOuGps =
+        form.endereco.trim() ||
+        (typeof locationHook.address === 'string' ? locationHook.address.trim() : '');
+      const nomeLocalTrim = enderecoDoFormOuGps || undefined;
+
       const basePayload = {
         nome: form.nome,
         esporte: form.esporte,
         latitude: Number(form.latitude),
         longitude: Number(form.longitude),
+        nomeLocal: nomeLocalTrim,
         dataHora: dataHora.toISOString(),
         totalJogadores: form.totalJogadores,
         tipoPartida: form.tipoPartida,
@@ -127,6 +133,7 @@ export const useCriarPartida = () => {
           esporte: basePayload.esporte,
           latitude: basePayload.latitude,
           longitude: basePayload.longitude,
+          nomeLocal: basePayload.nomeLocal,
           dataHora: dataHora.toISOString(),
           totalJogadores: basePayload.totalJogadores,
           tipoPartida: basePayload.tipoPartida,
@@ -139,6 +146,7 @@ export const useCriarPartida = () => {
           esporte: basePayload.esporte,
           latitude: basePayload.latitude,
           longitude: basePayload.longitude,
+          nomeLocal: basePayload.nomeLocal,
           dataHora: basePayload.dataHora,
           totalJogadores: basePayload.totalJogadores,
           tipoPartida: basePayload.tipoPartida,
@@ -155,7 +163,7 @@ export const useCriarPartida = () => {
     } finally {
       setLoading(false);
     }
-  }, [form, isEdit, partidaId, navigate, validate, repositories.partidaRepository]);
+  }, [form, locationHook.address, isEdit, partidaId, navigate, validate, repositories.partidaRepository]);
 
   const onPlaceSelect = useCallback((place: import('../../../../infra/services/geocoding').PlaceSuggestion) => {
     locationHook.onPlaceSelect(place);
